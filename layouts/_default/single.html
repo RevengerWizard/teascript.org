@@ -1,0 +1,10 @@
+{{ define "main" }}
+<div>
+    {{ partial "sidebar/section-menu.html" . }}
+</div>
+<nav>
+    {{ partial "sidebar/toc-desktop.html" . }}
+</nav>
+<h2>{{ .Title }}</h2>
+{{ .Content }}
+{{ end }}

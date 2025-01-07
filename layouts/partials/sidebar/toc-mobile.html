@@ -1,0 +1,8 @@
+{{ if and (ne .Params.toc false) (partial "sidebar/has-headings.html" .) -}}
+    <details>
+        <summary>On this page</summary>
+        <div class="page-links">
+            {{ .TableOfContents }}
+        </div>
+    </details>
+{{ end -}}

@@ -1,0 +1,26 @@
+{{ define "main" }}
+<p>
+    {{ $sample := readFile "hello.tea" }}
+    {{ highlight $sample "js" }}
+</p>
+<p>
+Teascript is a simple, multi-paradigm scripting language for embedded and standalone use<br>
+<br>
+- it's lightweight<br>
+- it's extensible<br>
+- it's embeddable<br>
+- it's a scripting language<br>
+- it's multi-paradigm<br>
+<br>
+Main features<br>
+<br>
+- a fast single-pass compiler to tight bytecode<br>
+- very few built-in types<br>
+- dynamic typing<br>
+- garbage collection<br>
+- operator overloading<br>
+- lexical scoping<br>
+- high order functions and classes<br>
+- closures<br>
+</p>
+{{ end }}

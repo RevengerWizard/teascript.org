@@ -1,0 +1,10 @@
+baseURL = "https://teascript.org/"
+title = "Teascript"
+
+[taxonomies]
+
+[markup]
+[markup.highlight]
+noClasses = false
+codeFences = true
+tabWidth = 4

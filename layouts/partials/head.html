@@ -1,0 +1,10 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ .Title }}</title>
+    {{ $style := resources.Get "scss/main.scss" | css.Sass | resources.Minify | resources.Fingerprint }}
+    {{ $syntax := resources.Get "css/syntax.css" | css.Sass | resources.Minify | resources.Fingerprint }}
+    <link rel="stylesheet" type="text/css" href="{{ $style.RelPermalink }}">
+    <link rel="stylesheet" type="text/css" href="{{ $syntax.RelPermalink }}">
+</head>

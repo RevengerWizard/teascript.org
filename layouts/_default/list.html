@@ -1,0 +1,22 @@
+{{ define "main" }}
+<article>
+    <h1>
+        {{ if eq .CurrentSection .FirstSection }}
+            {{ .Section | humanize }}
+        {{ else }}
+            {{ .Title }}
+        {{ end }}
+    </h1>
+    {{ .Content }}
+    {{ $currentSection := .CurrentSection }}
+    {{ range where .Site.RegularPages.ByTitle "Section" .Section }}
+        {{ if in (.RelPermalink | string) $currentSection.RelPermalink }}
+            <div class="card my-3">
+                <div class="card-body">
+                    <a class="stretched-link" href="{{ .RelPermalink }}">{{ .Params.title }} &rarr;</a>
+                </div>
+            </div>
+        {{ end }}
+    {{ end }}
+</article>
+{{ end }}

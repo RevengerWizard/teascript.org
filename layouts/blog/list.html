@@ -1,0 +1,15 @@
+{{ define "main" }}
+    <h2>Blog</h2>
+    <p><a href="{{.RelPermalink}}/index.xml">RSS feed</a></p>
+    {{ range .Data.Pages }}
+    <div class="stub">
+        <h2>
+            <a href="{{.Permalink}}">{{.Title}}</a>
+        </h2>
+        <small>
+            {{.Date.Format "January 2, 2006"}}
+            by {{.Params.author}}
+        </small>
+    </div>
+    {{ end }}
+{{ end }}
