@@ -1,5 +1,5 @@
 ---
 title: Getting started
-weight: 150
+weight: 100
 toc: true
 ---

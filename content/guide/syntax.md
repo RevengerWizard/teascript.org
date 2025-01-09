@@ -22,3 +22,23 @@ Block comments start with `/*` and end with `*/`. They can span multiple lines:
     comment 
 */
 ```
+
+prec | operator | description | associates
+---|---|---|---
+1 | `.` `()` | Grouping, calls | Left
+2 | `[]` | Subscript | Left
+3 | `not` `!` `~` | Negate, Not, Complement | Right
+4 | `**` | Power | Left
+5 | `*` `/` `%` | Multiply, Divide, Modulo | Left
+6 | `+` `-` | Add, Subtract | Left
+7 | `..` | Range | Left
+8 | `<<` `>>` | Left shift, Right shift | Left
+9 | `&` | Bitwise and | Left
+10 | `^` | Bitwise xor | Left
+11 | `\|` | Bitwise or | Left
+12 | `<` `>` `<=` `>=` | Comparison | Left
+13 | `is` | Type test | Left
+14 | `==` `!=` | Equals, not equal | Left
+15 | `and` | Logical and | Left
+16 | `or` | Logical or | Left
+17 | `=` | Assignment | Right

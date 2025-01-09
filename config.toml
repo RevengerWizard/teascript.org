@@ -1,7 +1,32 @@
 baseURL = "https://teascript.org/"
 title = "Teascript"
 
+[params]
+repo = "https://github.com/RevengerWizard/teascript"
+siteRepo = "https://github.com/RevengerWizard/teascript.org"
+branch = "master"
+
 [taxonomies]
+
+[[menu.main]]
+name = "Blog"
+url = "/blog"
+weight = 10
+
+[[menu.main]]
+name = "Guide"
+url = "/guide/getting-started"
+weight = 20
+
+[[menu.main]]
+name = "Docs"
+url = "/docs"
+weight = 30
+
+[[menu.main]]
+name = "API"
+url = "/api"
+weight = 40
 
 [markup]
 [markup.highlight]
