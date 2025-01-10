@@ -1,8 +1,12 @@
 {{ define "main" }}
+
+<article>
     <h2>{{ .Title }}</h2>
     <small>
         {{.Date.Format "January 2, 2006"}}
         by {{.Params.author}}
     </small>
     {{ .Content }}
+</article>
+
 {{ end }}

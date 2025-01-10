@@ -5,6 +5,7 @@ title = "Teascript"
 repo = "https://github.com/RevengerWizard/teascript"
 siteRepo = "https://github.com/RevengerWizard/teascript.org"
 branch = "master"
+sections = ["guide", "docs", "api"]
 
 [taxonomies]
 
@@ -29,7 +30,12 @@ url = "/api"
 weight = 40
 
 [markup]
+
 [markup.highlight]
 noClasses = false
 codeFences = true
 tabWidth = 4
+
+[markup.goldmark.renderer]
+hardWraps = false
+unsafe = true

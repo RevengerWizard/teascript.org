@@ -12,11 +12,11 @@
 {{- /* includes */}}
 {{- $includes := slice }}
 
-{{ $syntax := resources.Get "css/syntax.css" }}
+{{ $syntax := resources.Get "css/includes/syntax.css" }}
 {{ $core := resources.Get "css/main.scss" | css.Sass | resources.Minify }}
 
 {{- /* bundle all required css */}}
-{{- $stylesheet := (slice $core $syntax) | resources.Concat "assets/css/stylesheet.css"  }}
+{{- $stylesheet := (slice $core $syntax) | resources.Concat "assets/css/stylesheet.css" }}
 {{- $stylesheet := $stylesheet | fingerprint }}
 <link crossorigin="anonymous" href="{{ $stylesheet.RelPermalink }}" integrity="{{ $stylesheet.Data.Integrity }}" rel="preload stylesheet" as="style">
 

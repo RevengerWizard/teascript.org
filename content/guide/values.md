@@ -1,6 +1,6 @@
 ---
 title: Values
-weight: 150
+weight: 120
 toc: true
 ---
 

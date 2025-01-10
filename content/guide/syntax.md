@@ -1,6 +1,6 @@
 ---
 title: Syntax
-weight: 150
+weight: 110
 toc: true
 ---
 

@@ -1,0 +1,32 @@
+{{- $sections := site.Params.sections }}
+{{- $pages := where site.RegularPages "Type" "in" $sections }}
+{{- $sortedPages := sort $pages ".Weight" }}
+{{- $currentPage := . }}
+{{- $currentType := $currentPage.Type }}
+{{- $pagesInSection := where $sortedPages "Type" $currentType }}
+
+{{- if and (gt (len $pagesInSection) 1) (in $pagesInSection . ) }}
+<nav class="paginav">
+    {{/* Find previous page - page with next lowest weight */}}
+    {{- $prevPages := where $pagesInSection "Weight" "lt" $currentPage.Weight }}
+    {{- $prevPage := last 1 (sort $prevPages ".Weight") }}
+    {{- with index $prevPage 0 }}
+    <a class="prev" href="{{ .Permalink }}">
+        <span class="title">« Previous</span>
+        <br>
+        <span>{{- .Title -}}</span>
+    </a>
+    {{- end }}
+
+    {{/* Find next page - page with next highest weight */}}
+    {{- $nextPages := where $pagesInSection "Weight" "gt" $currentPage.Weight }}
+    {{- $nextPage := first 1 (sort $nextPages ".Weight") }}
+    {{- with index $nextPage 0 }}
+    <a class="next" href="{{ .Permalink }}">
+        <span class="title">Next »</span>
+        <br>
+        <span>{{- .Title -}}</span>
+    </a>
+    {{- end }}
+</nav>
+{{- end }}
