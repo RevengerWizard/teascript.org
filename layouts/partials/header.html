@@ -38,11 +38,10 @@
         {{- $currentPage := . }}
         <ul id="menu">
             {{- range site.Menus.main }}
-            {{- $menu_item_url := 
-                cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL) }}
-            {{- $page_url:= $currentPage.Permalink }}
+            {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL)) | absURL }}
+            {{- $page_url := $currentPage.Permalink | absURL }}
             <li>
-                <a href="{{ .URL }}" title="{{ .Title | default .Name }}">
+                <a href="{{ .URL | absURL }}" title="{{ .Title | default .Name }}">
                     <span {{- if eq $menu_item_url $page_url }} class="active" {{- end }}>
                         {{- .Pre }}
                         {{- .Name -}}
