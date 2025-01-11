@@ -1,0 +1,10 @@
+- title: "Hello world"
+  file: "hello.tea"
+- title: "Fibonacci"
+  file: "fib.tea"
+- title: 99 Bottles
+  file: "99bottles.tea"
+- title: Fizzbuzz
+  file: "fizzbuzz.tea"
+- title: Mandelbrot fractal
+  file: "fractal.tea"

@@ -105,7 +105,7 @@ var states = {
     ["Vermont"] = "Chamomile tea",
 }
 
-for(var key, value in states)
+for var key, value in states
 {
     print("Popular tea in ${key} is ${value}")
 }

@@ -26,7 +26,7 @@ This finds a module named "beverages" and executes its source code. Then, it loo
 This statement can appear anywhere a variable declaration is allowed, even inside blocks:
 
 ```tea
-if(thirsty)
+if thirsty
 {
     from "beverages" import Coffee, Tea
 }

@@ -6,6 +6,7 @@ repo = "https://github.com/RevengerWizard/teascript"
 siteRepo = "https://github.com/RevengerWizard/teascript.org"
 branch = "master"
 sections = ["guide", "docs", "api"]
+defaultTheme = "dark"
 
 [taxonomies]
 

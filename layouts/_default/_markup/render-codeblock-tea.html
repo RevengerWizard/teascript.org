@@ -1,0 +1,4 @@
+{{/* Hugo doesn't support any kind of custom highlight lexer... */}}
+
+{{- $content := .Inner -}}
+{{- highlight ($content | safeHTML) "js" -}}

@@ -4,7 +4,7 @@ weight: 120
 toc: true
 ---
 
-Values are the built-in atomic object types that all other objects are composed of. They can be created through literals, expressions that evaluate to a value. All values are immutable—once created, they do not change. The number `3` is always the number `3`. The string `"frozen"` can never have its character array modified in place.
+Values are the built-in atomic object types that all other objects are composed of. They can be created through literals, expressions that evaluate to a value. All values are immutable — once created, they do not change. The number `3` is always the number `3`. The string `"frozen"` can never have its character array modified in place.
 
 ## Booleans
 

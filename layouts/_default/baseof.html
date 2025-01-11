@@ -5,7 +5,12 @@
     {{ partial "head.html" . }}
 </head>
 
-<body>
+<body class="
+{{- print "list" -}}
+{{- if eq site.Params.defaultTheme `dark` -}}
+{{- print " dark" }}
+{{- end -}}
+">
     {{ partialCached "header.html" . }}
     <main class="main">
         {{ block "main" . }}{{ end }}

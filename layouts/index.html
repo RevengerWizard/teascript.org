@@ -1,7 +1,6 @@
 {{ define "main" }}
 
-{{ $sample := readFile "data/hello.tea" }}
-{{ highlight $sample "js" }}
+{{ partial "snippet" . }}
 
 {{ .Content }}
 

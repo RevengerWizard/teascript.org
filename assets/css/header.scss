@@ -36,6 +36,20 @@
     margin-inline-end: 8px;
 }
 
+button#theme-toggle {
+    font-size: 26px;
+    margin: auto 4px;
+}
+
+body.dark #moon {
+    vertical-align: middle;
+    display: none;
+}
+
+body:not(.dark) #sun {
+    display: none;
+}
+
 #menu {
     list-style: none;
     word-break: keep-all;
@@ -54,4 +68,10 @@
 #menu .active {
     font-weight: 500;
     border-bottom: 2px solid currentColor;
+}
+
+.toggles {
+    display: inline-flex;
+    margin: auto 4px;
+    flex-wrap: inherit;
 }

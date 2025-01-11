@@ -3,334 +3,414 @@ title: C API
 ---
 
 ```c
-typedef void* (*TeaAlloc)(void* ud, 
+typedef void* (*tea_Alloc)(void* ud, 
                           void* ptr, 
                           size_t osize, 
                           size_t nsize);
 ```
 
 ```c
-typedef void (*TeaCFunction)(TeaState* T);
+typedef void (*tea_CFunction)(tea_State* T);
 ```
 
 Type for C functions.
 
 ```c
-TeaState* tea_new_state(TeaAlloc f, void* ud);
+tea_State* tea_new_state(tea_Alloc f, void* ud);
 ```
 
 ```c
-TeaState* tea_new_state(TeaAlloc f, void* ud);
+void tea_close(tea_State* T);
 ```
 
 ```c
-void tea_close(TeaState* T);
+void tea_set_argv(tea_State* T, int argc, char** argv, int argf);
 ```
 
 ```c
-void tea_set_argv(TeaState* T, int argc, char** argv, int argf);
+void tea_CFunction tea_atpanic(tea_State* T, tea_CFunction panicf);
 ```
 
 ```c
-void tea_set_repl(TeaState* T, bool b);
+tea_Alloc tea_get_allocf(tea_State* T, void** ud);
 ```
 
 ```c
-TeaCFunction tea_atpanic(TeaState* T, TeaCFunction panicf);
+void tea_set_allocf(tea_State* T, tea_Alloc f, void* ud);
 ```
 
 ```c
-TeaAlloc tea_get_allocf(TeaState* T, void** ud);
+int tea_absindex(tea_State* T, int index);
 ```
 
 ```c
-void tea_set_allocf(TeaState* T, TeaAlloc f, void* ud);
+void tea_pop(tea_State* T, int n);
 ```
 
 ```c
-int tea_get_top(TeaState* T);
+int tea_get_top(tea_State* T);
 ```
 
 ```c
-void tea_set_top(TeaState* T, int index);
+void tea_set_top(tea_State* T, int index);
 ```
 
 ```c
-void tea_push_value(TeaState* T, int index);
+void tea_push_value(tea_State* T, int index);
 ```
 
 ```c
-void tea_remove(TeaState* T, int index);
+void tea_remove(tea_State* T, int index);
 ```
 
 ```c
-void tea_insert(TeaState* T, int index);
+void tea_insert(tea_State* T, int index);
 ```
 
 ```c
-void tea_replace(TeaState* T, int index);
+void tea_replace(tea_State* T, int index);
 ```
 
 ```c
-void tea_copy(TeaState* T, int from_index, int to_index);
+void tea_copy(tea_State* T, int from_index, int to_index);
 ```
 
 ```c
-int tea_type(TeaState* T, int index);
+void tea_swap(tea_State* T, int index1, int index2);
 ```
 
 ```c
-const char* tea_type_name(TeaState* T, int index);
+int tea_get_mask(tea_State* T, int index);
 ```
 
 ```c
-double tea_get_number(TeaState* T, int index);
+int tea_get_type(tea_State* T, int index);
 ```
 
 ```c
-bool tea_get_bool(TeaState* T, int index);
+bool tea_get_bool(tea_State* T, int index);
 ```
 
 ```c
-void tea_get_range(TeaState* T, int index, double* start, double* end, double* step);
+tea_Number tea_get_number(tea_State* T, int index);
 ```
 
 ```c
-const char* tea_get_lstring(TeaState* T, int index, int* len);
+tea_Integer tea_get_integer(tea_State* T, int index);
 ```
 
 ```c
-bool tea_is_object(TeaState* T, int index);
+const void* tea_get_pointer(tea_State* T, int index);
 ```
 
 ```c
-bool tea_is_cfunction(TeaState* T, int index);
+void tea_get_range(tea_State* T, int index, double* start, double* end, double* step);
 ```
 
 ```c
-bool tea_to_bool(TeaState* T, int index);
+const char* tea_get_lstring(tea_State* T, int index, size_t* len);
 ```
 
 ```c
-double tea_to_numberx(TeaState* T, int index, bool* is_num);
+const char* tea_get_string(tea_State* T, int index);
 ```
 
 ```c
-const char* tea_to_lstring(TeaState* T, int index, int* len);
+const char* tea_get_userdata(tea_State* T, int index);
 ```
 
 ```c
-TeaCFunction tea_to_cfunction(TeaState* T, int index);
+bool tea_is_object(tea_State* T, int index);
 ```
 
 ```c
-void* tea_to_userdata(TeaState* T, int index);
+bool tea_is_cfunction(tea_State* T, int index);
 ```
 
 ```c
-bool tea_equal(TeaState* T, int index1, int index2);
+bool tea_to_bool(tea_State* T, int index);
 ```
 
 ```c
-bool tea_rawequal(TeaState* T, int index1, int index2);
+tea_Number tea_to_numberx(tea_State* T, int index, bool* is_num);
 ```
 
 ```c
-void tea_concat(TeaState* T);
+tea_Number tea_to_numberx(tea_State* T, int index);
 ```
 
 ```c
-void tea_pop(TeaState* T, int n);
+tea_Integer tea_to_integerx(tea_State* T, int index, bool* is_num);
 ```
 
 ```c
-void tea_push_null(TeaState* T);
+tea_Integer tea_to_integer(tea_State* T, int index);
 ```
 
 ```c
-void tea_push_true(TeaState* T);
+const void* tea_to_pointer(tea_State* T, int index);
 ```
 
 ```c
-void tea_push_false(TeaState* T);
+void* tea_to_userdata(tea_State* T, int index);
 ```
 
 ```c
-void tea_push_bool(TeaState* T, bool b);
+const char* tea_to_lstring(tea_State* T, int index, size_t* len);
 ```
 
 ```c
-void tea_push_number(TeaState* T, double n);
+const char* tea_to_string(tea_State* T, int index);
 ```
 
 ```c
-const char* tea_push_lstring(TeaState* T, const char* s, int len);
+TeaCFunction tea_to_cfunction(tea_State* T, int index);
 ```
 
 ```c
-const char* tea_push_string(TeaState* T, const char* s);
+bool tea_equal(tea_State* T, int index1, int index2);
 ```
 
 ```c
-const char* tea_push_fstring(TeaState* T, const char* fmt, ...);
+bool tea_rawequal(tea_State* T, int index1, int index2);
 ```
 
 ```c
-const char* tea_push_vfstring(TeaState* T, const char* fmt, va_list args);
+void tea_concat(tea_State* T);
 ```
 
 ```c
-void tea_push_range(TeaState* T, double start, double end, double step);
+void tea_push_nil(tea_State* T);
 ```
 
 ```c
-void tea_push_cfunction(TeaState* T, TeaCFunction fn);
+void tea_push_true(tea_State* T);
 ```
 
 ```c
-void tea_new_list(TeaState* T);
+void tea_push_false(tea_State* T);
 ```
 
 ```c
-void tea_new_map(TeaState* T);
+void tea_push_bool(tea_State* T, bool b);
 ```
 
 ```c
-void* tea_new_userdata(TeaState* T, size_t size);
+void tea_push_number(tea_State* T, tea_Number n);
 ```
 
 ```c
-void tea_create_class(TeaState* T, const char* name, const TeaClass* klass);
+void tea_push_integer(tea_State* T, tea_Integer n);
 ```
 
 ```c
-void tea_create_module(TeaState* T, const char* name, const TeaModule* module);
+const char* tea_push_lstring(tea_State* T, const char* s, size_t len);
 ```
 
 ```c
-int tea_len(TeaState* T, int index);
+const char* tea_push_string(tea_State* T, const char* s);
 ```
 
 ```c
-void tea_add_item(TeaState* T, int list);
+const char* tea_push_fstring(tea_State* T, const char* fmt, ...);
 ```
 
 ```c
-void tea_get_item(TeaState* T, int list, int index);
+const char* tea_push_vfstring(tea_State* T, const char* fmt, va_list args);
 ```
 
 ```c
-void tea_set_item(TeaState* T, int list, int index);
+void tea_push_range(tea_State* T, tea_Number start, tea_Number end, tea_Number step);
 ```
 
 ```c
-bool tea_get_field(TeaState* T, int obj);
+void tea_push_cfunction(tea_State* T, TeaCFunction fn, int nargs, int nopts);
 ```
 
 ```c
-void tea_set_field(TeaState* T, int obj);
+bool tea_get_udvalue(tea_State* T, int ud, int n);
 ```
 
 ```c
-bool tea_get_key(TeaState* T, int obj, const char* key);
+void tea_set_udvalue(tea_State* T, int ud, int n);
 ```
 
 ```c
-void tea_set_key(TeaState* T, int obj, const char* key);
+void* tea_new_userdatav(tea_State* T, size_t size, int nuvs);
 ```
 
 ```c
-bool tea_get_global(TeaState* T, const char* name);
+void* tea_new_udatav(tea_State* T, size_t size, int nuvs, const char* name);
 ```
 
 ```c
-void tea_set_global(TeaState* T, const char* name);
+void* tea_new_userdata(tea_State* T, size_t size);
 ```
 
 ```c
-void tea_set_funcs(TeaState* T, const TeaReg* reg);
+void* tea_new_udata(tea_State* T, size_t size, const char* name);
 ```
 
 ```c
-bool tea_has_module(TeaState* T, const char* module);
+void tea_new_list(tea_State* T, size_t n);
 ```
 
 ```c
-void tea_set_instanceud(TeaState* T, int index);
+void tea_new_map(tea_State* T);
 ```
 
 ```c
-void tea_check_type(TeaState* T, int index, int type);
+void tea_new_class(tea_State* T, const char* name);
 ```
 
 ```c
-void tea_check_any(TeaState* T, int index);
+void tea_new_module(tea_State* T, const char* name);
 ```
 
 ```c
-double tea_check_number(TeaState* T, int index);
+void tea_new_submodule(tea_State* T, const char* name);
 ```
 
 ```c
-bool tea_check_bool(TeaState* T, int index);
+void tea_create_class(tea_State* T, const char* name, const TeaClass* klass);
 ```
 
 ```c
-void tea_check_range(TeaState* T, int index, double* start, double* end, double* step);
+void tea_create_module(tea_State* T, const char* name, const TeaModule* module);
 ```
 
 ```c
-const char* tea_check_lstring(TeaState* T, int index, int* len);
+void tea_create_submodule(tea_State* T, const char* name, const tea_Reg* module);
 ```
 
 ```c
-TeaCFunction tea_check_cfunction(TeaState* T, int index);
+int tea_len(tea_State* T, int index);
 ```
 
 ```c
-void* tea_check_userdata(TeaState* T, int index);
+void tea_add_item(tea_State* T, int list);
 ```
 
 ```c
-void tea_opt_any(TeaState* T, int index);
+bool tea_get_item(tea_State* T, int list, int index);
 ```
 
 ```c
-bool tea_opt_bool(TeaState* T, int index, bool def);
+bool tea_set_item(tea_State* T, int list, int index);
 ```
 
 ```c
-double tea_opt_number(TeaState* T, int index, double def);
+bool tea_delete_item(tea_State* T, int list, int index);
 ```
 
 ```c
-const char* tea_opt_lstring(TeaState* T, int index, const char* def, int* len);
+bool tea_insert_item(tea_State* T, int list, int index);
 ```
 
 ```c
-int tea_check_option(TeaState* T, int index, const char* def, const char* const options[]);
+int tea_next(tea_State* T, int obj);
 ```
 
 ```c
-void tea_openf(TeaState* T, const char* mod, TeaCFunction openf, bool glb);
+bool tea_get_field(tea_State* T, int obj);
 ```
 
 ```c
-int tea_gc(TeaState* T);
+void tea_set_field(tea_State* T, int obj);
 ```
 
 ```c
-int tea_interpret(TeaState* T, const char* module_name, const char* source);
+bool tea_get_key(tea_State* T, int obj, const char* key);
 ```
 
 ```c
-int tea_dofile(TeaState* T, const char* path);
+void tea_set_key(tea_State* T, int obj, const char* key);
 ```
 
 ```c
-void tea_call(TeaState* T, int n);
+bool tea_get_global(tea_State* T, const char* name);
 ```
 
 ```c
-void tea_error(TeaState* T, const char* fmt, ...);
+void tea_set_global(tea_State* T, const char* name);
+```
+
+```c
+void tea_set_funcs(tea_State* T, const TeaReg* reg);
+```
+
+```c
+bool tea_has_module(tea_State* T, const char* module);
+```
+
+```c
+void tea_check_type(tea_State* T, int index, int type);
+```
+
+```c
+void tea_check_any(tea_State* T, int index);
+```
+
+```c
+double tea_check_number(tea_State* T, int index);
+```
+
+```c
+bool tea_check_bool(tea_State* T, int index);
+```
+
+```c
+void tea_check_range(tea_State* T, int index, double* start, double* end, double* step);
+```
+
+```c
+const char* tea_check_lstring(tea_State* T, int index, int* len);
+```
+
+```c
+TeaCFunction tea_check_cfunction(tea_State* T, int index);
+```
+
+```c
+void* tea_check_userdata(tea_State* T, int index);
+```
+
+```c
+void tea_opt_any(tea_State* T, int index);
+```
+
+```c
+bool tea_opt_bool(tea_State* T, int index, bool def);
+```
+
+```c
+double tea_opt_number(tea_State* T, int index, double def);
+```
+
+```c
+const char* tea_opt_lstring(tea_State* T, int index, const char* def, int* len);
+```
+
+```c
+int tea_check_option(tea_State* T, int index, const char* def, const char* const options[]);
+```
+
+```c
+void tea_openf(tea_State* T, const char* mod, TeaCFunction openf, bool glb);
+```
+
+```c
+int tea_gc(tea_State* T);
+```
+
+```c
+int tea_dofile(tea_State* T, const char* path);
+```
+
+```c
+void tea_call(tea_State* T, int n);
+```
+
+```c
+void tea_error(tea_State* T, const char* fmt, ...);
 ```

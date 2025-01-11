@@ -1,0 +1,39 @@
+{{/* $sample := readFile "assets/hello.tea" */}}
+{{/* highlight $sample "js" */}}
+
+<select id="snippet" onchange="snippet(this.value)">
+    {{ range .Site.Data.examples }}
+    <option value="{{ .file }}">{{ .title }}</option>
+    {{ end }}
+</select>
+<div class="highlight">
+<pre class="chroma external">
+<code class="language-js external" id="external-code">
+loading...
+</code>
+</pre>
+</div>
+<script>
+const codeBlock = document.getElementById('external-code');
+
+async function snippet(file)
+{
+    try
+    {
+        const response = await fetch(`https://raw.githubusercontent.com/RevengerWizard/teascript/master/example/${file}`);
+        const data = await response.text();
+        codeBlock.textContent = data.trim();
+        codeBlock.removeAttribute('data-highlighted');
+        hljs.highlightElement(codeBlock);
+    }
+    catch(err)
+    {
+        console.error('Error loading example:', err);
+    }
+}
+const select = document.getElementById('snippet');
+const options = select.options;
+const idx = Math.floor(Math.random() * options.length);
+select.selectedIndex = idx;
+snippet(select.value);
+</script>

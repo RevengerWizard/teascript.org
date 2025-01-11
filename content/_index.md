@@ -19,7 +19,7 @@ Main features
 
 <br/>
 
-* a fast single-pass compiler to tight bytecode
+* a fast single-pass compiler with tight bytecode
 * very few built-in types
 * dynamic typing
 * garbage collection
