@@ -26,19 +26,19 @@ skipped. To override this behavior, set $skipHome to false below.
 @examples
 
 {{ with site.Menus.main }}
-{{ partial "sidebar/render-section-menu.html" (dict "currentPage" $ "nodes" .) }}
+{{ partial "sidebar.html" (dict "currentPage" $ "nodes" .) }}
 {{ end }}
 
 {{ with site.Sections }}
-{{ partial "sidebar/render-section-menu.html" (dict "currentPage" $ "nodes" .) }}
+{{ partial "sidebar.html" (dict "currentPage" $ "nodes" .) }}
 {{ end }}
 
 {{ with (.Site.GetPage "section" .Section).Sections }}
-{{ partial "sidebar/render-section-menu.html" (dict "currentPage" $ "nodes" .) }}
+{{ partial "sidebar.html" (dict "currentPage" $ "nodes" .) }}
 {{ end }}
 
 {{ with slice (site.GetPage "/introduction") }}
-{{ partial "sidebar/render-section-menu.html" (dict "currentPage" $ "nodes" .) }}
+{{ partial "sidebar.html" (dict "currentPage" $ "nodes" .) }}
 {{ end }}
 
 */}}

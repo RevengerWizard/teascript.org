@@ -3,23 +3,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 {{- /* Title */}}
-<title>{{ if .IsHome }}{{ else }}{{ if .Title }}{{ .Title }} | {{ end }}{{ end }}{{ site.Title }}</title>
+<title>{{ .Title }} &ndash; {{ site.Title }}</title>
 
 {{- /* Meta */}}
 
 {{- /* Styles */}}
 
-{{- /* includes */}}
-{{- $includes := slice }}
-
-{{ $syntax := resources.Get "css/includes/syntax.css" }}
-{{ $core := resources.Get "css/main.scss" | css.Sass | resources.Minify }}
-
-{{- /* bundle all required css */}}
-{{- $stylesheet := (slice $core $syntax) | resources.Concat "assets/css/stylesheet.css" }}
-{{- $stylesheet := $stylesheet | fingerprint }}
-<link crossorigin="anonymous" href="{{ $stylesheet.RelPermalink }}" integrity="{{ $stylesheet.Data.Integrity }}" rel="preload stylesheet" as="style">
-
+{{ $style := resources.Get "css/app.scss" | css.Sass | resources.Minify | fingerprint }}
+<link crossorigin="anonymous" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" rel="preload stylesheet" as="style">
+ 
 {{- /* Javascript */}}
 
 {{- /* Client-side syntax highlighting for homepage */}}
@@ -31,5 +23,4 @@
 {{- /* Favicons */}}
 
 <noscript>
-Looks like you disabled Javascript for this little website :(
 </noscript>

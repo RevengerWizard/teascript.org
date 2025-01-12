@@ -1,5 +1,5 @@
 ---
-title: Hello first blog post
+title: Hello Teascript
 date: 2025-01-07
 author: Valentin
 ---

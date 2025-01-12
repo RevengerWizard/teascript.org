@@ -1,5 +1,5 @@
 ---
-title: C API
+title: API
 ---
 
 ```c

@@ -1,4 +1,0 @@
-{{- $sidebar := printf "sidebar_%s" .Section }}
-{{ with (.Site.GetPage "section" .Section).RegularPages }}
-    {{ partial "sidebar/render_sidebar.html" (dict "currentPage" $ "nodes" .) }}
-{{ end }}

@@ -35,14 +35,11 @@
                 <h1>teascript</h1>
             </a>
         </div>
-        {{- $currentPage := . }}
         <ul id="menu">
             {{- range site.Menus.main }}
-            {{- $menu_item_url := (cond (strings.HasSuffix .URL "/") .URL (printf "%s/" .URL)) | absURL }}
-            {{- $page_url := $currentPage.Permalink | absURL }}
             <li>
                 <a href="{{ .URL | absURL }}" title="{{ .Title | default .Name }}">
-                    <span {{- if eq $menu_item_url $page_url }} class="active" {{- end }}>
+                    <span>
                         {{- .Pre }}
                         {{- .Name -}}
                         {{ .Post -}}
