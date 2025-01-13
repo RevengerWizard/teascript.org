@@ -72,17 +72,23 @@ In practice, most top-level variables are only assigned once anyway, so this rar
 
 Earlier, I described a program's set of modules as a tree. Of course, it's only a *tree* of modules if there are no *shared imports*. But consider a program like:
 
-```tea
+```tea {title="main.tea"}
 // main.tea
 import "a"
 import "b"
+```
 
+```tea {title="a.tea"}
 // a.tea
 import "shared"
+```
 
+```tea {title="b.tea"}
 // b.tea
 import "shared"
+```
 
+```tea {title="shared.tea"}
 // shared.tea
 print("Shared!")
 ```
@@ -106,15 +112,19 @@ Note the order of the last two steps. When a module is loaded, it is added to th
 
 For example:
 
-```tea
+```tea {title="main.tea"}
 // main.tea
 import "a"
+```
 
+```tea {title="a.tea"}
 // a.tea
 print("start a")
 import "b"
 print("end a")
+```
 
+```tea {title="b.tea"}
 // b.tea
 print("start b")
 import "a"
@@ -130,14 +140,18 @@ This program runs successfully and prints:
 
 Where you have to be careful is binding variables. Consider:
 
-```tea
+```tea {title="main.tea"}
 // main.tea
 import "a"
+```
 
+```tea {title="a.tea"}
 // a.tea
 from "a" import B
 var A = "a variable"
+```
 
+```tea {title="b.tea"}
 // b.tea
 from "a" import A
 var B = "b variable"
@@ -151,14 +165,18 @@ The import of "a" in b.tea will fail here. If you trace the execution, you get:
 
 Instead, we look for a variable named `A` in that module. But it hasn't been defined yet since "a.tea" is still sitting on the `from "b" import B` line before the declaration. To get this to work, you would need to move the variable declaration above the import:
 
-```tea
+```tea {title="main.tea"}
 // main.tea
 import "a"
+```
 
+```tea {title="a.tea"}
 // a.tea
 var A = "a variable"
 from "b" import B
+```
 
+```tea {title="b.tea"}
 // b.tea
 from "a" import A
 var B = "b variable"

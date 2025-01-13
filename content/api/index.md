@@ -1,6 +1,39 @@
 ---
-title: API
+title: C API
 ---
+
+The Teascript C API (defined in `tea.h`) is a set of constants and API calls which allows C/C++ programs to interface with Teascript code and shields them from internal details like value representation.
+
+## Example C program
+
+```c
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <tea.h>
+
+#define tea_dofile(T, fn) \
+    (tea_load_file(T, fn, NULL) || tea_pcall(T, 0))
+
+int main(int argc, char** argv)
+{
+    tea_State* T = tea_open();
+    tea_set_argv(T, argc, argv, 0);
+
+    if(tea_dofile(T, "hello.tea"))
+    {
+        const char* err = tea_to_string(T, -1);
+        fputs(err, stderr);
+        fputc('\n', stderr);
+        tea_pop(T, 1);
+    }
+    tea_pop(T, 1);
+
+    tea_close(T);
+
+    return EXIT_SUCCESS;
+}
+```
 
 ```c
 typedef void* (*tea_Alloc)(void* ud, 

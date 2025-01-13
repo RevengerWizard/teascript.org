@@ -12,8 +12,10 @@
 }
 
 .post-title {
-    margin-bottom: 2px;
+    margin-bottom: 12px;
     font-size: 30px;
+    border-bottom: 1px solid var(--border); // Added border
+    padding-bottom: 10px;
 }
 
 .post-description {

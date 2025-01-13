@@ -12,9 +12,7 @@
 {{- end -}}
 ">
     {{ partialCached "header.html" . }}
-    <main class="main">
-        {{ block "main" . }}{{ end }}
-    </main>
+    {{ block "main" . }}{{ end }}
     {{ partialCached "footer.html" . }}
 </body>
 

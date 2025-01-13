@@ -1,0 +1,26 @@
+.docs-main {
+    position: relative;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+    max-width: initial;
+    margin: 0;
+    padding: 0;
+}
+
+.edit-page {
+    font-size: 0.8rem;
+    margin: -0.5rem 0;
+    padding-bottom: 0.6rem;
+    text-decoration-color: var(--primary);
+    
+    a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: inherit;
+    }
+
+    svg {
+        width: 12px;
+        height: 12px;
+    }
+}

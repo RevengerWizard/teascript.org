@@ -77,3 +77,12 @@ body:not(.dark) #sun {
     margin: auto 4px;
     flex-wrap: inherit;
 }
+
+.limit {
+    display: inline-block;
+    height: 1.8em;
+    width: 1px;
+    background-color: var(--border);
+    margin: auto 1.2rem;
+    vertical-align: middle;
+}

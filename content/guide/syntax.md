@@ -7,36 +7,11 @@ toc: true
 ## Keywords
 
 ```tea
-and
-as
-break
-case
-class
-const
-continue
-default
-do
-else
-false
-for
-from
-function
-if
-import
-in
-is
-nil
-not
-operator
-or
-return
-self
-static
-super
-switch
-true
-var
-while
+and         as          break       case        class       const  
+continue    default     do          else        false       for    
+from        function    if          import      in          is     
+nil         not         operator    or          return      self   
+static      super       switch      true        var         while  
 ```
 
 ## Comments
