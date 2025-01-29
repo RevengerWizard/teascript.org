@@ -6,7 +6,7 @@ toc: true
 
 ## Keywords
 
-```tea
+```
 and         as          break       case        class       const  
 continue    default     do          else        false       for    
 from        function    if          import      in          is     

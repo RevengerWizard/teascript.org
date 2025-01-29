@@ -61,33 +61,6 @@ print("Hello, " + name + "!")
 
 ---
 
-## open
-
-The `open` function opens a file and returns a `file` object. This object can be used to read, write or manipulate the file.
-
-#### Syntax
-
-```tea
-open(file, mode='r')
-```
-
-#### Parameters
-
--   `file`: The name of the file to open.
--   `mode`: An optional string that specifies the mode in which the file is opened. The default mode is `'r'`, which means the file is opened in read-only mode. Other possible modes are `'w'` for writing, `'a'` for appending, `'x'` for creating and writing to a new file, and `'b'` for binary mode. These modes can be combined by using the `+` operator, for example `'w+'` for reading and writing, or `'rb'` for reading a binary file.
-
-#### Return value
-
-A `file` object that can be used to manipulate the opened file.
-
-#### Example
-
-```tea
-input(prompt)
-```
-
----
-
 ## assert
 
 The `assert` function is used to check if a given condition is `true`, and if it is not, it raises an error with an optional error message.
@@ -105,7 +78,7 @@ assert(condition, message)
 
 #### Return value
 
-`null` if the assertion is successful. If the assertion fails, it raises an error with the optional error message.
+`nil` if the assertion is successful. If the assertion fails, it raises an error with the optional error message.
 
 #### Example
 
@@ -288,66 +261,14 @@ print(ord("0"))  // 48
 
 ---
 
-## hex
+## tonumber
 
-The `hex` function converts an integer to a hexadecimal string.
-
-#### Syntax
-
-```tea
-hex(x)
-```
-
-#### Parameters
-
--   `x`: a number.
-
-#### Return value
-
-A string with the hexadecimal representation of the number.
-
-#### Example
-
-```tea
-print(hex(255))  // "0xff"
-```
-
----
-
-## bin
-
-The `bin` function converts an integer to a binary string.
+The `tonumber` function converts a string to a number or raises an error if the string cannot be converted.
 
 #### Syntax
 
 ```tea
-bin(x)
-```
-
-#### Parameters
-
--   `x`: a number.
-
-#### Return value
-
-A string with the binary representation of the number.
-
-#### Example
-
-```tea
-print(bin(255))  // "0b11111111"
-```
-
----
-
-## number
-
-The `number` function converts a string to a number or raises an error if the string cannot be converted.
-
-#### Syntax
-
-```tea
-number(x)
+tonumber(x)
 ```
 
 #### Parameters
