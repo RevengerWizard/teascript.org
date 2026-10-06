@@ -1,0 +1,106 @@
+/* Highlight.js tokens used by the homepage snippet, kept in sync with Chroma (Zedokai colors). */
+.hljs {
+    color: var(--code-primary);
+    background: var(--code-block-bg);
+}
+
+.hljs-keyword,
+.hljs-selector-tag {
+    color: #ff6188;
+}
+
+.hljs-literal,
+.hljs-number {
+    color: #ab9df2;
+}
+
+.hljs-title,
+.hljs-title.function_ {
+    color: #a9dc76;
+}
+
+.hljs-title.class_ {
+    color: #78dce8;
+}
+
+.hljs-string,
+.hljs-regexp {
+    color: #ffd866;
+}
+
+.hljs-comment,
+.hljs-quote {
+    color: #727072;
+    font-style: italic;
+}
+
+.hljs-built_in,
+.hljs-type {
+    color: #78dce8;
+}
+
+.hljs-variable {
+    color: #fcfcfa;
+}
+
+.hljs-operator {
+    color: #ff6188;
+}
+
+.hljs-punctuation {
+    color: #939293;
+}
+
+/* ---- Light Mode ---- */
+@mixin hljs-theme-light {
+    .hljs-keyword,
+    .hljs-selector-tag {
+        color: #e14775;
+    }
+
+    .hljs-literal,
+    .hljs-number {
+        color: #7058be;
+    }
+
+    .hljs-title,
+    .hljs-title.function_ {
+        color: #269d69;
+    }
+
+    .hljs-title.class_ {
+        color: #1c8ca8;
+    }
+
+    .hljs-string,
+    .hljs-regexp {
+        color: #cc7a0a;
+    }
+
+    .hljs-comment,
+    .hljs-quote {
+        color: #a59fa0;
+        font-style: italic;
+    }
+
+    .hljs-built_in,
+    .hljs-type {
+        color: #1c8ca8;
+    }
+
+    .hljs-variable {
+        color: #29242a;
+    }
+
+    .hljs-operator {
+        color: #e14775;
+    }
+
+    .hljs-punctuation {
+        color: #918c8e;
+    }
+}
+
+body:not(.dark) {
+    @include hljs-theme-light;
+}

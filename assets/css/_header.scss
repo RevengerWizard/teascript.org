@@ -1,3 +1,12 @@
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--theme) 88%, transparent);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
 .nav {
     display: flex;
     flex-wrap: wrap;
@@ -24,9 +33,21 @@
     flex-wrap: inherit;
 }
 
+.logo h1 {
+    font-family: monospace;
+}
+
 .logo a {
     font-size: 16px;
     font-weight: 700;
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+.logo a:hover {
+    color: var(--accent);
+    -webkit-text-fill-color: var(--accent);
 }
 
 .logo a img, .logo a svg {
@@ -43,6 +64,10 @@ button#theme-toggle {
     margin: auto 4px;
 }
 
+button#theme-toggle:hover {
+    color: var(--accent);
+}
+
 body.dark #moon {
     vertical-align: middle;
     display: none;
@@ -57,6 +82,7 @@ body:not(.dark) #sun {
     word-break: keep-all;
     overflow-x: auto;
     white-space: nowrap;
+    margin-left: auto;
 }
 
 #menu li + li {
@@ -67,9 +93,20 @@ body:not(.dark) #sun {
     font-size: 16px;
 }
 
+#menu a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
 #menu .active {
     font-weight: 500;
-    border-bottom: 2px solid currentColor;
+    color: var(--accent);
+    border-bottom: 0;
+    text-decoration: underline;
+}
+
+#menu .active a {
+    color: var(--accent);
 }
 
 .toggles {
@@ -85,4 +122,50 @@ body:not(.dark) #sun {
     background-color: var(--border);
     margin: auto 1.2rem;
     vertical-align: middle;
+}
+
+@media (max-width: 1200px) {
+    .nav {
+        flex-wrap: nowrap;
+        padding: 0 2rem;
+    }
+
+    .logo {
+        flex: 0 0 auto;
+        width: 300px;
+        margin: auto var(--gap);
+    }
+
+    #menu {
+        min-width: 0;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 991px) {
+    .nav {
+        flex-wrap: wrap;
+        padding: 1.2rem 1.6rem 0;
+        align-items: normal;
+        justify-content: flex-start;
+    }
+
+    .logo {
+        flex: 0 0 auto;
+        flex-basis: 100%;
+        width: auto;
+        margin: 0;
+        align-items: center;
+    }
+
+    #menu {
+        flex: 1 1 auto;
+        flex-basis: 100%;
+        min-width: 0;
+        justify-content: flex-start;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }

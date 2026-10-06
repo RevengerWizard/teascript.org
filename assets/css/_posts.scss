@@ -46,6 +46,16 @@
     color: var(--content);
 }
 
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+}
+
 .post-content h3,
 .post-content h4,
 .post-content h5,
@@ -59,24 +69,28 @@
 }
 
 .post-content h2 {
-    margin: 32px auto 24px;
-    font-size: 32px;
-}
-
-.post-content h3 {
+    margin: 28px auto 20px;
     font-size: 24px;
 }
 
+.post-content h3 {
+    font-size: 21px;
+}
+
 .post-content h4 {
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .post-content h5 {
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .post-content h6 {
     font-size: 12px;
+}
+
+.post-content a {
+    color: var(--accent);
 }
 
 .post-content a,
@@ -170,6 +184,78 @@
     direction: ltr;
 }
 
+/* Keep the homepage example block visually consistent with Markdown code */
+.highlight {
+    margin: 10px auto;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--code-block-bg) !important;
+}
+
+.snippet-select {
+    display: block;
+    margin: 0 0 0.6rem;
+    padding: 0.45rem 2rem 0.45rem 0.7rem;
+    color: var(--primary);
+    background: var(--theme);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.snippet-select:hover,
+.snippet-select:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: none;
+}
+
+.snippet-select option {
+    color: var(--primary);
+    background: var(--theme);
+}
+
+.snippet-select,
+.snippet-select option {
+    color: var(--code-primary);
+    background: var(--code-block-bg);
+}
+
+.snippet-select:hover,
+.snippet-select:focus {
+    border-color: var(--code-block-bg);
+}
+
+.highlight pre,
+.highlight pre code {
+    display: block;
+    margin: 0;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--code-block-bg) !important;
+    color: var(--code-primary);
+    overflow-x: auto;
+    overflow-y: visible;
+    white-space: pre;
+    height: auto;
+    max-height: none;
+    font-size: 0.86rem;
+    line-height: 1.45;
+}
+
+.post-content .highlight,
+.post-content .highlight pre,
+.post-content .highlight pre code {
+    border-radius: var(--radius);
+}
+
+.post-content .chroma {
+    background: var(--code-block-bg) !important;
+}
+
 .post-content li > .highlight {
     margin-inline-end: 0;
 }
@@ -200,19 +286,20 @@
 }
 
 .post-content code {
-    margin: auto 4px;
-    padding: 4px 6px;
-    /*font-size: 0.78em;*/
+    margin: auto 2px;
+    padding: 1px 4px;
+    font-size: 0.86rem;
     line-height: 1.5;
+    color: var(--primary);
     background: var(--code-bg);
-    border-radius: 2px;
+    border-radius: 4px;
 }
 
 .post-content pre code {
     display: grid;
     margin: auto 0;
     padding: 10px;
-    color: rgb(213, 213, 214);
+    color: var(--code-primary);
     background: var(--code-block-bg) !important;
     border-radius: var(--radius);
     overflow-x: auto;
@@ -226,9 +313,9 @@
 }
 
 .post-content hr {
-    margin: 30px 0;
-    height: 2px;
-    background: var(--tertiary);
+    margin: 15px 0;
+    height: 1px;
+    background: var(--border);
     border: 0;
 }
 
@@ -268,10 +355,6 @@
     background: var(--code-bg);
     border-radius: var(--radius);
     padding: 0.4em;
-}
-
-.dark .toc {
-    background: var(--entry);
 }
 
 .toc .details {
@@ -328,8 +411,7 @@
     background: var(--code-bg);
 }
 
-.post-tags a:hover,
-.paginav a:hover {
+.post-tags a:hover {
     background: var(--border);
 }
 
@@ -357,7 +439,7 @@ h4:hover .anchor,
 h5:hover .anchor,
 h6:hover .anchor {
     display: inline-flex;
-    color: var(--secondary);
+    color: var(--accent);
     margin-inline-start: 8px;
     font-weight: 500;
     user-select: none;
@@ -366,12 +448,17 @@ h6:hover .anchor {
 .paginav {
     display: flex;
     line-height: 30px;
+    gap: 10px;
+    background: transparent;
+    border: 0;
 }
 
 .paginav a {
+    flex: 1;
     padding-inline-start: 14px;
     padding-inline-end: 14px;
     border-radius: var(--radius);
+    border: 1px solid var(--border);
 }
 
 .paginav .title {
@@ -383,10 +470,11 @@ h6:hover .anchor {
 
 .paginav .prev,
 .paginav .next {
-    width: 50%;
+    width: auto;
 }
 
-.paginav span:hover:not(.title) {
+.paginav span:not(.title):hover {
+    color: var(--accent);
     box-shadow: 0 1px 0;
 }
 

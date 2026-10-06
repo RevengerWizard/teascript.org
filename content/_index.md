@@ -3,15 +3,11 @@ title: Home
 ---
 <br/>
 
-Teascript is a simple, multi-paradigm scripting language for embedded and standalone use
+Teascript is a lightweight, embeddable scripting language designed for simplicity and speed.
 
 <br/>
 
-* it's lightweight
-* it's extensible
-* it's embeddable
-* it's a scripting language
-* it's multi-paradigm
+With a minimal footprint, a fast single-pass compiler, and a flexible class system, it’s ideal for game development, scripting, and lightweight applications.
 
 <br/>
 

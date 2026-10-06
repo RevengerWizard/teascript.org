@@ -1,4 +1,6 @@
-@import "syntax";
+@import "chroma";
+@import "highlight";
+
 @import "vars";
 @import "global";
 @import "header";
@@ -7,4 +9,5 @@
 @import "posts";
 @import "blog";
 @import "docs";
+@import "api";
 @import "pages";

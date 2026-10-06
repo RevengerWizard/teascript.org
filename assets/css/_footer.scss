@@ -26,13 +26,9 @@
 }
 
 .footer a:hover {
-    border-bottom: 1px solid var(--primary);
+    border-bottom: 1px solid var(--accent);
 }
 
 .footer a:hover {
-    color: var(--primary);
-}
-
-#theme-toggle:focus {
-    outline: 0;
+    color: var(--accent);
 }

@@ -1,32 +1,35 @@
-{{- $sections := site.Params.sections }}
-{{- $pages := where site.RegularPages "Type" "in" $sections }}
-{{- $sortedPages := sort $pages ".Weight" }}
-{{- $currentPage := . }}
-{{- $currentType := $currentPage.Type }}
-{{- $pagesInSection := where $sortedPages "Type" $currentType }}
-
-{{- if and (gt (len $pagesInSection) 1) (in $pagesInSection . ) }}
+{{- $currentPage := . -}}
+{{- $root := site.GetPage "section" $currentPage.Section -}}
+{{- $pagesInSection := $currentPage.Parent.RegularPages.ByWeight -}}
+{{- if in (slice "guide" "docs") $currentPage.Section -}}
+    {{- $pagesInSection = $root.RegularPagesRecursive.ByWeight -}}
+{{- end -}}
+{{- if eq $currentPage.Section "docs" -}}
+    {{- $pagesInSection = slice -}}
+    {{- $pagesInSection = $pagesInSection | append $root.RegularPages -}}
+    {{- range $root.Sections.ByWeight -}}
+        {{- $pagesInSection = $pagesInSection | append .RegularPages -}}
+    {{- end -}}
+    {{- $pagesInSection = sort $pagesInSection "Weight" -}}
+{{- end -}}
+{{- if and (le (len $pagesInSection) 1) (gt (len $root.RegularPages) 1) -}}
+    {{- $pagesInSection = $root.RegularPages.ByWeight -}}
+{{- end -}}
+{{- if and (gt (len $pagesInSection) 1) (in $pagesInSection $currentPage) -}}
 <nav class="paginav">
-    {{/* Find previous page - page with next lowest weight */}}
-    {{- $prevPages := where $pagesInSection "Weight" "lt" $currentPage.Weight }}
-    {{- $prevPage := last 1 (sort $prevPages ".Weight") }}
-    {{- with index $prevPage 0 }}
-    <a class="prev" href="{{ .Permalink }}">
-        <span class="title">« Previous</span>
-        <br>
-        <span>{{- .Title -}}</span>
-    </a>
-    {{- end }}
-
-    {{/* Find next page - page with next highest weight */}}
-    {{- $nextPages := where $pagesInSection "Weight" "gt" $currentPage.Weight }}
-    {{- $nextPage := first 1 (sort $nextPages ".Weight") }}
-    {{- with index $nextPage 0 }}
-    <a class="next" href="{{ .Permalink }}">
-        <span class="title">Next »</span>
-        <br>
-        <span>{{- .Title -}}</span>
-    </a>
-    {{- end }}
+    {{- $index := 0 -}}
+    {{- range $i, $page := $pagesInSection -}}
+        {{- if eq $page.RelPermalink $currentPage.RelPermalink }}{{ $index = $i }}{{ end -}}
+    {{- end -}}
+    {{- if gt $index 0 -}}
+    {{- with index $pagesInSection (sub $index 1) -}}
+    <a class="prev" href="{{ .RelPermalink }}"><span class="title">« Previous</span><br><span>{{ .Title }}</span></a>
+    {{- end -}}
+    {{- end -}}
+    {{- if lt $index (sub (len $pagesInSection) 1) -}}
+    {{- with index $pagesInSection (add $index 1) -}}
+    <a class="next" href="{{ .RelPermalink }}"><span class="title">Next »</span><br><span>{{ .Title }}</span></a>
+    {{- end -}}
+    {{- end -}}
 </nav>
-{{- end }}
+{{- end -}}

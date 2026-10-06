@@ -1,0 +1,24 @@
+{{- $before := slice -}}
+{{- $after := slice -}}
+{{- with .Get "before" -}}
+    {{- $before = split . "," -}}
+{{- end -}}
+{{- with .Get "after" -}}
+    {{- $after = split . "," -}}
+{{- end -}}
+
+<div class="stack-effect" aria-label="Stack effect">
+    <div class="stack-effect__stack" aria-label="Stack before">
+        {{- range $before -}}
+            {{- $item := trim . " " -}}
+            <code class="stack-effect__item{{ if eq $item "..." }} stack-effect__item--ellipsis{{ end }}">{{ $item }}</code>
+        {{- end -}}
+    </div>
+    <span class="stack-effect__arrow" aria-hidden="true">→</span>
+    <div class="stack-effect__stack" aria-label="Stack after">
+        {{- range $after -}}
+            {{- $item := trim . " " -}}
+            <code class="stack-effect__item{{ if eq $item "..." }} stack-effect__item--ellipsis{{ end }}">{{ $item }}</code>
+        {{- end -}}
+    </div>
+</div>

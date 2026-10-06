@@ -37,8 +37,8 @@
         </div>
         <ul id="menu">
             {{- range site.Menus.main }}
-            <li>
-                <a href="{{ .URL | absURL }}" title="{{ .Title | default .Name }}">
+            <li class="{{ if and $.Section (hasPrefix .URL (printf "/%s" $.Section)) }}active{{ end }}">
+                <a href="{{ .URL | relURL }}" title="{{ .Title | default .Name }}">
                     <span>
                         {{- .Pre }}
                         {{- .Name -}}

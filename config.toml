@@ -4,6 +4,7 @@ title = "Teascript"
 [params]
 repo = "https://github.com/RevengerWizard/teascript"
 siteRepo = "https://github.com/RevengerWizard/teascript.org"
+authorWebsite = "https://theredwizardtower.com"
 branch = "master"
 sections = ["guide", "docs", "api"]
 defaultTheme = "dark"

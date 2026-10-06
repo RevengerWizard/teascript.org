@@ -1,17 +1,13 @@
 {{/* $sample := readFile "assets/hello.tea" */}}
 {{/* highlight $sample "js" */}}
 
-<select id="snippet" onchange="snippet(this.value)">
+<select id="snippet" class="snippet-select" onchange="snippet(this.value)">
     {{ range .Site.Data.examples }}
     <option value="{{ .file }}">{{ .title }}</option>
     {{ end }}
 </select>
-<div class="highlight">
-<pre class="chroma external">
-<code class="language-js external" id="external-code">
-loading...
-</code>
-</pre>
+<div class="highlight homepage-snippet">
+<pre class="chroma external"><code class="language-js external" id="external-code">loading...</code></pre>
 </div>
 <script>
 const codeBlock = document.getElementById('external-code');
@@ -34,6 +30,8 @@ async function snippet(file)
 const select = document.getElementById('snippet');
 const options = select.options;
 const idx = Math.floor(Math.random() * options.length);
-select.selectedIndex = idx;
-snippet(select.value);
+window.addEventListener('load', () => {
+    select.selectedIndex = idx;
+    snippet(select.value);
+});
 </script>

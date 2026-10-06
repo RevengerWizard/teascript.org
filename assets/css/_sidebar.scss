@@ -1,64 +1,25 @@
-.docs-container {
-    display: grid;
-    grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
-    gap: 4rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 6rem;
-
-    @media (max-width: 991px) {
-        grid-template-columns: 1fr;
-        padding: 0 1rem;
-    }
-}
-
-.docs-sidebar {
+.sidebar {
     position: sticky;
     top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--header-height) - 2rem);
+    margin-top: 1rem;
     overflow-y: auto;
     padding-right: 1rem;
     border-right: 1px solid var(--border);
-
-    @media (max-width: 991px) {
-        display: none;
-    }
 }
 
-.docs-main {
-    min-width: 0;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 1rem;
-
-    @media (max-width: 991px) {
-        padding: 0;
-        max-width: 100%;
-    }
-}
-
-.post-single {
-    width: 100%;
-    margin: 0 auto;
-    padding-right: 5rem;
-
-    @media (max-width: 991px) {
-        padding: 0;
-    }
-}
-
-.section-nav {
+.sidebar-nav {
     padding-top: 2rem;
-    font-size: 1rem;
+    font-size: 0.9rem;
 
     details {
         border: 0;
         padding: 0;
         margin: 0.8rem 0;
-        
+
         &[open] {
             padding: 0;
-            
+
             > summary {
                 border-bottom: 0;
                 margin-bottom: 0.4rem;
@@ -74,7 +35,7 @@
         border-left: 1px solid var(--border);
         margin-left: 0.5rem;
         padding-left: 0.5rem;
-        
+
     }
 
     a {
@@ -83,14 +44,178 @@
         color: var(--secondary);
 
         &:hover {
-            color: var(--primary);
-            background: var(--code-bg);
+            color: var(--accent);
+            text-decoration: underline;
         }
     }
 
     li.active > a {
         font-weight: 500;
+        color: var(--accent);
+        text-decoration: underline;
+    }
+
+.sidebar-home,
+    .sidebar-sections {
+        display: block;
         color: var(--primary);
+        font-weight: 600;
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+    }
+
+    .sidebar-home:hover,
+    .sidebar-part-title:hover {
+        color: var(--accent);
+    }
+
+    .sidebar-chapters {
+        font-family: var(--font-body);
+    }
+
+    .sidebar-home {
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .sidebar-introduction {
+        list-style: none;
+        margin: 0 0 1.2rem;
+        padding-left: 0.25rem;
+    }
+
+    .sidebar-parts,
+    .sidebar-chapters {
+        padding-left: 1rem;
+    }
+
+    .sidebar-parts {
+        list-style: none;
+        padding-left: 0.3rem;
+        counter-reset: guide-chapter;
+    }
+
+    .sidebar-chapters {
+        list-style: none;
+    }
+
+    .sidebar-part {
+        margin: 1rem 0;
+    }
+
+    .sidebar-chapters {
+        margin-top: 0.35rem;
+    }
+
+    .sidebar-chapters li {
+        margin: 0.4rem 0;
+
+        &::before {
+            counter-increment: guide-chapter;
+            content: counter(guide-chapter) ". ";
+        }
+    }
+}
+
+.page-content-layout {
+    display: grid;
+    grid-template-columns: 800px 180px;
+    gap: 2rem;
+    align-items: start;
+    min-width: 0;
+}
+
+.page-content-layout .post-content {
+    max-width: 800px;
+    text-align: justify;
+    width: 100%;
+    min-width: 0;
+}
+
+.reference-toc {
+    position: sticky;
+    top: calc(var(--header-height) + 1.5rem);
+    max-height: calc(100vh - var(--header-height) - 2rem);
+    overflow-y: auto;
+    font-size: 0.78rem;
+    color: var(--secondary);
+}
+
+.reference-toc nav {
+    margin: 0;
+    padding: 0;
+}
+
+.reference-toc ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 1rem;
+}
+
+.reference-toc ul ul {
+    padding-left: 0.8rem;
+}
+
+.reference-toc a {
+    color: var(--secondary);
+}
+
+.reference-toc summary {
+    display: none;
+}
+
+.reference-toc a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+@media (max-width: 1200px) {
+    .sidebar {
+        display: none; /* was: hidden below 991px + hidden 992–1200px */
+    }
+
+    .page-content-layout {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .page-guide,
+    .page-reference {
+        grid-template-columns: minmax(0, 1fr);
+        width: 100%;
+    }
+
+    .page-content-layout .post-content {
+        order: 2;
+        width: 100%;
+        max-width: none;
+    }
+
+    .reference-toc {
+        order: 1;
+        position: static;
+        width: 100%;
+        max-height: none;
+        margin: 0;
+        order: -1;
+    }
+
+    .reference-toc details {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
         background: var(--code-bg);
+    }
+
+    .reference-toc summary {
+        display: block;
+        padding: 0.45rem 0.7rem;
+        cursor: pointer;
+        color: var(--secondary);
+        font-size: 0.85rem;
+    }
+
+    .reference-toc nav {
+        padding: 0.25rem 0.7rem 0.7rem;
     }
 }

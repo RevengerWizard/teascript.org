@@ -51,7 +51,36 @@ skipped. To override this behavior, set $skipHome to false below.
 {{- $nodes := .nodes }}
 
 {{- /* Render. */}}
-<nav class="section-nav docs-links">
+{{- if in (slice "guide" "docs" "api") $currentPage.Section -}}
+{{- $section := site.GetPage "section" $currentPage.Section -}}
+<nav class="sidebar-nav" aria-label="{{ $section.Title }} contents">
+    <a class="sidebar-home" href="{{ $section.RelPermalink }}">{{ $section.Title }}</a>
+    {{- with $section.RegularPages.ByWeight -}}
+    <ul class="sidebar-introduction">
+        {{- range . -}}
+        <li class="{{ if eq .RelPermalink $currentPage.RelPermalink }}active{{ end }}">
+            <a {{ if eq .RelPermalink $currentPage.RelPermalink }}aria-current="page"{{ end }} href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+        </li>
+        {{- end -}}
+    </ul>
+    {{- end -}}
+    <ol class="sidebar-parts">
+        {{- range $section.Sections.ByWeight -}}
+        <li class="sidebar-part">
+            <span class="sidebar-sections">{{ .Params.number }} {{ .Title }}</span>
+            <ol class="sidebar-chapters">
+                {{- range .RegularPages.ByParam "number" -}}
+                <li class="{{ if eq .RelPermalink $currentPage.RelPermalink }}active{{ end }}">
+                    <a {{ if eq .RelPermalink $currentPage.RelPermalink }}aria-current="page"{{ end }} href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
+                </li>
+                {{- end -}}
+            </ol>
+        </li>
+        {{- end -}}
+    </ol>
+</nav>
+{{- else -}}
+<nav class="sidebar-nav">
     <ul class="list-unstyled">
         {{- range $nodes }}
         {{- if and .Page.IsHome $skipHome }}
@@ -61,6 +90,7 @@ skipped. To override this behavior, set $skipHome to false below.
         {{- end }}
     </ul>
 </nav>
+{{- end -}}
 
 {{- /* Recurively render list items. */}}
 {{- define "walk" }}

@@ -1,0 +1,41 @@
+.stack-effect {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 1rem 0;
+    overflow-x: auto;
+    background: transparent;
+}
+
+.stack-effect__stack {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 6px 6px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--theme);
+}
+
+.stack-effect__item {
+    display: inline-block;
+    min-width: 45px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--primary);
+    background: var(--entry);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.post-content .stack-effect__item--ellipsis {
+    color: var(--secondary);
+    font-style: italic;
+}
+
+.stack-effect__arrow {
+    color: var(--accent);
+    font-size: 1.25rem;
+}

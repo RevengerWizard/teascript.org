@@ -11,7 +11,7 @@
 {{- print " dark" }}
 {{- end -}}
 ">
-    {{ partialCached "header.html" . }}
+    {{ partialCached "header.html" . .Section }}
     {{ block "main" . }}{{ end }}
     {{ partialCached "footer.html" . }}
 </body>

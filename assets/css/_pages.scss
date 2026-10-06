@@ -5,3 +5,89 @@
     margin: auto;
     padding: var(--gap);
 }
+
+.page-layout {
+    display: grid;
+    grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+    gap: 4rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 6rem;
+    min-width: 0;
+}
+
+.page-main {
+    min-width: 0;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.post-single {
+    width: 100%;
+    margin: 0 auto;
+    padding-right: 5rem;
+}
+
+.page-main .post-title {
+    font-family: var(--font-heading);
+    font-weight: 400;
+}
+
+.page-guide,
+.page-reference {
+    grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
+    max-width: 1600px;
+}
+
+.page-guide .page-main,
+.page-reference .page-main {
+    max-width: none;
+    padding: 0;
+    position: relative;
+}
+
+.page-guide .post-single,
+.page-reference .post-single {
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.page-guide .sidebar,
+.page-reference .sidebar {
+    padding-left: 1rem;
+}
+
+.page-guide .post-header,
+.page-guide .post-footer,
+.page-reference .post-header,
+.page-reference .post-footer {
+    max-width: 800px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+@media (max-width: 1200px) {
+    .page-guide .post-header,
+    .page-guide .post-footer,
+    .page-reference .post-header,
+    .page-reference .post-footer {
+        max-width: none;
+    }
+
+    .page-layout {
+        grid-template-columns: 1fr;
+        padding: 0 1rem;
+    }
+
+    .page-main {
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .post-single {
+        padding: 0;
+    }
+}

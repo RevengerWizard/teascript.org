@@ -2,6 +2,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 {{- /* Title */}}
 <title>{{ .Title }} &ndash; {{ site.Title }}</title>
 
@@ -11,16 +15,21 @@
 
 {{ $style := resources.Get "css/app.scss" | css.Sass | resources.Minify | fingerprint }}
 <link crossorigin="anonymous" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}" rel="preload stylesheet" as="style">
- 
+
 {{- /* Javascript */}}
 
 {{- /* Client-side syntax highlighting for homepage */}}
 {{ if .IsHome }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/monokai.min.css" integrity="sha512-pU8Ny4jS7Uq58y/K4YLD+jF/74zC3R5SDco/Ln143vyLEmGQY7MV8p+Z5q7big/mNimhvQsfQpprGvUa2QzihQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" integrity="sha512-EBLzUL8XLl+va/zAsmXwS7Z2B1F9HUHkZwyS/VKwh3S7T/U0nF4BaU29EP/ZSf6zgiIxYAnKLu6bJ8dqpmX5uw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 {{ end }}
 
 {{- /* Favicons */}}
+<link rel="icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta name="theme-color" content="#111111">
 
 <noscript>
 </noscript>
