@@ -1,6 +1,6 @@
 ---
 title: Data Structures
-number: 6.
+number: "5."
 weight: 2100
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: OS Module
-number: 9.
+number: "8."
 weight: 900
 ---
 

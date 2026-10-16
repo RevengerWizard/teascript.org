@@ -1,6 +1,6 @@
 ---
 title: Calling Teascript from C
-number: 11.
+number: "10."
 weight: 3200
 ---
 

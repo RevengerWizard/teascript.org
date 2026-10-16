@@ -1,6 +1,6 @@
 ---
 title: Handling Types and Values
-number: 13.
+number: "12."
 weight: 3400
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Object-Oriented Programming
-number: 9.
+number: "8."
 weight: 2400
 ---
 

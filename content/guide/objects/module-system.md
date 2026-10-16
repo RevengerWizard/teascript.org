@@ -1,6 +1,6 @@
 ---
 title: The Module System
-number: 8.
+number: "7."
 weight: 2300
 ---
 

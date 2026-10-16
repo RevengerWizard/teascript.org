@@ -1,5 +1,6 @@
 ---
 title: Stack Manipulation
+number: "5."
 weight: 300
 ---
 

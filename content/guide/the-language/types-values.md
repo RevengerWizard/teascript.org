@@ -1,6 +1,6 @@
 ---
 title: Types and Values
-number: 2.
+number: "1."
 weight: 200
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: List Methods
-number: 4.
+number: "4."
 weight: 400
 ---
 

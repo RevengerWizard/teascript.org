@@ -1,6 +1,6 @@
 ---
 title: Range Methods
-number: 6.
+number: "6."
 weight: 600
 ---
 

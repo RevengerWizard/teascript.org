@@ -1,6 +1,6 @@
 ---
 title: Core Functions
-number: 2.
+number: "2."
 weight: 200
 ---
 

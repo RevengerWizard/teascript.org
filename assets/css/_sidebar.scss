@@ -92,7 +92,6 @@
     .sidebar-parts {
         list-style: none;
         padding-left: 0.3rem;
-        counter-reset: guide-chapter;
     }
 
     .sidebar-chapters {
@@ -109,11 +108,10 @@
 
     .sidebar-chapters li {
         margin: 0.4rem 0;
+    }
 
-        &::before {
-            counter-increment: guide-chapter;
-            content: counter(guide-chapter) ". ";
-        }
+    .sidebar-chapter-number {
+        margin-right: 0.35rem;
     }
 }
 

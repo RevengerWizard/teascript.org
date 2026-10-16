@@ -1,5 +1,6 @@
 ---
 title: Garbage Collection
+number: "19."
 weight: 1700
 ---
 

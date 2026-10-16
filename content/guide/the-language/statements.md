@@ -1,6 +1,6 @@
 ---
 title: Statements
-number: 4.
+number: "3."
 weight: 400
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: IO Module
-number: 8.
+number: "7."
 weight: 800
 ---
 

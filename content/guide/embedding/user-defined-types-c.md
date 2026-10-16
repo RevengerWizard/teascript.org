@@ -1,6 +1,6 @@
 ---
 title: User-Defined Types in C
-number: 14.
+number: "13."
 weight: 3500
 ---
 

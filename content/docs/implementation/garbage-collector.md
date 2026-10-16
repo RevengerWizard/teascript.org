@@ -1,6 +1,6 @@
 ---
 title: Garbage Collector
-number: 19.
+number: "3."
 weight: 1805
 ---
 

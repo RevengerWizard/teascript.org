@@ -1,5 +1,6 @@
 ---
 title: Push Functions
+number: "8."
 weight: 700
 ---
 

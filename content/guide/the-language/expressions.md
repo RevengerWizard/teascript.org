@@ -1,6 +1,6 @@
 ---
 title: Expressions
-number: 3.
+number: "2."
 weight: 300
 ---
 

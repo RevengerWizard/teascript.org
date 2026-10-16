@@ -1,6 +1,6 @@
 ---
 title: Introduction
-number: 1.
+number: "1."
 weight: 100
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Get Functions
+number: "6."
 weight: 400
 ---
 

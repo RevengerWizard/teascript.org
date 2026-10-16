@@ -1,6 +1,6 @@
 ---
 title: Debug Module
-number: 13.
+number: "13."
 weight: 1300
 ---
 

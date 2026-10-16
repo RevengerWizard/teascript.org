@@ -1,6 +1,6 @@
 ---
 title: Storing State in C
-number: 15.
+number: "14."
 weight: 3600
 ---
 

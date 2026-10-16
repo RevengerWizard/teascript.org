@@ -1,5 +1,6 @@
 ---
 title: Collection Operations
+number: "10."
 weight: 1000
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Concepts
-number: 2.
+number: "2."
 weight: 101
 ---
 

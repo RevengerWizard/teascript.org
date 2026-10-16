@@ -1,6 +1,6 @@
 ---
 title: Functions
-number: 5.
+number: "4."
 weight: 500
 ---
 

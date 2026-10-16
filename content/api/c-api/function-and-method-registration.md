@@ -1,5 +1,6 @@
 ---
 title: Function and Method Registration
+number: "15."
 weight: 1400
 ---
 

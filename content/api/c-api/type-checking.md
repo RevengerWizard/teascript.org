@@ -1,5 +1,6 @@
 ---
 title: Type Checking
+number: "17."
 weight: 1500
 ---
 

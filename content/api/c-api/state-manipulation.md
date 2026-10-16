@@ -1,5 +1,6 @@
 ---
 title: State Manipulation
+number: "4."
 weight: 200
 ---
 

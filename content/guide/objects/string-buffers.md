@@ -1,6 +1,6 @@
 ---
 title: String Buffers
-number: 7.
+number: "6."
 weight: 2200
 ---
 
@@ -35,29 +35,6 @@ var buf = Buffer.new(4096)
 This internally only reserves the memory up front, so the buffer doesn't need to grow while you fill it. If you try checking it, the buffer is actually still empty (`buf.len` is `0`), and it will grow past its original defined size once it has been surpassed. The size must be a non-negative integer.
 
 And like any other value in Teascript, buffers are managed for you, meaning they're reclaimed once the buffer is no longer used.
-
-## Creating Buffers
-
-Create a buffer by calling `Buffer`, like any other class:
-
-```tea
-var buf = Buffer()
-```
-
-A new buffer is empty. Its `len` property tells you how many bytes it currently holds:
-
-```console
-> print(buf.len)
-0
-```
-
-If you know roughly how much text you are going to produce, you can pass an initial size in bytes. The buffer still starts empty, but it won't need to grow as you fill it:
-
-```tea
-var buf = Buffer(4096)
-```
-
-Like every other value, buffers are managed for you: there is nothing to close or free.
 
 ## Reading and Writing
 

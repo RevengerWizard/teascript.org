@@ -1,6 +1,6 @@
 ---
 title: String Methods
-number: 3.
+number: "3."
 weight: 300
 ---
 

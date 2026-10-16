@@ -69,8 +69,9 @@ skipped. To override this behavior, set $skipHome to false below.
         <li class="sidebar-part">
             <span class="sidebar-sections">{{ .Params.number }} {{ .Title }}</span>
             <ol class="sidebar-chapters">
-                {{- range .RegularPages.ByParam "number" -}}
+                {{- range .RegularPages.ByWeight -}}
                 <li class="{{ if eq .RelPermalink $currentPage.RelPermalink }}active{{ end }}">
+                    {{- with .Params.number }}<span class="sidebar-chapter-number">{{ . }}</span>{{ end -}}
                     <a {{ if eq .RelPermalink $currentPage.RelPermalink }}aria-current="page"{{ end }} href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>
                 </li>
                 {{- end -}}

@@ -1,6 +1,6 @@
 ---
 title: Math Module
-number: 10.
+number: "9."
 weight: 1000
 ---
 

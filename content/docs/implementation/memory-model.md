@@ -1,6 +1,6 @@
 ---
 title: Memory Model
-number: 19.
+number: "4."
 weight: 1900
 ---
 

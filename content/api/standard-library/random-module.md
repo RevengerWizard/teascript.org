@@ -1,6 +1,6 @@
 ---
 title: Random Module
-number: 11.
+number: "10."
 weight: 1100
 ---
 

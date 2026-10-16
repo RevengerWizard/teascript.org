@@ -1,5 +1,6 @@
 ---
 title: String Operations
+number: "23."
 weight: 2100
 ---
 

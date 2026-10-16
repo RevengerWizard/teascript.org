@@ -1,6 +1,6 @@
 ---
 title: Overview of the C API
-number: 10.
+number: "9."
 weight: 3100
 ---
 

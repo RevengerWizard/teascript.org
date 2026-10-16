@@ -16,6 +16,16 @@
 
 ---
 
+Name
+- Chapter
+- Part N - Title
+0. Chapter Title
+    * Section 1
+    * Section 2
+    * Section
+
+---
+
 Guide
 - Conventions
     * Code
@@ -182,7 +192,11 @@ Docs
 - Part I - Language Specification
 1. Notation and Conventions
     - Grammar Notation
+        * Normative Language
+        * Extended BNF
+        * Operator Precedence Tables 
     - Lexical and Syntactic Layers
+        * Terminology 
 2. Lexical Structure
     - Source Encoding
     - Whitespace and Line Endings
@@ -195,8 +209,14 @@ Docs
         * Float Literals
         * String Literals
         * Escape Sequences
-3. Types
+    - Lexical Errors
+3. Type System
     - Type System Overview
+        * Types
+        * Value Types and Reference Types
+        * Truth Value
+        * Equality
+        * Classes of Built-in Types
     - Nil
     - Boolean
     - Number
@@ -211,40 +231,89 @@ Docs
     - List
     - Map
     - Class and Instance
+        * Instances
     - Module
     - Userdata
     - Pointer
 4. Expressions
+    - Expression Forms
+        * Literals and Names
+        * Grouping
+        * List and Map Literals
+        * Function Expressions
+        * Member Access
+        * Calls
+        * Subscripts and Slices
+        * Ranges
+        * Conditional Expression
+        * Self and Super
     - Evaluation Order
     - Operator Semantics
         * Arithmetic
         * Comparison
-        * Logical (short-circuit rules)
+        * Logical
         * Identity
         * Bitwise
         * Operator Overloading Dispatch
     - Operator Precedence Table
     - Assignment
+    - Compound Assignment
 5. Statements
     - Execution Model
-    - Variable Declaration and Scope
-    - Name Resolution Rules
+        * Completion
+        * Empty Statement
+        * Expression Statements
+        * Blocks
+        * Execution of a Chunk
     - Control Flow Semantics
         * Truthiness
         * if / else
+        * switch
         * while / do
-        * Numeric for (iteration semantics, step edge cases)
-        * Generic for (iterator protocol)
+        * Generic for
+        * Iterative for
     - break / continue / return
-6. Functions
+        * break
+        * continue
+        * return
+    - Multiple Assignment
+6. Declarations
+    - Declarations Overview
+    - Variable Declaration
+        * var and const
+        * Initialization
+        * Destructuring with Rest
+        * Constants
+    - Scope
+        * Kinds of Scope
+        * Where a Variable is Visible
+        * Visibility During Initialization
+        * Redeclaration and Shadowing
+        * Lifetime
+    - Name Resolution Rules
+    - Exporting Declarations
+7. Functions
     - Definition and Calling Convention
+        * Function Values
+        * Forms That Create Functions
+        * Parameters
+        * Calling Convention
     - Argument Passing Semantics
     - Default and Variadic Arguments
+        * Optional Parameters
+        * Variadic Parameters
     - Multiple Return Values
     - Closures and Upvalue Capture
+        * Which Variables are Captured
+        * Capture by Reference
+        * Lifetime of Captured Variables
+        * One Variable per Execution of a Scope
     - Tail Calls
-7. Object System
+8. Object System
     - Class Definition and Instantiation
+        * Class Declarations
+        * Instantiation
+        * Attributes
     - Method Resolution Order
     - Special Methods
         * get / set
@@ -253,67 +322,149 @@ Docs
         * Operator Overload Dispatch Table
     - Inheritance Semantics
     - Identity and Equality
-8. Module System
+9. Module System
     - Import Semantics
+        * Statements
+        * Execution
+        * Forms and Binds
+        * Exports
     - Search Path Resolution
+        * Logical Names
+        * Paths
+        * Candidates
     - Circular Imports
     - Module Caching
-9. Error Model
+10. Error Model
     - Error Values
+        * Conditions that Raise
+        * Errors
+        * The Error Value
+        * error
+        * assert
     - Propagation
     - Protected Execution
-10. Execution Environment
+        * pcall
+        * What is caught
+        * State After an Error is Caught
+        * Rethrowing
+11. Execution Environment
     - The Global Environment
-    - Standard Modules
-    - argv and the Sys Module
+
 - Part II - Bytecode Reference
-11. Overview
+12. Overview
     - Design Goals
     - Versioning and Compatibility
-    - The chunk Format
-12. Binary Encoding
+        * What Requires a Version Change
+        * What Does Not Matter
+        * Limits
+    - The Chunk Format
+        * Anatomy of a Bytecode Chunk
+        * Function Prototypes
+        * Modules
+        * Producing and Loading Chunks
+        * Loading Errors
+    - From Source to Execution
+        * The Execution Model in Brief
+    - Inspecting Bytecode
+13. Binary Encoding
+    - Primitive Types
+        * ULEB128
+        * uleb128_33
+        * Byte Order
     - File Header
+        * Flags
+        * Module Variable Table
     - Type Tags
     - Constant Pool
+        * Strings
+        * Numbers
+        * Nested Functions
     - Upvalue Descriptors
     - Function Prototypes
-13. Instruction Set
+        * Prototype Body
+        * Reading and Validation
+        * Footer
+    - Complete Example
+14. Instruction Set
     - Instruction Encoding
+        * Stack Frames
+        * Call States and Re-entry
     - Operand Types and Notation
+        * Operand Types
+        * Method Flags
+        * Stack Notation
+        * Syntax Lines
+        * Stack Effect Table
     - Instruction Reference
-      — one entry per opcode:
-      mnemonic, encoding, stack effect, semantics, notes
+        * Stack Operations
+        * ...
+        * Constant Operations
+        * ...
+        * Function Calls
+        * ...
+        * Arithmetic Operations
+        * ...
+        * Comparison Operations
+        * ...
+        * Control Flow
+        * ...
+        * Collection Operations
+        * ...
+        * Object Access
+        * ...
+        * Global and Module Access
+        * ...
+        * Closures and Upvalues
+        * ...
+        * Logical and Type Operations
+        * ...
+        * Bitwise Operations
+        * ...
+        * Iteration
+        * ...
+        * Classes
+        * ...
+        * Special Instructions
+        * ...
+
 - Part III - Implementation
-14. The Interpreter
+15. The Interpreter
     - Single-Pass Architecture
     - Scope and Upvalue Resolution
     - Constant Folding
     - Jump Patching
-15. The Virtual Machine
+16. The Virtual Machine
     - Execution Loop
     - The Call Stack
     - Upvalue Closing
     - Error Dispatch
     - Interacting with the GC
-16. Garbage Collector
+17. Garbage Collector
     - Algorithm
     - Tri-Color Marking
     - The Write Barrier
     - Finalization Order
     - Interaction with Userdata
-17. Memory Model
+18. Memory Model
     - Value Representation
     - Object Layout
-18. Limits
+19. Limits
     - Constants
     - Locals
     - Upvalues
     - Call Depth
 
 - Appendix
-A. Full Grammar (EBNF)
-B. Versioning and Compatibility
-C. Keywords and Reserved Words
+- A. Full Grammar
+    - EBNF
+- B. Versioning and Compatibility
+- C. Keywords and Reserved Words
+    - Reserved Words
+        * Groups
+        * Multi-role Words
+        * Context-sensitive Words
+    - Not Reserved Words
+    - Symbols
 
 ---
 
@@ -341,19 +492,19 @@ API
     - Thread Safety
 16. State Manipulation
 17. Stack Manipulation
-18. Get Functions          (tea_get_*: read without coercion, no error)
-19. Value Testing          (tea_is_*, tea_equal, tea_rawequal)
-20. Value Conversion       (tea_to_*: coerce if possible, no error)
-21. Push Functions         (tea_push_*)
-22. Object Creation        (tea_new_*, tea_create_*)
-23. Object Manipulation    (tea_len, tea_next)
+18. Get Functions
+19. Value Testing
+20. Value Conversion
+21. Push Functions
+22. Object Creation
+23. Object Manipulation
 24. List Operations
 25. Map Operations
 26. Attribute Access
 27. Variable Access
 28. Function and Method Registration
-29. Type Checking          (tea_check_*)
-30. Optional Arguments     (tea_opt_*)
+29. Type Checking
+30. Optional Arguments
 31. Garbage Collection
 32. Memory Management
 33. Code Loading and Execution
@@ -361,16 +512,16 @@ API
 35. String Operations
 
 - Appendix
-A. Error Code Reference\
-B. Type Tag Reference  (TEA_TYPE_*, TEA_MASK_*)\
-C. Macro Reference     (all the convenience macros from tea.h)\
-D. Migration Guide     (API changes between versions, once 1.0 exists)\
+- A. Error Code Reference
+- B. Type Tag Reference  (TEA_TYPE_*, TEA_MASK_*)
+- C. Macro Reference     (all the convenience macros from tea.h)
+- D. Migration Guide     (API changes between versions, once 1.0 exists)
 
 ---
 
 Bytecode Reference Documentation
 
-Versioned
+Versioned?
 
 - Tea Stack
 - Instruction Notation
@@ -408,6 +559,8 @@ Returns
 Errors
   Raises a runtime error if the value is not a named userdata or if the
   name does not match.
+
+Example
 
 See also
   tea_test_udata, tea_get_userdata, tea_new_udata

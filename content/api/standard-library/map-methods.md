@@ -1,6 +1,6 @@
 ---
 title: Map Methods
-number: 5.
+number: "5."
 weight: 500
 ---
 
