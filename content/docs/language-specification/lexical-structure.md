@@ -29,7 +29,8 @@ print("hello")
 
 The `#!` line is recognized only at the very start of the source. A `#` anywhere else is an unexpected character.
 
-> NOTE: A chunk is either source text or precompiled bytecode, distinguished by its first byte. A byte-order mark or `#!` line in front of precompiled bytecode causes the chunk to be entirely rejected. This chapter describes source text only.
+> [!NOTE]
+> A chunk is either source text or precompiled bytecode, distinguished by its first byte. A byte-order mark or `#!` line in front of precompiled bytecode causes the chunk to be entirely rejected. This chapter describes source text only.
 
 The way the source is delivered to the comiler, for example in blocks read from a file, has no effect on its meaning; a token may span a block boundary.
 
@@ -66,7 +67,8 @@ A **block comment** runs from `/*` to its matching `*/`. Block comments can **ne
 
 A block comment is still open at the end of the source is an _unfinished comment_ error. Because of nesting, `/* ... */` cannot be used to disable a region containing an unbalanced `/*` or `*/`, such as one inside a string literal.
 
-> NOTE: Inside comments, only `\n` advances the line counter, so sources using bare `\r` line endings may report line numbers that are too low after a block comment. LF and CRLF sources are unaffected.
+> [!NOTE]
+> Inside comments, only `\n` advances the line counter, so sources using bare `\r` line endings may report line numbers that are too low after a block comment. LF and CRLF sources are unaffected.
 
 Comments act as white space. `a/**/b` is two tokens.
 

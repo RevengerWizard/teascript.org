@@ -6,7 +6,7 @@ weight: 600
 
 A _statement_ is a construct that is executed for its effect. This chapter defines how statements are sequenced and what it means for one to complete, and gives the semantics of Teascript's control flow statements: conditionals, loops, `switch`, and the jump statements `break`, `continue` and `return`.
 
-The declaration statements (`var`, `const`, `function`, `class`), scoping and name resolution are described in the chapter on declarations; `import`, `from` and `export` in the chapter on modules. Expressions, including assignments, are described in [Expressions](expressions.md). Truth values and equality are defined in [Type System](type-system.md).
+The declaration statements (`var`, `const`, `function`, `class`), scoping and name resolution are described in the chapter on declarations; `import`, `from` and `export` in the chapter on modules. Expressions, including assignments, are described in [Expressions](../expressions). Truth values and equality are defined in [Type System](../type-system).
 
 ## Execution Model
 
@@ -39,7 +39,7 @@ statement   ::= ';'
 block       ::= '{' declaration* '}'
 ```
 
-Statements are executed **one after another, in source order**. A declaration takes effect when execution reaches it. Newlines do not end statements (see [Lexical Structure](lexical-structure.md)), and a semicolon is not required to end a statement; semicolons are required only between the clauses of the three-clause `for`.
+Statements are executed **one after another, in source order**. A declaration takes effect when execution reaches it. Newlines do not end statements (see [Lexical Structure](../lexical-structure)), and a semicolon is not required to end a statement; semicolons are required only between the clauses of the three-clause `for`.
 
 ### Completion
 
@@ -93,7 +93,7 @@ The code of a chunk is executed once, from the top. When the last statement comp
 
 ### Truthiness
 
-Every control-flow condition is tested by **truth value**, as defined under [Truth value](type-system.md#truth-value); a condition need not be a boolean. This applies to the conditions of `if`, `while`, `do ... while` and the clauses of generic `for`.
+Every control-flow condition is tested by **truth value**, as defined under [Truth value](../type-system#truth-value); a condition need not be a boolean. This applies to the conditions of `if`, `while`, `do ... while` and the clauses of generic `for`.
 
 ### if / else
 
@@ -135,7 +135,7 @@ default_clause   ::= 'default' block
 There are no braces around the clauses.
 
 1. The `switch` expression is evaluated **once**
-2. The clauses are examined in order. A `case` clause matches if the switch value is **equal** to the value of at least one of its expressions, using the equality relation of [Type System](type-system.md#equality). `switch` never calls an `==` operator method, so instances and userdata match by identity
+2. The clauses are examined in order. A `case` clause matches if the switch value is **equal** to the value of at least one of its expressions, using the equality relation of [Type System](../type-system#equality). `switch` never calls an `==` operator method, so instances and userdata match by identity
 3. The block of the **first** matching clause is executed, and then the statement ends. There is **no fall-through**
 4. If no clause matches, the `default` block is executed, if there is one; otherwise nothing happens
 
@@ -212,7 +212,8 @@ for var i = 0; i < 3; i += 1
 }
 ```
 
-> NOTE: The copy back does not take place when the iteration ends with `continue`, so an assignment to the loop variable made in the body before a `continue` is lost. If the loop variable is declared with `const`, an increment that assigns to it is a compile-time error.
+> [!NOTE]
+> The copy back does not take place when the iteration ends with `continue`, so an assignment to the loop variable made in the body before a `continue` is lost. If the loop variable is declared with `const`, an increment that assigns to it is a compile-time error.
 
 #### Steps and Termination
 The language does not interpret the three clauses: the _increment_ is any expression and the _condition_ is any expression, so the step may be any amount, positive or negative, and the loop terminates only if the condition eventually becomes falsy. In particular:
@@ -291,7 +292,8 @@ return_statement   ::= 'return' expression?
 | generic `for` | the next call of the iterator |
 | `do ... while` | the **beginning of the body**; the condition is **not** evaluated |
 
-> NOTE: The last row differs from most languages: in a `do ... while` loop `continue` jumps back to the start of the body without testing the condition, so the loop continues even if the condition is falsy.
+> [!NOTE]
+> The last row differs from most languages: in a `do ... while` loop `continue` jumps back to the start of the body without testing the condition, so the loop continues even if the condition is falsy.
 
 Variables declared in the body are discarded. It is a compile-time error if `continue` is not inside a loop.
 

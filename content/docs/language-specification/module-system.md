@@ -6,7 +6,7 @@ weight: 900
 
 A Teascript program is made of _modules_. A module is one unit of source code (usually a file) together with its top-level variables and its **exports**, the values that it makes available to other modules. A module is executed **once**, the first time it is imported, and the result is shared by every later import.
 
-This chapter defines the forms of `import`, `from` and `export`, the way an imported module is located, the treatment of circular imports, and the caching of modules. The module value itself is described in [Type System](type-system.md#module), and the declaration of the names that imports introduce in [Declarations](declarations.md). The locations of the library directories and the loading of native extension modules are implementation-defined and are described in the Implementation part of this documentation.
+This chapter defines the forms of `import`, `from` and `export`, the way an imported module is located, the treatment of circular imports, and the caching of modules. The module value itself is described in [Type System](../type-system#module), and the declaration of the names that imports introduce in [Declarations](../declarations). The locations of the library directories and the loading of native extension modules are implementation-defined and are described in the Implementation part of this documentation.
 
 ## Import Semantics
 
@@ -32,7 +32,7 @@ export_statement ::= 'export' ( variable_declaration | function_declaration | cl
 There are two way to name the module to import:
 
 - A **logical name**, written as an indentifier: `import math`. The name refers to a module of the language's libraries and is resolved as described in [Search Path Resolution](#search-path-resolution).
-- A **path**, written as a string: `import "util"`. The path is interpreted relative to the directory of the module that contains the statement. A path may be an interpolated string (see [String Literals](lexical-structure.md#string-literals)), in which case it is built when the statement is executed.
+- A **path**, written as a string: `import "util"`. The path is interpreted relative to the directory of the module that contains the statement. A path may be an interpolated string (see [String Literals](../lexical-structure#string-literals)), in which case it is built when the statement is executed.
 
 ### Execution
 
@@ -41,7 +41,7 @@ There are two way to name the module to import:
 1. The module is located and, unless it has already been loaded. When loading, its source is compiled and its top-level code is executed (see [Module Caching](#module-caching)).
 2. The requested names are bound to variables of the importing scope.
 
-A syntax error in the module raises an error at the import statement, and so does any runtime error in its top-level code; see [Error Model](error-model.md). A module that cannot be found is a runtime error that names it.
+A syntax error in the module raises an error at the import statement, and so does any runtime error in its top-level code; see [Error Model](../error-model). A module that cannot be found is a runtime error that names it.
 
 ### Forms and Binds
 
@@ -55,7 +55,7 @@ A syntax error in the module raises an error at the import statement, and so doe
 
 Several modules may be imported by one statement, separated by commas `import math, os as system`. The `from` forms accepts a logical name or a path after `from`.
 
-The bound names are ordinary variables, declared in the scope of the statement, and the rules of [Declarations](declarations.md) apply: it is a compile-time error to bind a name that is already declared in the same scope. They are mutable; assigning to one changes only that variable.
+The bound names are ordinary variables, declared in the scope of the statement, and the rules of [Declarations](../declarations) apply: it is a compile-time error to bind a name that is already declared in the same scope. They are mutable; assigning to one changes only that variable.
 
 #### Accessing a Module
 
@@ -165,5 +165,5 @@ A module that is loaded for the first time is processed in this order:
 Two points follow from this order:
 
 - **The module is cached before it runs**, which makes circular imports possible.
-- **A module whose loading fails stays in the cache.** If the compilation or the top-level code raises an error, the module is not removed. A later import of the same module returns the module as it was left, **without running its code again and without an error**; its exports are those that had been defined when the error occurred. A program that catches the error of a failed import (see [Protected Execution](error-model.md#protected-execution)) should therefore not import the module again expecting a second attempt.
+- **A module whose loading fails stays in the cache.** If the compilation or the top-level code raises an error, the module is not removed. A later import of the same module returns the module as it was left, **without running its code again and without an error**; its exports are those that had been defined when the error occurred. A program that catches the error of a failed import (see [Protected Execution](../error-model#protected-execution)) should therefore not import the module again expecting a second attempt.
 No import form reloads a module.

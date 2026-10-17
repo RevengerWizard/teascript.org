@@ -63,7 +63,8 @@ The version number covers the dump layout _and_ the meaning of the instruction s
 - The **operand layout or semantics** of any instruction.
 - The meaning of the prototype `flags` bits or of the upvalue descriptor bits.
 
-> WARNING: A dump does not store an opcode table or a checksum of it. Changing the instruction set without bumping the version produces dumps that load successfully and then misbehave when executed.
+> [!WARNING] 
+> A dump does not store an opcode table or a checksum of it. Changing the instruction set without bumping the version produces dumps that load successfully and then misbehave when executed.
 
 ### What Does Not Matter
 

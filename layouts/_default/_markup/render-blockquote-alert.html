@@ -1,0 +1,74 @@
+{{- /* layouts/_default/_markup/render-blockquote-alert.html */}}
+
+{{- if eq .Type "alert" -}}
+    {{- /* This is an Admonition - Render using admonition logic */}}
+
+    {{- /* Map alert type to icon */}}
+    {{- $icons := dict
+        "caution"    "caution-icon.svg"
+        "important"  "important-icon.svg"
+        "note"       "note-icon.svg"
+        "tip"        "tip-icon.svg"
+        "warning"    "warning-icon.svg"
+    }}
+
+    {{- /* Determine type and title */}}
+    {{- $type := cond (index $icons .AlertType) .AlertType "note" }}
+    {{- $rawTitle := or .AlertTitle "" }}
+    {{- $headless := false }}
+    {{- if $rawTitle }}
+        {{- $trimmedTitle := $rawTitle | strings.TrimSpace }}
+        {{- $dequotedTitle := $trimmedTitle | replaceRE `["'']|&quot;|&rdquo;|&ldquo;|&rsquo;|&lsquo;|&#34;|&#39;` "" }}
+        {{- if eq ($dequotedTitle | strings.TrimSpace) "" }}
+            {{- $headless = true }}
+        {{- end }}
+    {{- end }}
+    {{- $title := or .AlertTitle (T (printf "admonitions.%s" $type)) (title $type) }}
+    {{- $iconFile := index $icons $type }}
+    {{- $partial := printf "admonitions/icons/%s" $iconFile }}
+
+    {{- /* Check if icon exists */}}
+    {{- if not (templates.Exists (printf "partials/%s" $partial)) }}
+        {{- errorf "The blockquote render hook was unable to find the icon partial at layouts/partials/%s for admonition type '%s'." $partial $type }}
+    {{- end }}
+
+    {{- /* Check if .AlertSign exists to determine if it's foldable */}}
+    {{- if and .AlertSign (not $headless) }}
+        {{- /* --- START Foldable Admonition HTML (using <details>) --- */}}
+        {{- /* The 'open' attribute could be conditionally added based on .AlertSign, e.g., if eq .AlertSign "-" */}}
+        <details class="admonition {{ $type }}">
+        <summary class="admonition-header">
+            {{- partialCached $partial . }}
+            <span>{{ $title }}</span>
+            {{- /* Optional: Add a custom chevron/indicator here via span/svg if you hide the default one */}}
+        </summary>
+        {{- with .Text }}
+        <div class="admonition-content">
+            {{ . }}
+        </div>
+        {{- end }}
+        </details>
+        {{- /* --- END Foldable Admonition HTML --- */}}
+    {{- else }}
+        {{- /* --- START Non-Foldable Admonition HTML (using <div>) --- */}}
+        <div class="admonition {{ $type }}{{ if $headless }} admonition--headless{{ end }}">
+        {{- if not $headless }}
+        <div class="admonition-header">
+            {{- partialCached $partial . }}
+            <span>{{ $title }}</span>
+        </div>
+        {{- end }}
+        {{- with .Text }}
+        <div class="admonition-content">
+            {{ . }}
+        </div>
+        {{- end }}
+        </div>
+        {{- /* --- END Non-Foldable Admonition HTML --- */}}
+    {{- end }}
+{{- else -}}
+    {{- /* This is a standard blockquote */}}
+    <blockquote>
+        {{ .Text }}
+    </blockquote>
+{{- end -}}

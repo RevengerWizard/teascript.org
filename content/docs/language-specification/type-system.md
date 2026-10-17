@@ -103,7 +103,7 @@ A boolean is never equal to a value of another type, and there is no implicit co
 
 `number` is the **only numeric type**. A number is an IEEE 754 **binary64** (double-precision) floating-point value. There is no separate integer type; an integer is a number with no fractional part. Every integer with magnitude up to 2^53 is represented exactly; beyond that, integers are rounded like any other double.
 
-The lexical forms of numeric literal are specified in [Lexical Structure](lexical-structure.md). Integer-form and float-form literals both produce a `number`.
+The lexical forms of numeric literal are specified in [Lexical Structure](../lexical-structure). Integer-form and float-form literals both produce a `number`.
 
 **Numeric conversion**. The runtime provides conversions from value to number. Where it is applied (for example by library functions), it behaves as follows:
 
@@ -168,7 +168,7 @@ A string is an **immutable sequence of bytes**. A string carries **no encoding**
 - The _length_ of a string is its number of _bytes_
 - Any byte value 0 to 255 may occur, including `0` (NUL)
 - Operations that decompose a string, such as slicing a string with a range or expanding it into a list, work on _bytes_; expanding `"é"` (the UTF-8 encoding of U+00E9 is two bytes) yields a list of two one-byte strings, neither of which is valid UTF-8 on its own
-- Strings written in source are produced by the rules of [Lexical Structure](lexical-structure.md); `\u` and `\U` escapes produce the UTF-8 encoding of a code point
+- Strings written in source are produced by the rules of [Lexical Structure](../lexical-structure); `\u` and `\U` escapes produce the UTF-8 encoding of a code point
 
 #### Slicing
 Slicing a string with a range `start..end` produces a new string of the bytes from index `start` up to but excluding index `end`:
@@ -181,7 +181,8 @@ Slicing a string with a range `start..end` produces a new string of the bytes fr
 
 The truth value of a string is determined by its **first byte**: a string is falsy if its first byte is NUL. For every string that contains no NUL byte this is the same as being empty. A non-empty string that begins with a NUL byte is falsy.
 
-> NOTE: Internally, every string is also followed by a terminating NUL byte which is not counted in its length. This is an implementation detail with no effect on the language, except for the truth-value rule above.
+> [!NOTE]
+> Internally, every string is also followed by a terminating NUL byte which is not counted in its length. This is an implementation detail with no effect on the language, except for the truth-value rule above.
 
 ### Interning
 

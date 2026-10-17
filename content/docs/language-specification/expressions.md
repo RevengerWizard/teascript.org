@@ -6,7 +6,7 @@ weight: 500
 
 An _expression_ is a construct that is evaluated to produce a value. This chapter defines the forms of expression, the order in which their parts are evaluated, the meaning of every operator, the precedence and associativity that decide how operators group, and assignment.
 
-The types of the values that expressions produce, and the truth value and equality relations used below, are defined in [Type System](type-system.md). The lexical forms of literals are defined in [Lexical Structure](lexical-structure.md). Grammar notation is defined in [Notation and Conventions](notation-and-conventions.md); as explained there, operators are specified by the precedence table in this chapter, and the productions below describe operands and the postfix forms.
+The types of the values that expressions produce, and the truth value and equality relations used below, are defined in [Type System](../type-system). The lexical forms of literals are defined in [Lexical Structure](../lexical-structure). Grammar notation is defined in [Notation and Conventions](../notation-and-conventions); as explained there, operators are specified by the precedence table in this chapter, and the productions below describe operands and the postfix forms.
 
 ## Expression Forms
 
@@ -28,7 +28,7 @@ subscript  ::= '[' ( expression | slice ) ']'
 
 ### Literals and Names
 
-`nil`, `true` and `false` denote the values of the same names. Numeric and string literals are described in [Lexical Structure](lexical-structure.md). An _interpolated string_ (`"a ${x} b"`) evaluates its embedded expressions from left to right and produces a string made by joining the literal pieces with the values of the expressions, converted to strings in the way the standard `join` operation does.
+`nil`, `true` and `false` denote the values of the same names. Numeric and string literals are described in [Lexical Structure](../lexical-structure). An _interpolated string_ (`"a ${x} b"`) evaluates its embedded expressions from left to right and produces a string made by joining the literal pieces with the values of the expressions, converted to strings in the way the standard `join` operation does.
 
 When two or more string literals are joined with `+` and nothing else, as in `"ab" + "cd"`, they are concatenated at compile-time into one literal. The folding is applied greedily, before any following operators or member access is considered: in `"a" + "b".f()` the member access applies to the folded literal `"ab"`, not to `"b"`.
 
@@ -55,11 +55,12 @@ map_entry    ::= <name> '=' expression
                | '[' expression ']' '=' expression
 ```
 
-A list literal creates a new list each time it is evaluated, with the items in order. A `...` item evaluates its expression and appends every element it denotes: the elements of a list, the integers of a range, or the bytes of a string as one-byte strings; see [List](type-system.md#list). Any other type is a runtime error.
+A list literal creates a new list each time it is evaluated, with the items in order. A `...` item evaluates its expression and appends every element it denotes: the elements of a list, the integers of a range, or the bytes of a string as one-byte strings; see [List](../type-system#list). Any other type is a runtime error.
 
 A map literal creates a new map each time it is evaluated. An entry of the form `name = value` has the **string** name as its key; an entry of the form `[key] = value` uses the value of the key expression. Entries are evaluated in order, and within an entry the key is evaluated before the value. Both forms allow a trailing comma. Note that entries use `=`.
 
-> NOTE: A `{` at the start of statement begins a block, not a map literal. To use a map literal as an expression statement, wrap it in parentheses.
+> [!NOTE]
+> A `{` at the start of statement begins a block, not a map literal. To use a map literal as an expression statement, wrap it in parentheses.
 
 ### Function Expressions
 
@@ -78,18 +79,18 @@ The parameters (required, optional with defaults, and a variadic `...name`) are 
 
 | `object` | `object.name` |
 | --- | --- |
-| instance, userdata | its attribute, or its class's method or getter, or the result of the class's `getattr` special method (see [Class and Instance](type-system.md#class-and-instance)) |
+| instance, userdata | its attribute, or its class's method or getter, or the result of the class's `getattr` special method (see [Class and Instance](../type-system#class-and-instance)) |
 | class | in a method call, its `static` method called `name` |
 | module | the exported value called `name` |
 | any other value | a method of the value's class |
 
 `name` must be a `<name>` or the keyword `new`.
 
-`object.name(arguments)` is a **method call**. It looks up `name` as just described and calls it with `object` as the receiver, without first creating a bound method. `Class.new(arguments)` constructs an instance, see [Class and Instance](type-system.md#class-and-instance).
+`object.name(arguments)` is a **method call**. It looks up `name` as just described and calls it with `object` as the receiver, without first creating a bound method. `Class.new(arguments)` constructs an instance, see [Class and Instance](../type-system#class-and-instance).
 
 ### Calls
 
-`callee(arguments)` evaluates the callee, then the arguments from left to right, then performs the call. The callee may be a function, a bound method, or an instance or userdata whose class defines `call`; any other value is a runtime error, see [Function](type-system.md#function). A call evaluates to the value the function returns.
+`callee(arguments)` evaluates the callee, then the arguments from left to right, then performs the call. The callee may be a function, a bound method, or an instance or userdata whose class defines `call`; any other value is a runtime error, see [Function](../type-system#function). A call evaluates to the value the function returns.
 
 ```
 arguments ::= argument ( ',' argument )*
@@ -124,7 +125,7 @@ The start must always be written. The meaning of the range for a given object ty
 
 ### Ranges
 
-`start..end` and `start..end..step` create a new range value; see [Range](type-system.md#range). `start`, `end` and `step` are evaluated from left to right, and the step is `1` when omitted. All three must be numbers, otherwise a runtime error is raised.
+`start..end` and `start..end..step` create a new range value; see [Range](../type-system#range). `start`, `end` and `step` are evaluated from left to right, and the step is `1` when omitted. All three must be numbers, otherwise a runtime error is raised.
 
 The operands `start` and `end` bind tighter than `..`, at the level of addition, so `1..n + 1` is `1..(n + 1)`. The step, however, is a full expression. Ranges do not chain.
 
@@ -178,7 +179,7 @@ Whenever the precedence table makes two operators group in a particular way, eva
 
 The arithmetic, bitwise and ordering operators have two behaviours:
 
-1. a **built-in behaviour** when its operands are numbers, as specified in [Number](type-system.md#number);
+1. a **built-in behaviour** when its operands are numbers, as specified in [Number](../type-system#number);
 2. when the operands are not numbers, **dispatch to an operator method**, described in [Operator Overloading Dispatch](#operator-overloading-dispatch)
 
 ### Arithmetic
@@ -188,12 +189,12 @@ The arithmetic, bitwise and ordering operators have two behaviours:
 | `a + b` | Addition | Also string concatenation, see below |
 | `a - b` | Subtraction | |
 | `a * b` | Multiplication | |
-| `a / b` | Division | Division by zero is not an error; see [NaN and Infinity](type-system.md#nan-and-infinity) |
+| `a / b` | Division | Division by zero is not an error; see [NaN and Infinity](../type-system#nan-and-infinity) |
 | `a % b` | Remainder | Sign of the dividend |
 | `a ** b` | Exponentiation | |
 | `-a` | Negation | Unary |
 
-When both operands are numbers, the result is a number computed in double precision, as specified in [Arithmetic Semantics](type-system.md#arithmetic-semantics). There is no implicit conversion. An operand that is not a number never becomes one. `+` applied to two strings denotes **concatenation** and produces a string that is the bytes of the left operand followed by those of the right.
+When both operands are numbers, the result is a number computed in double precision, as specified in [Arithmetic Semantics](../type-system#arithmetic-semantics). There is no implicit conversion. An operand that is not a number never becomes one. `+` applied to two strings denotes **concatenation** and produces a string that is the bytes of the left operand followed by those of the right.
 
 Any other combination is resolved by [dispatch](#operator-overloading-dispatch), and is runtime error if neither operand's class provides an operator method.
 
@@ -208,7 +209,7 @@ Any other combination is resolved by [dispatch](#operator-overloading-dispatch),
 | `a not in b` | Negated membership |
 
 #### Equality
-`==` applies the equality relation of [Type System](type-system.md#equality). Values of different types are never equal. If either operand is an instance or a userdata, an `==` operator method is used when one exists, and its result, whatever it is, is the value of the expression. `a != b` is evaluated as `not (a == b)`. Its result is always boolean, and any `==` operator method is the one that is consulted.
+`==` applies the equality relation of [Type System](../type-system#equality). Values of different types are never equal. If either operand is an instance or a userdata, an `==` operator method is used when one exists, and its result, whatever it is, is the value of the expression. `a != b` is evaluated as `not (a == b)`. Its result is always boolean, and any `==` operator method is the one that is consulted.
 
 #### Ordering
 When both operands are numbers the comparison is the IEEE-754 comparison and produces a boolean (always `false` if an operand is `NaN`). Otherwise the corresponding operator method is dispatched; the language itself defines no ordering for other types. Comparisons do **chain**: `a < b < c` is `(a < b) < c`, which compares the boolean result of `a < b` with `c`.
@@ -222,7 +223,7 @@ When both operands are numbers the comparison is the IEEE-754 comparison and pro
 not a      !a      a and b      a or b
 ```
 
-`and` and `or` are **short-circuit** operators that work on truth values, but give one of their operands not a boolean; see [Truth value](type-system.md#truth-value)
+`and` and `or` are **short-circuit** operators that work on truth values, but give one of their operands not a boolean; see [Truth value](../type-system#truth-value)
 
 | Expression | Evaluation | Result |
 | --- | --- | --- |
@@ -258,7 +259,7 @@ For types whose `==` is identity (functions, classes, modules, instances without
 | `a << b` | Left shift |
 | `a >> b` | Right shift (zero-filling) |
 
-When both operands are numbers, the operation is performed on **32-bit unsigned integers**, as specified in [Arithmetic Semantics](type-system.md#arithmetic-semantics): the result is an integer in `0` to `4294967295`, and the effect of operands outside the range of 32-bit unsigned integers, and of shift counts of 32 or more, is unspecified. Otherwise the corresponding operator method is dispatched.
+When both operands are numbers, the operation is performed on **32-bit unsigned integers**, as specified in [Arithmetic Semantics](../type-system#arithmetic-semantics): the result is an integer in `0` to `4294967295`, and the effect of operands outside the range of 32-bit unsigned integers, and of shift counts of 32 or more, is unspecified. Otherwise the corresponding operator method is dispatched.
 
 Bitwise operators bind **more tightly than the comparison and equality operators** (unlike C): `a & b == c` is `(a & b) == c`.
 
@@ -273,7 +274,7 @@ A class overloads an operator by defining the corresponding _operator method_; t
 | Comparison | `<` `<=` `>` `>=` `==` |
 | Index | `[]` (read) and `[]=` (write) |
 
-`!=`, `not`, `!`, `and`, `or`, `is`, `is not`, `..` and the conditional operator cannot be overloaded; `!=` follows from `==`. The other special methods (`call`, `contains`, `iter`, `getattr`, `setattr`, `tostring`, `gc`, `new`) are not operators; they are listed in [Class and Instance](type-system.md#operator-methods-and-special-methods).
+`!=`, `not`, `!`, `and`, `or`, `is`, `is not`, `..` and the conditional operator cannot be overloaded; `!=` follows from `==`. The other special methods (`call`, `contains`, `iter`, `getattr`, `setattr`, `tostring`, `gc`, `new`) are not operators; they are listed in [Class and Instance](../type-system#operator-methods-and-special-methods).
 
 #### Binary operators
 For `a op b`, after both operands are evaluated:
@@ -371,7 +372,8 @@ Assigning to a variable declared with `const`, by `=` or by a compound assignmen
 #### Undeclared Names
 Assigning to a name that does not resolve to a variable is a compile-time error; see [Literals and Names](#literals-and-names). Assignment does not create variables, and predefined globals cannot be assigned.
 
-> NOTE: Assigning to several targets at once `a, b = b, a` is a statement, not an expression, and is described in statements.
+> [!NOTE]
+> Assigning to several targets at once `a, b = b, a` is a statement, not an expression, and is described in statements.
 
 ## Compound Assignment
 

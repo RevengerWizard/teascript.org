@@ -6,7 +6,7 @@ weight: 800
 
 A _class_ defines the behaviour shared by its instances. Methods, static methods, accessors and operator methods. An _instance_ is an object that belongs to one class and has its own attributes, which are created by assignment and not declared.
 
-This chapter defines class declarations and instantiation, how a name on an object is resolved to a method or an attribute, the special methods through which a class customizes the language's operators and constructs, inheritance, and the identity and equality of objects. The representation of classes and instances is described in [Type System](type-system.md#class-and-instance), the member access and `super` expressions in [Expressions](expressions.md), and function parameters and closures in [Functions](functions.md).
+This chapter defines class declarations and instantiation, how a name on an object is resolved to a method or an attribute, the special methods through which a class customizes the language's operators and constructs, inheritance, and the identity and equality of objects. The representation of classes and instances is described in [Type System](../type-system#class-and-instance), the member access and `super` expressions in [Expressions](../expressions), and function parameters and closures in [Functions](../functions).
 
 ## Class Definition and Instantiation
 
@@ -32,11 +32,11 @@ setter            ::= <name> '=' '(' parameters? ')' block
 
 Evaluating a class declaration:
 
-1. Creates a new class object with the given name and **declares the variable** `Name` for it, so the name is visible in the superclass expression and in every member. The variable is an ordinary mutable variable of the enclosing scope; see [Declarations](declarations.md)
+1. Creates a new class object with the given name and **declares the variable** `Name` for it, so the name is visible in the superclass expression and in every member. The variable is an ordinary mutable variable of the enclosing scope; see [Declarations](../declarations)
 2. If a superclass is given `class Name : expression`, evaluates the expression and makes the new class inherit the result; see [Inheritance Semantics](#inheritance-semantics). Otherwise the class inherits from the **root class** `Object`, the class at the top of every inheritance chain
 3. Evaluates the members **in source order**, creating a function for each one and storing it in the class under its name. A member whose name is already present in the class, whether declared earlier in the same body or inherited, **replaces** the earlier one
 
-A class body contains only members; there are no field declarations. Members are functions. They capture the variables of the scopes that enclose the class declaration exactly as other functions do, and the `parameters` follow the rules of [Functions](functions.md#parameters). Methods can also be added to an existing class with `function Class:name(...) { ... }`.
+A class body contains only members; there are no field declarations. Members are functions. They capture the variables of the scopes that enclose the class declaration exactly as other functions do, and the `parameters` follow the rules of [Functions](../functions#parameters). Methods can also be added to an existing class with `function Class:name(...) { ... }`.
 
 | Member | Declared as | Receiver `self` | Called as |
 | --- | --- | --- | --- |
@@ -47,7 +47,7 @@ A class body contains only members; there are no field declarations. Members are
 | Setter | `name= (value) { ... }` | the object | assignment of `object.name` |
 | Operator method | `operator + (a, b) { ... }` | none, except for `[]` and `[]=` | by the operator |
 
-`self` is a reserved word that denotes the receiver; it can be used only in the members for which the table shows a receiver, and elsewhere it is a compile-time error; see [Expressions](expressions.md#self-and-super).
+`self` is a reserved word that denotes the receiver; it can be used only in the members for which the table shows a receiver, and elsewhere it is a compile-time error; see [Expressions](../expressions#self-and-super).
 
 ### Instantiation
 
@@ -56,8 +56,8 @@ A class body contains only members; there are no field declarations. Members are
 1. `Class` must be a class, otherwise a runtime error is raised
 2. The class must have a **constructor**, that is a member named `new`, declared in the class or inherited from a superclass. If it has none, a runtime error is raised, since a class without constructor cannot be instantiated
 3. A new instance of `Class`, with no attributes, is created
-4. The constructor is called with the new instance as `self` followed by the arguments, under the rules of [Functions](functions.md#calling-convention)
-5. The expression evaluates to **the new instance**. A constructor implicitly returns it. The constructor's own `return` may not carry a value; see [return](statements.md#return)
+4. The constructor is called with the new instance as `self` followed by the arguments, under the rules of [Functions](../functions#calling-convention)
+5. The expression evaluates to **the new instance**. A constructor implicitly returns it. The constructor's own `return` may not carry a value; see [return](../statements#return)
 
 A constructor that is a native function is called with the class as receiver and will need to create the object itself.
 
@@ -110,7 +110,7 @@ The same lookup applies to the other kinds of receiver:
 | --- | --- |
 | a class | only its `static` members; otherwise a runtime error |
 | an instance, userdata | steps 1 to 4 above |
-| a module | the exported value `name`; see [Module](type-system.md#module) |
+| a module | the exported value `name`; see [Module](../type-system#module) |
 | a value of a built-in type | the member `name` of the built-in class of its type (if it is a getter, it is called first, as in step 2) |
 
 A `super.name` expression looks `name` up in the method table of the superclass (see below), not in the class of `self`.
@@ -189,7 +189,7 @@ add5(10)                  // -> 15
 
 ### Operator Overload Dispatch Table
 
-An operator is overloaded by an `operator` member of the class. The rule that decides _which_ method is used (the left operand's class first, then the right operand's; no method is a runtime error) and the way its result is used are described in [Operator Overloading Dispatch](expressions.md#operator-overloading-dispatch). The table gives, for each overloadable operator, the special method that implements it and how it is called.
+An operator is overloaded by an `operator` member of the class. The rule that decides _which_ method is used (the left operand's class first, then the right operand's; no method is a runtime error) and the way its result is used are described in [Operator Overloading Dispatch](../expressions#operator-overloading-dispatch). The table gives, for each overloadable operator, the special method that implements it and how it is called.
 
 | Operator | Declaration | Arguments | Notes |
 |----------|-------------|-----------|-------|
@@ -225,7 +225,7 @@ class Vec
 }
 ```
 
-The special methods `iter` (see [Iterative for](statements.md#iterative-for)), `contains`, `tostring` and `gc` are ordinary methods called with `self`, in the situations described in the table of special methods above.
+The special methods `iter` (see [Iterative for](../statements#iterative-for)), `contains`, `tostring` and `gc` are ordinary methods called with `self`, in the situations described in the table of special methods above.
 
 ## Inheritance Semantics
 
@@ -277,7 +277,7 @@ class Dog : Animal
 ```
 
 #### The Class Relation
-The expression `value is Class` is true when the class of `value` is `Class` or when `Class` can be reached from it by following superclass links; every class reaches the root class. See [Identity](expressions.md#identity).
+The expression `value is Class` is true when the class of `value` is `Class` or when `Class` can be reached from it by following superclass links; every class reaches the root class. See [Identity](../expressions#identity).
 
 ## Identity and Equality
 
@@ -285,7 +285,7 @@ The expression `value is Class` is true when the class of `value` is `Class` or 
 Every instance created by `Class.new` is a distinct object. Classes, functions, bound methods and modules are also single objects. Assigning or passing such a value copies the _reference_; the object remains the same one.
 
 #### Equality
-The `==` operator applies the equality relation defined in [Type System](type-system.md#equality), which for objects is as follows:
+The `==` operator applies the equality relation defined in [Type System](../type-system#equality), which for objects is as follows:
 
 - Two instances are equal exactly when they are **the same object**, unless the class of one of them defines an `==` operator method. In that case the method is called with both operands (the left operand's class first, then the right operand's) and its result is the value of the expression, with no conversions to boolean
 - Two classes are equal only if they are the same class, and two modules only if they are the same module

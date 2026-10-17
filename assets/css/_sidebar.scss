@@ -115,6 +115,10 @@
     }
 }
 
+.sidebar-close {
+    display: none;
+}
+
 .page-content-layout {
     display: grid;
     grid-template-columns: 800px 180px;
@@ -167,9 +171,72 @@
     text-decoration: underline;
 }
 
+.reference-toc nav li > a {
+    display: block;
+    border-bottom: 1px dotted var(--border);
+}
+
+.reference-toc nav li {
+    padding: 0.3rem 0;
+}
+
 @media (max-width: 1200px) {
     .sidebar {
-        display: none; /* was: hidden below 991px + hidden 992–1200px */
+        display: block;
+        position: fixed;
+        z-index: 201;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 85vw;
+        max-width: 380px;
+        height: auto;
+        margin: 0;
+        background: var(--theme);
+        box-shadow: 8px 0 24px rgba(0, 0, 0, 0.2);
+        overflow-y: auto;
+        transform: translateX(-105%);
+        visibility: hidden;
+        pointer-events: none;
+        transition: transform 180ms ease, visibility 0s linear 180ms;
+    }
+
+    .sidebar-close {
+        display: block;
+        position: absolute;
+        top: 0.75rem;
+        right: 1rem;
+        margin: 0;
+        padding: 0.35rem;
+        color: var(--secondary);
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    .sidebar-close:hover {
+        color: var(--accent);
+    }
+
+    .sidebar-close svg {
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+        transition: transform 180ms ease;
+    }
+
+    .sidebar .sidebar-nav {
+        padding-top: 1rem;
+    }
+
+    .sidebar .sidebar-home {
+        padding-right: 2.5rem;
     }
 
     .page-content-layout {
@@ -200,9 +267,7 @@
     }
 
     .reference-toc details {
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        background: var(--code-bg);
+        background: transparent;
     }
 
     .reference-toc summary {
@@ -211,9 +276,33 @@
         cursor: pointer;
         color: var(--secondary);
         font-size: 0.85rem;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .reference-toc summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .reference-toc summary svg {
+        width: 1.15rem;
+        height: 1.15rem;
+    }
+
+    .reference-toc details[open] nav {
+        border-bottom: 0;
+    }
+
+    .reference-toc details[open] {
+        border-bottom: 1px solid var(--border);
     }
 
     .reference-toc nav {
         padding: 0.25rem 0.7rem 0.7rem;
     }
+
 }

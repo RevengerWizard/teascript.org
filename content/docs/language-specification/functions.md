@@ -6,7 +6,7 @@ weight: 700
 
 A _function_ is a value that packages code which can be executed repeatedly, with different arguments, by calling it. This chapter defines how functions are declared and called, how arguments are bound to parameters (including optional and variadic parameters), what a function returns, how functions capture variables of the scopes in which they are created, and what the language guarantees about tail calls.
 
-The types of callable values are listed in [Type System](type-system.md#function), the call expression in [Expressions](expressions.md#calls), the `return` statement in [Statements](statements.md#return), and the scoping rules for function names and parameters in [Declarations](declarations.md). Methods, constructors and accessors are functions that belong to a class; they are described in the chapter on the object system.
+The types of callable values are listed in [Type System](../type-system#function), the call expression in [Expressions](../expressions#calls), the `return` statement in [Statements](../statements#return), and the scoping rules for function names and parameters in [Declarations](../declarations). Methods, constructors and accessors are functions that belong to a class; they are described in the chapter on the object system.
 
 ## Definition and Calling Convention
 
@@ -27,10 +27,10 @@ function_expression  ::= 'function' '(' parameters? ')' block
                        | '(' parameters? ')' '=>' ( expression | block )
 ```
 
-- `function name(...) { ... }` declares the variable `name` and stores the function in it. The name is visible inside the function's own body, so a function can call itself; see [Declarations](declarations.md#visibility-during-initialization)
+- `function name(...) { ... }` declares the variable `name` and stores the function in it. The name is visible inside the function's own body, so a function can call itself; see [Declarations](../declarations#visibility-during-initialization)
 - `function a.b.c(...) { ... }` does not declare a variable. It evaluates the path `a.b` and stores the new function in the attribute `c` of the result, like an assignment to `a.b.c`
 - `function Class:name(...) { ... }` adds a **method** `name` to the existing class `Class`. The value denoted by `Class` must be a class, otherwise a runtime error is raised. Inside the body, `self` denotes the receiver
-- Function expressions and arrow functions are described in [Expressions](expressions.md#function-expressions)
+- Function expressions and arrow functions are described in [Expressions](../expressions#function-expressions)
 
 ### Parameters
 
@@ -49,7 +49,7 @@ A function has three kinds of parameters, which must appear in this order:
 
 The following are compile-time errors: two parameters with the same name; a required parameter after an optional one; a parameter after the variadic one; a default value on the variadic parameter. Because the variadic parameter counts as a required parameter, **a function cannot have both optional and a variadic parameter**
 
-Parameters are ordinary local variables of the function, declared in the scope that also contains the top-level declarations of the body; see [Declarations](declarations.md#kinds-of-scope). They may be assigned to; this never affects the caller's variables.
+Parameters are ordinary local variables of the function, declared in the scope that also contains the top-level declarations of the body; see [Declarations](../declarations#kinds-of-scope). They may be assigned to; this never affects the caller's variables.
 
 ### Calling Convention
 
@@ -58,9 +58,9 @@ A call `f(a1, ..., an)` proceeds in this order:
 1. The callee `f` is evaluated, then the arguments from left to right (a spread argument `...list` is replaced by the elements of the list)
 2. The number of arguments is checked against the function's parameters and the arguments are bound as described in the following sections. If the check fails, a runtime error is raised **before any of the function's code is executed**
 3. A new **activation** of the function is created, with its own set of local variable: its parameters, and then every variable declared in its body. Activations are independent. Recursive calls and calls made at the same time to the same function do not share locals
-4. The body is executed until it returns or an error occurs; see [return](statements.md#return). The call evaluates to the returned value; if the body ends without returning a value explicitly, the call evaluates to `nil`
+4. The body is executed until it returns or an error occurs; see [return](../statements#return). The call evaluates to the returned value; if the body ends without returning a value explicitly, the call evaluates to `nil`
 
-For a method call, a call through a bound method, or a call of an instance whose class defines `call`, the **receiver** (instance or object) is the value of `self` in the activation, and the arguments are bound to the parameters that follow. The kinds of values that can be called are listed in [Type System](type-system.md#function).
+For a method call, a call through a bound method, or a call of an instance whose class defines `call`, the **receiver** (instance or object) is the value of `self` in the activation, and the arguments are bound to the parameters that follow. The kinds of values that can be called are listed in [Type System](../type-system#function).
 
 Native functions, implemented by the host program, are called in the same way and are subject to the same argument-count checking.
 
@@ -80,7 +80,7 @@ function reset(list, n)
 }
 ```
 
-Arguments are matched to parameters **by position**. There are no named arguments. In `f(a = 1)` the argument is the _assignment expression_ `a = 1`, whose value is passed; see [Expressions](expressions.md#calls).
+Arguments are matched to parameters **by position**. There are no named arguments. In `f(a = 1)` the argument is the _assignment expression_ `a = 1`, whose value is passed; see [Expressions](../expressions#calls).
 
 #### Argument Count
 Let _r_ be the number of required parameters, _o_ the number of optional parameters, and let the function be _variadic_ or not. A call is valid if:
@@ -146,7 +146,7 @@ var x, y = swap(1, 2)      // declaration: x is 2, y is 1
 x, y = swap(x, y)          // multiple assignment: x is 1, y is 2
 ```
 
-If the returned list does not have exactly as many elements as there are targets, a runtime error is raised; see [Variable Declaration](declarations.md#variable-declaration) and [Multiple Assignment](statements.md#multiple-assignment). Destructuring with a rest variable (`var first, ...others = f()`) also accepts lists of different lengths.
+If the returned list does not have exactly as many elements as there are targets, a runtime error is raised; see [Variable Declaration](../declarations#variable-declaration) and [Multiple Assignment](../statements#multiple-assignment). Destructuring with a rest variable (`var first, ...others = f()`) also accepts lists of different lengths.
 
 ## Closures and Upvalue Capture
 
@@ -154,7 +154,7 @@ A **closure** is a function together with the variables of enclosing functions t
 
 ### Which Variables are Captured
 
-When a name inside a function resolves to a **local variable of an enclosing function** (step 2 of the lookup in [Name Resolution Rules](declarations.md#name-resolution-rules)), the function _captures_ that variable; the captured variables are called **upvalues**. Capture is transitive: a function nested severals levels deep that uses a variable of an outer function causes each function inbetween to capture it as well.
+When a name inside a function resolves to a **local variable of an enclosing function** (step 2 of the lookup in [Name Resolution Rules](../declarations#name-resolution-rules)), the function _captures_ that variable; the captured variables are called **upvalues**. Capture is transitive: a function nested severals levels deep that uses a variable of an outer function causes each function inbetween to capture it as well.
 
 Module variables and predefined globals are **not** captured. They are accessed directly in the module, and every function sees the current value.
 
@@ -196,7 +196,7 @@ a()        // -> 1
 b()        // -> 2
 ```
 
-The variable of a `for` loop has one copy per iteration; see [Generic for](statements.md#generic-for) and [Iterative for](statements.md#iterative-for).
+The variable of a `for` loop has one copy per iteration; see [Generic for](../statements#generic-for) and [Iterative for](../statements#iterative-for).
 
 ## Tail Calls
 

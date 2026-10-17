@@ -184,7 +184,8 @@ void tea_insert(tea_State* T, int index);
 
 Inserts the value popped from the top of the stack at position `index`, shifting up the elements at and above `index`.
 
-NOTE: Negative indices are evaluated before the top value is popped.
+> [!NOTE]
+> Negative indices are evaluated before the top value is popped.
 
 #### Example
 ```c
@@ -210,7 +211,8 @@ void tea_replace(tea_State* T, int index);
 
 Replaces the value at `index` with the value popped from the top of the stack.
 
-NOTE: Negative indices are evaluated before the top value is popped.
+> [!NOTE]
+> Negative indices are evaluated before the top value is popped.
 
 #### Arguments
 - `T`: Teascript state

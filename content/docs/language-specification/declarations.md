@@ -6,7 +6,7 @@ weight: 605
 
 A _declaration_ introduces a name for a variable and, usually, gives it an initial value. This chapter defines the variable declarations `var` and `const`, the scopes in which declared names are visible, and the rules by which a name in an expression is resolved to a variable. It also states the scoping rules that apply to the names introduced by function and class declarations; the rest of those two forms is described in the chapters on functions and on object system.
 
-Names are resolved **at compile-time**. A program that uses a name that no declaration makes visible, or that declares a name twice in the same scope, is rejected before it is run. Statements are described in [Statements](statements.md) and the assignment operators in [Expressions](expressions.md).
+Names are resolved **at compile-time**. A program that uses a name that no declaration makes visible, or that declares a name twice in the same scope, is rejected before it is run. Statements are described in [Statements](../statements) and the assignment operators in [Expressions](../expressions).
 
 ## Declarations Overview
 
@@ -21,7 +21,7 @@ The following constructs declare a variable:
 | a parameter of a function | the parameter | yes |
 | `for var` / `for const` loop variables | the loop variables | `var`: yes, `const`: no |
 
-A declaration may appear whenever a declaration is allowed. At the top level of a chunk and inside a block (see the grammar in [Statements](statements.md)). The bodies of `if`, loops and `switch` clauses are blocks, so they can contain declarations, and the declared names are local to the block.
+A declaration may appear whenever a declaration is allowed. At the top level of a chunk and inside a block (see the grammar in [Statements](../statements)). The bodies of `if`, loops and `switch` clauses are blocks, so they can contain declarations, and the declared names are local to the block.
 
 A declaration takes effect **when execution reaches it**, not when its scope begins. **Assignment never declares**: `x = 1` always stores into an existing variable and is a compile time error if no variable `x` is visible.
 
@@ -102,7 +102,7 @@ The **scope** of a variable is the part of the program in which its name can be 
 | **Module scope** | the top level of a chunk, outside any block | _module variables_; they exist as long as the module and are visible to every function of the module declared after them |
 | **Function scope** | a function: its parameters and the declarations at the top level of its body share one scope | locals of the function |
 | **Block scope** | each block `{ ... }`, including the bodies of `if`, `switch` clauses and loops | locals of the enclosing function or chunk |
-| **Loop scope** | the header of a `for` statement | the loop variables, see [Statements](statements.md) |
+| **Loop scope** | the header of a `for` statement | the loop variables, see [Statements](../statements) |
 
 Notes:
 
@@ -194,7 +194,7 @@ Further rules:
 - **Assignment** uses step 1 to 3 only. Assigning to a name that resolves to a predefined global, or to no variable, is a compile-time error, and so is assigning to a constant
 - Because lookup is lexical, a name always denotes the same variable, whenever the function that uses it is declared from
 - Only _variable names_ are resolved this way. The name after a dot, `object.name`, the bare names that serve as keys in a map literal, `{name = 1}` and the names of methods are not variable references. They are never resolved to variables
-- `self` and `super` are reserved words and are not looked up as variables; see [Expressions](expressions.md)
+- `self` and `super` are reserved words and are not looked up as variables; see [Expressions](../expressions)
 
 ```tea
 var scale = 10                  // module variable
@@ -216,4 +216,4 @@ A declaration at the top level of a module can be exported by prefixing it with 
 export_declaration ::= 'export' ( variable_declaration | function_declaration | class_declaration )
 ```
 
-`export` takes effect only for a declaration in a **module scope**, since only module variables can be exported. It is allowed only in the main body of a chunk, not in a function. The for `export {a, b}`, which exports module variables that have already been declared, and the semantics of what is exported, are described in the chapter on modules under [Module](type-system.md#module).
+`export` takes effect only for a declaration in a **module scope**, since only module variables can be exported. It is allowed only in the main body of a chunk, not in a function. The for `export {a, b}`, which exports module variables that have already been declared, and the semantics of what is exported, are described in the chapter on modules under [Module](../type-system#module).

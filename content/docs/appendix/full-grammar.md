@@ -1,12 +1,12 @@
 ---
 title: Full Grammar
 number: A.
-weight: 100
+weight: 2100
 ---
 
-This appendix collects the grammar of Teascript in one place, written in the notation defined in [Notation and Conventions](notation-and-conventions.md). It consolidates the productions given throughout this specification; each chapter remains the authority for the _meaning_ of the constructs.
+This appendix collects the grammar of Teascript in one place, written in the notation defined in [Notation and Conventions](../../language-specification/notation-and-conventions). It consolidates the productions given throughout this specification; each chapter remains the authority for the _meaning_ of the constructs.
 
-The grammar has two parts. The **lexical grammar** has characters as its alphabet and defines the tokens; the **syntactic grammar** has tokens as its alphabet and defines the structure of programs. Expressions are written here as a stratified grammar, one production per precedence level, which is equivalent to the precedence table of [Expressions](expressions.md#operator-precedence-table).
+The grammar has two parts. The **lexical grammar** has characters as its alphabet and defines the tokens; the **syntactic grammar** has tokens as its alphabet and defines the structure of programs. Expressions are written here as a stratified grammar, one production per precedence level, which is equivalent to the precedence table of [Expressions](../../language-specification/expressions#operator-precedence-table).
 
 ## EBNF
 

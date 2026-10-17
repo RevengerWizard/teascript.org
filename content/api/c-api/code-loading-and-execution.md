@@ -373,7 +373,8 @@ int tea_eval(tea_State* T, const char* s);
 
 Convenience function that loads the NUL-terminated string `s`, calls the resulting chunk, and leaves any results on the stack. Returns `TEA_OK` on success; otherwise an error code is returned and an error value is left on the stack.
 
-NOTE: Unlike `tea_load_buffer`, the source is a C string and cannot contain embedded NUL bytes.
+> [!NOTE]
+> Unlike `tea_load_buffer`, the source is a C string and cannot contain embedded NUL bytes.
 
 #### Arguments
 - `T`: Teascript state

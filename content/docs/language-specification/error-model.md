@@ -27,18 +27,18 @@ The following situations raise a runtime error. Each is specified with the const
 
 | Condition | Specified in |
 | --- | --- |
-| An operator applied to operands it does not support, and no operator method is applicable | [Operator Semantics](expressions.md#operator-semantics) |
-| Calling a value that is not callable, or calling with the wrong number of arguments | [Calling convention](functions.md#calling-convention) |
-| Spreading a value that is not a list into a call, or expanding a value that cannot be expanded in a list literal | [Expressions](expressions.md#calls) |
-| Creating a range from operands that are not numbers | [Ranges](expressions.md#ranges) |
-| Unpacking a value that is not a list, or a list of the wrong length | [Variable Declaration](declarations.md#variable-declaration), [Multiple Assignment](statements.md#multiple-assignment) |
-| Iterating over a value that is not iterable | [Generic for](statements.md#generic-for) |
-| Using a name on an object that has no such member, calling a member that does not exist, or reading an export that does not exist | [Method Resolution Order](object-system.md#method-resolution-order) |
-| Instantiating a class that has no constructor, or declaring an invalid superclass | [Instantiation](object-system.md#instantiation), [Inheritance Semantics](object-system.md#inheritance-semantics) |
+| An operator applied to operands it does not support, and no operator method is applicable | [Operator Semantics](../expressions#operator-semantics) |
+| Calling a value that is not callable, or calling with the wrong number of arguments | [Calling convention](../functions#calling-convention) |
+| Spreading a value that is not a list into a call, or expanding a value that cannot be expanded in a list literal | [Expressions](../expressions#calls) |
+| Creating a range from operands that are not numbers | [Ranges](../expressions#ranges) |
+| Unpacking a value that is not a list, or a list of the wrong length | [Variable Declaration](../declarations#variable-declaration), [Multiple Assignment](../statements#multiple-assignment) |
+| Iterating over a value that is not iterable | [Generic for](../statements#generic-for) |
+| Using a name on an object that has no such member, calling a member that does not exist, or reading an export that does not exist | [Method Resolution Order](../object-system#method-resolution-order) |
+| Instantiating a class that has no constructor, or declaring an invalid superclass | [Instantiation](../object-system#instantiation), [Inheritance Semantics](../object-system#inheritance-semantics) |
 | An argument of the wrong type or value passed to a built-in function | the description of the function |
 | `error` called, or `assert` failing | below |
 
-Conditions that are **not** errors include division by zero, which produces infinity or `NaN`; see [NaN and Infinity](type-system.md#nan-and-infinity).
+Conditions that are **not** errors include division by zero, which produces infinity or `NaN`; see [NaN and Infinity](../type-system#nan-and-infinity).
 
 ### The Error Value
 
@@ -82,7 +82,7 @@ Propagation has three properties:
 
 1. Every active function call is abandoned. The code that remains in each of them does not run, uncluding the remainder of any loops and blocks, and the call never returns a value. This applies equally to functions written in Teascript and to built-in functions.
 2. Nothing is rolled back. The effects of the code that ran before the error remain: assignments to variables, changes made to lists, maps and instances, and any other side effects keep their values. A statement or expression that was interrupted may have left a partial effect, for instance if it assigned to two variables and the error occurred between the two.
-3. Closures stay valid. A variable of an abandoned function that was captured by a closure continues to exist for as long as the closure does; see [Closures and Upvalue Capture](functions.md#closures-and-upvalue-capture).
+3. Closures stay valid. A variable of an abandoned function that was captured by a closure continues to exist for as long as the closure does; see [Closures and Upvalue Capture](../functions#closures-and-upvalue-capture).
 4. There is no cleanup construct. No code runs automatically while an error unwinds. A program that must release a resource when an error occurs does so by running the failing code under `pcall`, and releasing the resource afterwards.
 5. An error that nothing catches ends the program. If no protected call is active when an error is raised, the program terminates and the host environment reports the error. Code that has not yet been executed does not run. Statements already executed keep their effects, but no further code of the program runs.
 
@@ -99,7 +99,7 @@ Propagation has three properties:
 | the call finished without an error | `[true, value]`, where `value` is the value returned by the call |
 | an error occurred | `[false, error_value]`, where `error_value` is the error value (a string) |
 
-The result is a list so that it can be unpacked directly into two variables (see [Multiple Return Values](functions.md#multiple-return-values)):
+The result is a list so that it can be unpacked directly into two variables (see [Multiple Return Values](../functions#multiple-return-values)):
 
 ```tea
 var ok, result = pcall(parse_port, "8080")

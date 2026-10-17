@@ -2,6 +2,11 @@
 
 <div class="page-layout{{ if eq .Section "guide" }} page-guide{{ else if in (slice "docs" "api") .Section }} page-reference{{ end }}">
     <div class="sidebar">
+        {{ if in (slice "guide" "docs" "api") .Section }}
+        <button class="sidebar-close" type="button" aria-label="Close navigation">
+            {{ (resources.Get "svg/x.svg").Content | safeHTML }}
+        </button>
+        {{ end }}
         {{ with (.Site.GetPage "section" .Section).Pages }}
         {{ partial "sidebar.html" (dict "currentPage" $ "nodes" .) }}
         {{ end }}
@@ -10,9 +15,15 @@
     <div class="page-main">
     <article class="post-single">
         <header class="post-header">
-            <h1 class="post-title entry-hint-parent">
-                {{ .Title }}
-            </h1>
+            <div class="post-title-row">
+                {{ if in (slice "guide" "docs" "api") .Section }}
+                <button class="sidebar-toggle" type="button" aria-controls="page-sidebar" aria-expanded="false" aria-label="Open navigation">
+                    <span class="sidebar-toggle-open">{{ (resources.Get "svg/three-dots.svg").Content | safeHTML }}</span>
+                    <span class="sidebar-toggle-close">{{ (resources.Get "svg/x.svg").Content | safeHTML }}</span>
+                </button>
+                {{ end }}
+                <h1 class="post-title entry-hint-parent">{{ .Title }}</h1>
+            </div>
             <div class="post-meta">
                 {{- partial "edit_page.html" . -}}
             </div>
@@ -25,7 +36,7 @@
             {{ if ne .Params.toc false }}
             <aside class="reference-toc">
                 <details open>
-                    <summary>On this page</summary>
+                    <summary><span>On this page</span>{{ (resources.Get "svg/menu.svg").Content | safeHTML }}</summary>
                     <nav aria-label="On this page">
                     {{ .TableOfContents }}
                     </nav>
@@ -43,7 +54,6 @@
                         }
                     };
                     syncToc();
-                    window.addEventListener('resize', syncToc);
                 })();
             </script>
             {{ end }}
@@ -62,5 +72,29 @@
     </article>
     </div>
 </div>
+
+{{ if in (slice "guide" "docs" "api") .Section }}
+<script>
+    (() => {
+        const toggle = document.querySelector('.sidebar-toggle');
+        const close = document.querySelector('.sidebar-close');
+        const sidebar = document.querySelector('.page-layout > .sidebar');
+        if (!toggle || !sidebar) return;
+        sidebar.id = 'page-sidebar';
+        const setOpen = (open) => {
+            sidebar.classList.toggle('is-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+        };
+        toggle.addEventListener('click', () => setOpen(!sidebar.classList.contains('is-open')));
+        close.addEventListener('click', () => setOpen(false));
+        document.addEventListener('click', (event) => {
+            if (sidebar.classList.contains('is-open') && !sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                setOpen(false);
+            }
+        });
+    })();
+</script>
+{{ end }}
 
 {{ end }}

@@ -17,7 +17,8 @@ Two kinds of errors are distinguished throughout this reference:
 - **Compile-time error**: While the source is being read, before any code of that script runs
 - **Runtime error**: While the program runtime executes
 
-Text introduced by **NOTE** is informative and adds no requirements.
+> [!NOTE]
+> Text introduced by here is only informative and adds no requirements.
 
 ### Extended BNF
 
@@ -57,8 +58,8 @@ A program is read in three cooperative layers, each with its own grammar:
 
 | Layer | Works on | Produces | Specified in |
 |-------|----------|----------|--------------|
-| **Character layer** | Bytes | Characters and line numbers | [Lexical Structure](lexical-structure.md) |
-| **Lexical layer** | Characters | Tokens | [Lexical Structure](lexical-structure.md) |
+| **Character layer** | Bytes | Characters and line numbers | [Lexical Structure](../lexical-structure) |
+| **Lexical layer** | Characters | Tokens | [Lexical Structure](../lexical-structure) |
 | **Syntactic layer** | Tokens | Declarations, statements and expressions | The chapters on each construct |
 
 The **lexical grammar** has characters as its alphabet; its rules use character classes. The **syntactic grammar** has tokens as its alphabet; its terminals are keywords, symbols and token classes. White space and comments are discarded by the lexical layer and never appear in the syntactic grammar.
@@ -68,7 +69,7 @@ The layers run _on demand, in a single pass_. The parser requests one token at a
 Two consequences apply to the whole specification:
 
 - **Compilation stops at the first error**: A script is translated completely before it is executed, so a compile-time error anywhere in a script prevents all of it from running
-- **The lexical grammar is not purely regular**: String iterpolation allows expressions, including further strings, inside a string literal, so the lexer keeps a small amount of state and cooperates with the parser. The details are in [Lexical Structure](lexical-structure.md).
+- **The lexical grammar is not purely regular**: String iterpolation allows expressions, including further strings, inside a string literal, so the lexer keeps a small amount of state and cooperates with the parser. The details are in [Lexical Structure](../lexical-structure).
 
 ### Terminology
  

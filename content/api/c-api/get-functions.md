@@ -177,7 +177,8 @@ Retrieves the string value at `index` as a C string. The value must be a string.
 
 If `len` is not `NULL`, the string length is written to `*len`. Teascript strings may contain embedded zero bytes, so always use the returned length to determine the string size.
 
-NOTE: A non-NULL return value is guaranteed even for zero length strings.
+> [!NOTE]
+> A non-NULL return value is guaranteed even for zero length strings.
 
 #### Arguments
 - `T`: Teascript state
