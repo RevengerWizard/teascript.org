@@ -179,8 +179,8 @@ Guide
 26. Other Modules
 
 - Appendix
-A. Keywords and Operators Quick Reference
-B. Teascript for C / Python / Lua Programmers
+- A. Keywords and Operators Quick Reference
+- B. Teascript for C / Python / Lua Programmers
 
 - Index
 - Cookbook
@@ -428,31 +428,162 @@ Docs
         * ...
 
 - Part III - Implementation
-15. The Interpreter
+15. The Program
+    - Invocation
+        * Synopsis
+        * Running a Script
+        * Running Bytecode
+        * Reading from Standard Input
+    - Options
+        * Option Reference
+        * Option Parsing and the `--` Terminator
+        * Combining Options
+    - Script Arguments
+        * Chunk Names
+    - Environment Variables
+    - Exit Status
+        * Interrupt Handling
+    - Compiling to Bytecode
+        * Output File
+        * Stripping Debug Information
+        * Listing Bytecode
+        * Shebang Lines
+    - The REPL
+        * Line Editing and History
+        * Multi-line Input
+        * Result Printing
+        * Interaction with Globals
+16. Source Layout
+    - Source Tree Overview
+        * File Groups
+        * Public Interface
+        * Internal Headers
+        * Single-file Build
+    - Conventions
+        * File Preamble
+        * Naming
+        * Generated Tables
+16. The Interpreter
     - Single-Pass Architecture
+        * From Text to Function
+        * The Token Window
+        * Pratt Parsing and Assignment Flag
+        * The Function State Stack
+        * One Bytecode Buffer for All Functions
+        * Emission and Stack Accounting
+        * Constants
+        * Prototype Construction
+        * Syntax Nesting and Errors
     - Scope and Upvalue Resolution
+        * Kinds of Storage
+        * Resolution Order
+        * Locals and Scopes
+        * Hidden Locals
+        * Module Variables
+        * Upvalue Resolution
+        * Compile-time Class Context
     - Constant Folding
     - Jump Patching
-16. The Virtual Machine
+        * Forward Jumps
+        * Conditional Code
+        * Loops
+        * break and continue
+        * Spread Arguments
+17. The Virtual Machine
+    - Overview
     - Execution Loop
+        * Entry and Exit
+        * Cached Registers
+        * Dispatch
     - The Call Stack
+        * Value Stack and Frames
+        * Frame State Flags
+    - Calling Native Functions
+    - Re-entrancy
     - Upvalue Closing
     - Error Dispatch
+        * Mechanism
+        * Protected Calls and Unwinding
     - Interacting with the GC
-17. Garbage Collector
-    - Algorithm
-    - Tri-Color Marking
-    - The Write Barrier
-    - Finalization Order
-    - Interaction with Userdata
+        * When Collection Runs
+        * What the VM must guarantee
+        * Finalizers and Re-entrancy
+        * Collection and Errors
 18. Memory Model
     - Value Representation
+        * The Tagged Value
+        * Tags
+        * Numbers
     - Object Layout
-19. Limits
+        * Common Header
+        * Object Sizes
+        * Strings
+        * Ranges
+        * Prototypes and Functions
+        * Upvalues
+        * Modules
+        * Classes, Instance and Bound Methods
+        * Userdata
+        * Lists, Maps and Tables
+    - Allocation
+        * The Allocator Interface
+        * The Allocation Entry Point
+        * Allocating Objects
+        * Object Lifecycle
+        * Memory Errors
+        * Memory Outside the Managed Heap
+19. Core Data Structures
+    - String Table
+        * Hashing
+        * Interning Table Growth
+        * Substrings
+    - Lists
+        * Growth Strategy
+        * Slicing
+    - Maps
+        * Hash Table Layout
+        * Collisions and Deletion
+        * Iteration Order
+    - Instances and Method Tables
+        * Tables
+        * Accessor Entries
+        * Classes
+        * Instances
+        * Bound Methods
+    - Userdata
+    - Allocation and GC safety
+20. Garbage Collector
+    - Algorithm
+        * Properties
+        * When a Cycle Starts
+        * Phases
+        * Roots
+    - Tri-Color Marking
+        * Marking
+        * The Gray Stack
+        * Fixed Objects
+        * Resurrected Userdata
+    - The Write Barrier
+    - Finalization Order
+        * Which Objects, and in What Order
+        * Running the Finalizers
+        * At Shutdown
+    - Interaction with Userdata
+        * A Separate List
+        * Two Kinds of Finalizer
+        * What the Collector Traces
+    - Debugging Options
+21. Native Module Loading
+    - The Native Loader
+    - Symbol Naming Convention
+    - Library Lifetime
+    - Failure Modes
+22. Limits
     - Constants
     - Locals
     - Upvalues
     - Call Depth
+    - Other Limits
 
 - Appendix
 - A. Full Grammar
@@ -465,6 +596,18 @@ Docs
         * Context-sensitive Words
     - Not Reserved Words
     - Symbols
+- D. Implementation-Defined Behavior
+
+---
+
+- Compile-time Options
+    * Feature Toggles
+    * Debug and Diagnostic Switches
+    * Tuning Constants
+- Platform Layer
+    * Integer and Float Assumptions
+    * Dynamic Library Loading
+    * Filesystem and Path Conventions
 
 ---
 
@@ -484,6 +627,7 @@ API
 12. Sys Module
 13. Debug Module
 14. Other Modules
+
 - Part II - C API Reference
 15. Conventions
     - Stack Indices and Pseudo-indices
@@ -519,18 +663,31 @@ API
 
 ---
 
-Bytecode Reference Documentation
+Wiki
+- Building and Installing
+    * Building from Source (Linux/MacOS/Windows)
+    * Build Options and Flags
+    * Cross-compiling
+    * Building as a Shared or Static Library
+- Native Modules
+    * Writing a C Module: Project Setup
+    * Building a Shared Library Module (per platform)
+    * Where Teascript Finds Native Modules
+    * Distributing a Module
+- Embedding
+    * Linking Teascript into Your Project
+- Tooling and Integration
+    * Editor Support / Syntax Highlighting
+    * Using the Bytecode Explorer?
+    * Running Teascript in CI?
+- Troubleshooting
+    * Common Build Errors
+    * Linker and Symbol Issues
+    * Module Not Found
+- Cookbook
 
-Versioned?
-
-- Tea Stack
-- Instruction Notation
-- Instruction Summary
-
-* OP instruction
-- Syntax
-- Description
-- Examples
+Goal
+Prerequisites
 
 ---
 
