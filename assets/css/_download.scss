@@ -1,0 +1,98 @@
+.download-page .post-header {
+    margin-bottom: 1.5rem;
+}
+
+.download-page .post-content {
+    max-width: 720px;
+}
+
+.download-page .post-content > p {
+    margin-bottom: 1.5rem;
+}
+
+.download-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.download-platform h2 {
+    margin: 1.5rem 0 0.6rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.download-version {
+    color: var(--secondary);
+    font-size: 0.85rem;
+}
+
+.download-option {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(9rem, 1fr) minmax(8rem, 1.5fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 3.75rem;
+    padding: 0.55rem 0.8rem;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+a.download-option:hover,
+.download-option.is-recommended {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.download-option svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+.download-option strong,
+.download-option small {
+    display: block;
+}
+
+.download-target {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.download-option small,
+.download-option .download-verification {
+    color: var(--secondary);
+    font-size: 0.85rem;
+}
+
+.download-option-unavailable {
+    color: var(--secondary);
+}
+
+.download-option-unavailable .download-status {
+    color: var(--secondary);
+}
+
+.download-status {
+    text-align: right;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .download-option {
+        grid-template-columns: 2rem minmax(0, 1fr) auto;
+    }
+
+    .download-option .download-verification {
+        grid-column: 2 / -1;
+    }
+
+    .download-option .download-status {
+        grid-column: 3;
+    }
+}

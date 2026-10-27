@@ -1,0 +1,42 @@
+[[platforms]]
+name = "Windows"
+icon = "windows.svg"
+
+[[platforms.releases]]
+architecture = "x64"
+version = "v0.0.0"
+platform = "windows-x64"
+url = "https://github.com/RevengerWizard/teascript/actions/runs/40413175209/artifacts/12694142973"
+verification = "SHA-256 verification coming soon"
+
+[[platforms.releases]]
+architecture = "ARM64"
+version = "v0.0.0"
+platform = "windows-arm64"
+verification = "SHA-256 verification coming soon"
+
+[[platforms]]
+name = "macOS"
+icon = "apple.svg"
+
+[[platforms.releases]]
+architecture = "ARM64"
+version = "v0.0.0"
+platform = "macos-arm64"
+verification = "SHA-256 verification coming soon"
+
+[[platforms]]
+name = "Linux"
+icon = "linux.svg"
+
+[[platforms.releases]]
+architecture = "x64"
+version = "v0.0.0"
+platform = "linux-x64"
+verification = "SHA-256 verification coming soon"
+
+[[platforms.releases]]
+architecture = "ARM64"
+version = "v0.0.0"
+platform = "linux-arm64"
+verification = "SHA-256 verification coming soon"

@@ -1,0 +1,51 @@
+{{ define "main" }}
+
+<main class="main">
+    <article class="post-single download-page">
+        <header class="post-header">
+            <h1>{{ .Title }}</h1>
+        </header>
+
+        <div class="post-content">
+            {{ .Content }}
+
+            {{ range site.Data.download.platforms }}
+            {{ $icon := resources.Get (printf "svg/%s" .icon) }}
+            {{ $platform := . }}
+            <section class="download-platform">
+                <h2>{{ .name }}</h2>
+                <div class="download-options">
+                {{ range .releases }}
+                {{ if .url }}<a class="download-option" data-platform="{{ .platform }}" href="{{ .url }}" target="_blank" rel="noopener">{{ else }}<div class="download-option download-option-unavailable" data-platform="{{ .platform }}">{{ end }}
+                    {{ $icon.Content | safeHTML }}
+                    <span class="download-target">
+                        <strong>{{ $platform.name }}</strong>
+                        <span class="download-version">{{ .version }}</span>
+                        <small>{{ .architecture }}</small>
+                    </span>
+                    <span class="download-verification">{{ .verification }}</span>
+                    <span class="download-status">{{ if .url }}Download{{ else }}Coming soon{{ end }}</span>
+                {{ if .url }}</a>{{ else }}</div>{{ end }}
+                {{ end }}
+                </div>
+            </section>
+            {{ end }}
+            </div>
+        </div>
+    </article>
+</main>
+
+<script>
+(() => {
+    const platform = navigator.platform.toLowerCase();
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAppleSilicon = navigator.userAgentData?.platform === 'macOS' ||
+        (userAgent.includes('mac os') && navigator.maxTouchPoints > 1);
+    let target = userAgent.includes('win') ? 'windows-' + (userAgent.includes('arm') ? 'arm64' : 'x64') :
+        userAgent.includes('linux') ? 'linux-' + (userAgent.includes('aarch64') || userAgent.includes('arm') ? 'arm64' : 'x64') :
+        (userAgent.includes('mac os') || platform.includes('iphone') || platform.includes('ipad')) ? 'macos-' + (isAppleSilicon ? 'arm64' : 'arm64') : '';
+    document.querySelector(`[data-platform="${target}"]`)?.classList.add('is-recommended');
+})();
+</script>
+
+{{ end }}
