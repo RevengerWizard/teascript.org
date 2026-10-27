@@ -16,6 +16,7 @@
                 <h2>{{ .name }}</h2>
                 <div class="download-options">
                 {{ range .releases }}
+                <div class="download-entry">
                 {{ if .url }}<a class="download-option" data-platform="{{ .platform }}" href="{{ .url }}" target="_blank" rel="noopener">{{ else }}<div class="download-option download-option-unavailable" data-platform="{{ .platform }}">{{ end }}
                     {{ $icon.Content | safeHTML }}
                     <span class="download-target">
@@ -23,9 +24,10 @@
                         <span class="download-version">{{ .version }}</span>
                         <small>{{ .architecture }}</small>
                     </span>
-                    <span class="download-verification">{{ .verification }}</span>
                     <span class="download-status">{{ if .url }}Download{{ else }}Coming soon{{ end }}</span>
                 {{ if .url }}</a>{{ else }}</div>{{ end }}
+                    <span class="download-verification">{{ .verification }}</span>
+                </div>
                 {{ end }}
                 </div>
             </section>

@@ -16,8 +16,12 @@
     gap: 0.65rem;
 }
 
+.download-entry {
+    min-width: 0;
+}
+
 .download-platform h2 {
-    margin: 1.5rem 0 0.6rem;
+    margin: 2rem 0 0.75rem;
     font-size: 1.2rem;
     font-weight: 500;
 }
@@ -29,7 +33,7 @@
 
 .download-option {
     display: grid;
-    grid-template-columns: 2.25rem minmax(9rem, 1fr) minmax(8rem, 1.5fr) auto;
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.65rem;
     min-height: 3.75rem;
@@ -57,14 +61,15 @@ a.download-option:hover,
 }
 
 .download-target {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: baseline;
-    gap: 0.4rem;
+    gap: 1.5rem;
     min-width: 0;
 }
 
 .download-option small,
-.download-option .download-verification {
+.download-verification {
     color: var(--secondary);
     font-size: 0.85rem;
 }
@@ -86,10 +91,6 @@ a.download-option:hover,
 @media (max-width: 600px) {
     .download-option {
         grid-template-columns: 2rem minmax(0, 1fr) auto;
-    }
-
-    .download-option .download-verification {
-        grid-column: 2 / -1;
     }
 
     .download-option .download-status {

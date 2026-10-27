@@ -7,7 +7,7 @@ architecture = "x64"
 version = "v0.0.0"
 platform = "windows-x64"
 url = "https://github.com/RevengerWizard/teascript/actions/runs/40413175209/artifacts/12694142973"
-verification = "SHA-256 verification coming soon"
+verification = "sha256:1eca19604527a9e78dda9293d8158c2adeeca0a9572740bd06b74ea505449df2"
 
 [[platforms.releases]]
 architecture = "ARM64"
