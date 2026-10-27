@@ -33,26 +33,49 @@
 
 .download-option {
     display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    grid-template-columns: 2.25rem minmax(9rem, 1fr) minmax(4.5rem, auto) minmax(5rem, auto) auto;
     align-items: center;
     gap: 0.65rem;
     min-height: 3.75rem;
     padding: 0.55rem 0.8rem;
     color: var(--primary);
+    white-space: nowrap;
     border: 1px solid var(--border);
     border-radius: var(--radius);
 }
 
-a.download-option:hover,
+.download-page .post-content a.download-option {
+    color: var(--primary);
+    box-shadow: none;
+}
+
 .download-option.is-recommended {
-    color: var(--accent);
     border-color: var(--accent);
+}
+
+.download-option.is-recommended:hover {
     background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+
+.download-option.is-recommended svg,
+.download-option.is-recommended .download-status,
+.download-option.is-recommended .download-target strong {
+    color: var(--accent);
+}
+
+a.download-option:hover {
+    border-color: var(--accent);
 }
 
 .download-option svg {
     width: 2rem;
     height: 2rem;
+}
+
+a.download-option:hover svg,
+a.download-option:hover .download-status,
+a.download-option:hover .download-target strong {
+    color: var(--accent);
 }
 
 .download-option strong,
@@ -61,11 +84,7 @@ a.download-option:hover,
 }
 
 .download-target {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: baseline;
-    gap: 1.5rem;
-    min-width: 0;
+    display: contents;
 }
 
 .download-option small,
@@ -75,11 +94,18 @@ a.download-option:hover,
 }
 
 .download-option-unavailable {
-    color: var(--secondary);
+    color: var(--tertiary);
+    border-color: var(--tertiary);
 }
 
-.download-option-unavailable .download-status {
-    color: var(--secondary);
+.download-option-unavailable .download-status,
+.download-option-unavailable .download-version,
+.download-option-unavailable small {
+    color: var(--tertiary);
+}
+
+.download-verification-unavailable {
+    color: var(--tertiary);
 }
 
 .download-status {
@@ -90,10 +116,11 @@ a.download-option:hover,
 
 @media (max-width: 600px) {
     .download-option {
-        grid-template-columns: 2rem minmax(0, 1fr) auto;
+        grid-template-columns: 2rem minmax(8rem, 1fr) auto auto auto;
+        overflow-x: auto;
     }
 
-    .download-option .download-status {
-        grid-column: 3;
+    .download-target {
+        display: contents;
     }
 }

@@ -26,7 +26,7 @@
                     </span>
                     <span class="download-status">{{ if .url }}Download{{ else }}Coming soon{{ end }}</span>
                 {{ if .url }}</a>{{ else }}</div>{{ end }}
-                    <span class="download-verification">{{ .verification }}</span>
+                    <span class="download-verification{{ if not .url }} download-verification-unavailable{{ end }}">{{ .verification }}</span>
                 </div>
                 {{ end }}
                 </div>
