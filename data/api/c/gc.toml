@@ -1,0 +1,99 @@
+title = "Garbage Collection"
+slug = "gc"
+summary = "Collector control and finalizers"
+description = "Functions for controlling the garbage collector and for registering finalizers on userdata. Teascript frees unreachable objects automatically; the functions here let you force a collection, for diagnostics or benchmarking, and release non-memory resources (file handles, sockets, native buffers) when a userdata is collected."
+
+[[entry]]
+name = "tea_Finalizer"
+kind = "typedef"
+since = "1.0"
+tags = ["gc", "typedef"]
+signature = "typedef void (*tea_Finalizer)(void* p);"
+summary = "Finalizer callback"
+description = "Type of a userdata finalizer, as registered with `tea_set_finalizer`. It receives a pointer to the userdata's raw data block.\n\nA finalizer is not given a `tea_State`, so it cannot call the C API. It should only release the resources the block refers to."
+example = '''
+static void buffer_finalizer(void* p)
+{
+    Buffer* b = (Buffer*)p;
+    free(b->data);
+}
+'''
+see_also = ["tea_set_finalizer", "tea_new_userdata"]
+
+[[entry.params]]
+name = "p"
+desc = "Pointer to the userdata's raw data block"
+
+###
+
+[[entry]]
+name = "tea_gc"
+kind = "function"
+since = "1.0"
+tags = ["gc"]
+signature = "int tea_gc(tea_State* T);"
+summary = "Run full collection"
+description = "Performs a full garbage collection cycle immediately. The collector marks every object that is still reachable and frees the rest, calling the finalizers of any userdata that gets freed.\n\nThe return value is the amount of memory reclaimed, in kibibytes (KiB, bytes divided by 1024). It is mostly useful for diagnostics and for benchmarking allocator behavior."
+returns = "The memory reclaimed by this cycle, in KiB."
+stack = "[-0, +0, -]"
+example = '''
+/* build and drop a large amount of garbage */
+tea_new_list(T, 0);
+for(int i = 0; i < 100000; i++)
+{
+    tea_push_integer(T, i);
+    tea_add_item(T, -2);
+}
+tea_pop(T, 1);
+
+int kib = tea_gc(T);
+printf("Reclaimed %d KiB\n", kib);
+'''
+see_also = ["tea_set_finalizer", "tea_get_allocf"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_set_finalizer"
+kind = "function"
+since = "1.0"
+tags = ["gc", "userdata"]
+signature = "void tea_set_finalizer(tea_State* T, tea_Finalizer f);"
+summary = "Set userdata finalizer"
+description = "Registers the finalizer `f` for the userdata on top of the stack. The collector calls it when the userdata becomes unreachable, and `tea_close` calls it for userdata that are still alive, so native resources are always released.\n\nThe userdata is not popped. The value on top of the stack must be a userdata."
+stack = "[-0, +0, -]"
+example = '''
+typedef struct FileHandle
+{
+    FILE* fp;
+} FileHandle;
+
+static void file_finalizer(void* p)
+{
+    FileHandle* fh = (FileHandle*)p;
+    if(fh->fp)
+        fclose(fh->fp);
+}
+
+static void open_file(tea_State* T)
+{
+    const char* path = tea_check_string(T, 1);
+    FileHandle* fh = (FileHandle*)tea_new_userdata(T, sizeof(FileHandle));
+    fh->fp = fopen(path, "r");
+    tea_set_finalizer(T, file_finalizer);
+    /* the userdata is left on top of the stack as the result */
+}
+'''
+see_also = ["tea_Finalizer", "tea_gc", "tea_new_userdata", "tea_close"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "f"
+desc = "Finalizer to run when the userdata is collected"

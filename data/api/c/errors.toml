@@ -1,0 +1,254 @@
+title = "Errors"
+slug = "errors"
+summary = "Status codes and error raising"
+description = "Status codes returned by protected operations, and the functions that raise errors from C. `tea_throw` is the lowest-level primitive: it raises the value on top of the stack as the error object. `tea_error` builds a formatted message first, and the argument error functions produce standard \"bad argument\" messages for use inside C functions.\n\nErrors raised outside of a protected call (see `tea_pcall`) reach the panic function set with `tea_atpanic`."
+
+[[entry]]
+name = "TEA_OK"
+kind = "enum"
+since = "1.0"
+tags = ["error", "enum"]
+signature = '''
+enum
+{
+    TEA_OK,
+    TEA_ERROR_SYNTAX,
+    TEA_ERROR_RUNTIME,
+    TEA_ERROR_MEMORY,
+    TEA_ERROR_FILE,
+    TEA_ERROR_ERROR
+};
+'''
+summary = "Status codes"
+description = '''
+Status codes returned by protected calls and by the functions that load code. `TEA_OK` means success; every other value is an error, and the error value is left on top of the stack.
+
+| Code | Meaning |
+|---|---|
+| `TEA_OK` | No error |
+| `TEA_ERROR_SYNTAX` | Syntax error while compiling |
+| `TEA_ERROR_RUNTIME` | Runtime error |
+| `TEA_ERROR_MEMORY` | Memory allocation error |
+| `TEA_ERROR_FILE` | Error opening or reading a file |
+| `TEA_ERROR_ERROR` | Error while running the error handling machinery |
+'''
+example = '''
+int status = tea_pcall(T, 0);
+switch(status)
+{
+    case TEA_OK:
+        break;
+    case TEA_ERROR_MEMORY:
+        fprintf(stderr, "out of memory\n");
+        break;
+    default:
+        fprintf(stderr, "error: %s\n", tea_get_string(T, -1));
+        break;
+}
+'''
+see_also = ["tea_pcall", "tea_load_file", "tea_eval"]
+
+###
+
+[[entry]]
+name = "tea_throw"
+kind = "function"
+since = "1.0"
+tags = ["error"]
+signature = "void tea_throw(tea_State* T);"
+summary = "Raise top value"
+description = "Raises an error using the value on top of the stack as the error object. The value may be of any type (typically a string) and is consumed.\n\nThis is the lowest-level error primitive: `tea_error` and the argument error functions are built on top of it. Use it to raise a non-string error object, or one that has already been prepared on the stack."
+errors = "Always raises an error; never returns normally."
+stack = "[-1, +0, v]"
+example = '''
+static void fail_with_map(tea_State* T)
+{
+    tea_new_map(T);
+    tea_push_string(T, "unknown field");
+    tea_set_key(T, -2, "message");     /* {message = "unknown field"} */
+    tea_throw(T);
+}
+'''
+see_also = ["tea_error", "tea_pcall", "tea_atpanic"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_error"
+kind = "function"
+since = "1.0"
+tags = ["error", "string"]
+signature = "int tea_error(tea_State* T, const char* fmt, ...);"
+summary = "Raise formatted error"
+description = "Raises an error with a formatted message. `fmt` and the following arguments are processed like in `tea_push_fstring` to build the message, which is then raised with `tea_throw`.\n\nThe `int` return type exists only so the call can be written as `return tea_error(...)` or used in an expression; the function never returns normally."
+errors = "Always raises an error; never returns normally."
+stack = "[-0, +0, v]"
+example = '''
+static void divide(tea_State* T)
+{
+    tea_Number a = tea_check_number(T, 1);
+    tea_Number b = tea_check_number(T, 2);
+    if(b == 0.0)
+        tea_error(T, "division by zero: %g / %g", a, b);
+    tea_push_number(T, a / b);
+}
+'''
+see_also = ["tea_throw", "tea_arg_error", "tea_push_fstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "fmt"
+desc = "Format string, as in `tea_push_fstring`"
+
+[[entry.params]]
+name = "..."
+desc = "Arguments for `fmt`"
+
+###
+
+[[entry]]
+name = "tea_arg_error"
+kind = "function"
+since = "1.0"
+tags = ["error", "check"]
+signature = "int tea_arg_error(tea_State* T, int narg, const char* msg);"
+summary = "Bad argument error"
+description = "Raises a \"bad argument #`narg`\" error that includes `msg`. This is the general-purpose argument error, for problems that are not type mismatches (for those, `tea_type_error` is more appropriate).\n\nAs with `tea_error`, the `int` return type only allows `return tea_arg_error(...)` or use inside `tea_arg_check`."
+errors = "Always raises an error; never returns normally."
+stack = "[-0, +0, v]"
+example = '''
+static void set_name(tea_State* T)
+{
+    const char* name = tea_check_string(T, 1);
+    if(name[0] == '\0')
+        tea_arg_error(T, 1, "name must not be empty");
+    /* ... */
+}
+'''
+see_also = ["tea_type_error", "tea_arglimit_error", "tea_arg_check"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "narg"
+desc = "Number of the offending argument"
+
+[[entry.params]]
+name = "msg"
+desc = "Message describing the problem"
+
+###
+
+[[entry]]
+name = "tea_arglimit_error"
+kind = "function"
+since = "1.0"
+tags = ["error", "check"]
+signature = "int tea_arglimit_error(tea_State* T, int narg, const char* msg);"
+summary = "Argument out of range"
+description = "Raises an error saying that argument `narg` is outside the acceptable range, for example when a number exceeds a permitted maximum. `msg` describes the limit. The message carries the same \"bad argument #`narg`\" prefix as `tea_arg_error`."
+errors = "Always raises an error; never returns normally."
+stack = "[-0, +0, v]"
+example = '''
+static void set_quality(tea_State* T)
+{
+    tea_Integer q = tea_check_integer(T, 1);
+    if(q < 0 || q > 100)
+        tea_arglimit_error(T, 1, "quality must be in range [0, 100]");
+    /* ... */
+}
+'''
+see_also = ["tea_arg_error", "tea_type_error"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "narg"
+desc = "Number of the offending argument"
+
+[[entry.params]]
+name = "msg"
+desc = "Message describing the violated limit"
+
+###
+
+[[entry]]
+name = "tea_type_error"
+kind = "function"
+since = "1.0"
+tags = ["error", "type", "check"]
+signature = "int tea_type_error(tea_State* T, int narg, const char* xname);"
+summary = "Argument type error"
+description = "Raises a \"bad argument #`narg`\" error for a type mismatch. `xname` is the name of the expected type or userdata class, and is inserted into the message together with the actual type, as in `string expected, got number`."
+errors = "Always raises an error; never returns normally."
+stack = "[-0, +0, v]"
+example = '''
+static void connect(tea_State* T)
+{
+    if(!tea_test_udata(T, 1, "Socket"))
+        tea_type_error(T, 1, "Socket");
+    /* ... */
+}
+'''
+see_also = ["tea_arg_error", "tea_arglimit_error", "tea_test_udata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "narg"
+desc = "Number of the offending argument"
+
+[[entry.params]]
+name = "xname"
+desc = "Name of the expected type or class"
+
+###
+
+[[entry]]
+name = "tea_arg_check"
+kind = "macro"
+since = "1.0"
+tags = ["error", "check", "macro"]
+signature = "#define tea_arg_check(T, cond, narg, extramsg) ((void)((cond) || tea_arg_error(T, (narg), (extramsg))))"
+summary = "Assert argument condition"
+description = "Checks that `cond` is true and otherwise raises a bad argument error for argument `narg` with `extramsg`, by calling `tea_arg_error`. `cond` is evaluated exactly once."
+errors = "Raises an error if `cond` is false."
+stack = "[-0, +0, v]"
+example = '''
+static void set_volume(tea_State* T)
+{
+    tea_Integer v = tea_check_integer(T, 1);
+    tea_arg_check(T, v >= 0 && v <= 10, 1, "volume must be in range [0, 10]");
+    /* ... */
+}
+'''
+see_also = ["tea_arg_error", "tea_arglimit_error"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "cond"
+desc = "Condition that must hold"
+
+[[entry.params]]
+name = "narg"
+desc = "Number of the argument being checked"
+
+[[entry.params]]
+name = "extramsg"
+desc = "Message used if the condition is false"

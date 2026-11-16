@@ -1,0 +1,3 @@
+<table class="api-index-table"><thead><tr><th>Name</th><th>Category</th><th>Since</th><th>Kind</th><th>Summary</th></tr></thead><tbody>
+{{ range . }}<tr><td><code>{{ .name }}</code></td><td>{{ delimit .tags ", " }}</td><td>{{ .since }}</td><td>{{ .kind }}</td><td>{{ .summary }}</td></tr>{{ end }}
+</tbody></table>

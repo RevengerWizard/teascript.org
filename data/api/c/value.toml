@@ -1,0 +1,293 @@
+title = "Value Conversion"
+slug = "value"
+summary = "Lenient stack-to-C conversions"
+description = "Functions that convert a value on the stack into a native C value. Unlike the `tea_check_*` family, they never raise an error on a type mismatch: they convert when possible and otherwise return a safe default (`0`, `NULL` or `false`). The `x` variants also report whether the conversion succeeded.\n\nThe string conversions are different in one respect: `tea_to_string` and `tea_to_lstring` **push** the resulting string onto the stack, so remember to pop it when you are done."
+
+[[entry]]
+name = "tea_to_bool"
+kind = "function"
+since = "1.0"
+tags = ["conv", "bool"]
+signature = "bool tea_to_bool(tea_State* T, int index);"
+summary = "Convert to boolean"
+description = "Converts the value at `index` to a C boolean using Teascript truthiness: `nil` and `false` give `false`, and every other value, including `0` and the empty string, gives `true`."
+returns = "The boolean result. `false` if `index` is invalid or holds no value."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_number(T, 0);
+tea_push_nil(T);
+
+bool a = tea_to_bool(T, -2);   /* true  (0 is truthy) */
+bool b = tea_to_bool(T, -1);   /* false (nil is falsy) */
+'''
+see_also = ["tea_get_bool", "tea_check_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+###
+
+[[entry]]
+name = "tea_to_numberx"
+kind = "function"
+since = "1.0"
+tags = ["conv", "number"]
+signature = "tea_Number tea_to_numberx(tea_State* T, int index, bool* is_num);"
+summary = "Convert to number (flag)"
+description = "Converts the value at `index` to a number. Numbers convert to themselves, and strings that hold a valid number are parsed. If `is_num` is not `NULL`, it is set to `true` when the conversion succeeded and `false` otherwise."
+returns = "The converted number, or `0` if the value cannot be converted."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_string(T, "42");
+bool ok;
+tea_Number n = tea_to_numberx(T, -1, &ok);   /* n = 42, ok = true */
+
+tea_push_string(T, "hello");
+n = tea_to_numberx(T, -1, &ok);              /* n = 0, ok = false */
+'''
+see_also = ["tea_to_number", "tea_to_integerx", "tea_get_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+[[entry.params]]
+name = "is_num"
+desc = "Receives whether the conversion succeeded, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_to_number"
+kind = "function"
+since = "1.0"
+tags = ["conv", "number"]
+signature = "tea_Number tea_to_number(tea_State* T, int index);"
+summary = "Convert to number"
+description = "Converts the value at `index` to a number, ignoring whether the conversion succeeded. Equivalent to `tea_to_numberx(T, index, NULL)`."
+returns = "The converted number, or `0` if the value cannot be converted."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_string(T, "3.14");
+tea_Number n = tea_to_number(T, -1);   /* n = 3.14 */
+'''
+see_also = ["tea_to_numberx", "tea_get_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+###
+
+[[entry]]
+name = "tea_to_integerx"
+kind = "function"
+since = "1.0"
+tags = ["conv", "integer"]
+signature = "tea_Integer tea_to_integerx(tea_State* T, int index, bool* is_num);"
+summary = "Convert to integer (flag)"
+description = "Converts the value at `index` to a `tea_Integer`, discarding any fractional part. The accepted values are the same as for `tea_to_numberx`. If `is_num` is not `NULL`, it is set to `true` when the conversion succeeded and `false` otherwise."
+returns = "The converted integer, or `0` if the value cannot be converted."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_number(T, 7.9);
+bool ok;
+tea_Integer i = tea_to_integerx(T, -1, &ok);   /* i = 7, ok = true */
+'''
+see_also = ["tea_to_integer", "tea_to_numberx", "tea_get_integer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+[[entry.params]]
+name = "is_num"
+desc = "Receives whether the conversion succeeded, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_to_integer"
+kind = "function"
+since = "1.0"
+tags = ["conv", "integer"]
+signature = "tea_Integer tea_to_integer(tea_State* T, int index);"
+summary = "Convert to integer"
+description = "Converts the value at `index` to a `tea_Integer`, ignoring whether the conversion succeeded. Equivalent to `tea_to_integerx(T, index, NULL)`."
+returns = "The converted integer, or `0` if the value cannot be converted."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_number(T, 10.5);
+tea_Integer i = tea_to_integer(T, -1);   /* i = 10 */
+'''
+see_also = ["tea_to_integerx", "tea_get_integer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+###
+
+[[entry]]
+name = "tea_to_pointer"
+kind = "function"
+since = "1.0"
+tags = ["conv", "pointer"]
+signature = "const void* tea_to_pointer(tea_State* T, int index);"
+summary = "Convert to pointer"
+description = "Converts the value at `index` to a generic C pointer. Raw pointers convert to themselves; for other values the result depends on the type. Returns `NULL` if the value cannot be converted.\n\nThe result is intended for identity checks and debugging, not for dereferencing."
+returns = "A pointer representing the value, or `NULL` on failure."
+stack = "[-0, +0, -]"
+example = '''
+int x;
+tea_push_pointer(T, &x);
+const void* p = tea_to_pointer(T, -1);   /* p == &x */
+'''
+see_also = ["tea_get_pointer", "tea_check_pointer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+###
+
+[[entry]]
+name = "tea_to_userdata"
+kind = "function"
+since = "1.0"
+tags = ["conv", "userdata"]
+signature = "void* tea_to_userdata(tea_State* T, int index);"
+summary = "Convert to userdata pointer"
+description = "Returns the data block of the userdata at `index`. If the value is a raw pointer, that pointer is returned instead. For any other type, or an invalid index, returns `NULL`."
+returns = "The userdata's data block, the raw pointer, or `NULL`."
+stack = "[-0, +0, -]"
+example = '''
+int* data = (int*)tea_new_userdata(T, sizeof(int));
+*data = 99;
+
+void* p = tea_to_userdata(T, -1);   /* p == data */
+'''
+see_also = ["tea_get_userdata", "tea_check_userdata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+###
+
+[[entry]]
+name = "tea_to_lstring"
+kind = "function"
+since = "1.0"
+tags = ["conv", "string"]
+signature = "const char* tea_to_lstring(tea_State* T, int index, size_t* len);"
+summary = "Convert to string and length"
+description = "Converts the value at `index` to a string using Teascript's generic string conversion, which honors a `__tostring` method on instances and userdata. **The resulting string is pushed onto the stack**, and a pointer to its data is returned. If `len` is not `NULL`, the length is stored in `*len`.\n\nThe pointer stays valid while the string is on the stack, so pop the string only after you are done with it. The original value is left untouched."
+returns = "A pointer to the string data, or `NULL` if `index` holds no value."
+stack = "[-0, +1, e]"
+example = '''
+tea_push_integer(T, 1234);
+
+size_t len;
+const char* s = tea_to_lstring(T, -1, &len);   /* s = "1234", len = 4 */
+/* the stack is now [1234, "1234"] */
+printf("%.*s\n", (int)len, s);
+tea_pop(T, 1);                                 /* drop the string */
+'''
+see_also = ["tea_to_string", "tea_get_lstring", "tea_push_fstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+[[entry.params]]
+name = "len"
+desc = "Receives the string length, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_to_string"
+kind = "function"
+since = "1.0"
+tags = ["conv", "string"]
+signature = "const char* tea_to_string(tea_State* T, int index);"
+summary = "Convert to string"
+description = "Converts the value at `index` to a string using Teascript's generic string conversion. **The resulting string is pushed onto the stack**, and a pointer to its data is returned. Equivalent to `tea_to_lstring(T, index, NULL)`."
+returns = "A pointer to the string data, or `NULL` if `index` holds no value."
+stack = "[-0, +1, e]"
+example = '''
+tea_push_bool(T, true);
+const char* s = tea_to_string(T, -1);   /* s = "true" */
+tea_pop(T, 1);                          /* drop the string */
+'''
+see_also = ["tea_to_lstring", "tea_get_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"
+
+###
+
+[[entry]]
+name = "tea_to_cfunction"
+kind = "function"
+since = "1.0"
+tags = ["conv", "cfunction"]
+signature = "tea_CFunction tea_to_cfunction(tea_State* T, int index);"
+summary = "Convert to C function"
+description = "Returns the C function stored in the value at `index`, if the value is a C function or a C closure. Otherwise returns `NULL`."
+returns = "The `tea_CFunction`, or `NULL` if the value is not a C function."
+stack = "[-0, +0, -]"
+example = '''
+static void my_cfunc(tea_State* T) { /* ... */ }
+
+tea_push_cfunction(T, my_cfunc, 0, 0);
+tea_CFunction f = tea_to_cfunction(T, -1);   /* f == my_cfunc */
+'''
+see_also = ["tea_check_cfunction", "tea_is_cfunction"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to convert"

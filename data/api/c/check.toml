@@ -1,0 +1,562 @@
+title = "Argument Checking"
+slug = "check"
+summary = "Validate C function arguments"
+description = "Functions for validating the arguments received by a C function. Each `tea_check_*` function verifies the value at `index` and returns it as a C value; if the check fails, a bad argument error that names the offending argument is raised, so a C function can validate all its arguments at the top and then work with plain C values.\n\nThese functions raise errors and never return on failure. For a non-raising test, use the `tea_is_*` macros or `tea_test_udata`; for arguments that may be absent, see the Optional Arguments section; for values you already know have the right type, see the Get Functions section."
+
+[[entry]]
+name = "tea_check_type"
+kind = "function"
+since = "1.0"
+tags = ["check", "type"]
+signature = "void tea_check_type(tea_State* T, int index, int type);"
+summary = "Check exact type"
+description = "Checks that the value at `index` has exactly the type `type`, one of the `TEA_TYPE_*` constants."
+errors = "Raises a type error if the value does not have the expected type."
+stack = "[-0, +0, v]"
+example = '''
+/* argument 1 must be a list */
+tea_check_type(T, 1, TEA_TYPE_LIST);
+'''
+see_also = ["tea_check_any", "tea_get_type", "tea_is_mask"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "type"
+desc = "Expected type (`TEA_TYPE_*`)"
+
+###
+
+[[entry]]
+name = "tea_check_any"
+kind = "function"
+since = "1.0"
+tags = ["check"]
+signature = "void tea_check_any(tea_State* T, int index);"
+summary = "Check argument present"
+description = "Checks that there is a value at `index`, of any type. A `nil` value is accepted; only a missing argument fails."
+errors = "Raises an argument error if `index` holds no value."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_any(T, 1);   /* argument 1 is required, but may be nil */
+'''
+see_also = ["tea_check_type", "tea_opt_nil", "tea_is_none"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_bool"
+kind = "function"
+since = "1.0"
+tags = ["check", "bool"]
+signature = "bool tea_check_bool(tea_State* T, int index);"
+summary = "Check boolean"
+description = "Checks that the value at `index` is a boolean and returns it."
+returns = "The boolean value at `index`."
+errors = "Raises a type error if the value is not a boolean."
+stack = "[-0, +0, v]"
+example = '''
+bool verbose = tea_check_bool(T, 1);
+'''
+see_also = ["tea_opt_bool", "tea_get_bool", "tea_to_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_number"
+kind = "function"
+since = "1.0"
+tags = ["check", "number"]
+signature = "tea_Number tea_check_number(tea_State* T, int index);"
+summary = "Check number"
+description = "Checks that the value at `index` is a number and returns it."
+returns = "The numeric value at `index`."
+errors = "Raises a type error if the value is not a number."
+stack = "[-0, +0, v]"
+example = '''
+tea_Number radius = tea_check_number(T, 1);
+'''
+see_also = ["tea_check_integer", "tea_opt_number", "tea_get_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_integer"
+kind = "function"
+since = "1.0"
+tags = ["check", "integer"]
+signature = "tea_Integer tea_check_integer(tea_State* T, int index);"
+summary = "Check integer"
+description = "Checks that the value at `index` is a number and returns it truncated to a `tea_Integer`. The fractional part is discarded, so `2.9` gives `2`."
+returns = "The integer value at `index`."
+errors = "Raises a type error if the value is not a number."
+stack = "[-0, +0, v]"
+example = '''
+tea_Integer count = tea_check_integer(T, 2);
+'''
+see_also = ["tea_check_number", "tea_opt_integer", "tea_get_integer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_pointer"
+kind = "function"
+since = "1.0"
+tags = ["check", "pointer"]
+signature = "const void* tea_check_pointer(tea_State* T, int index);"
+summary = "Check pointer"
+description = "Checks that the value at `index` is a raw C pointer and returns it."
+returns = "The pointer at `index`."
+errors = "Raises a type error if the value is not a pointer."
+stack = "[-0, +0, v]"
+example = '''
+const void* ctx = tea_check_pointer(T, 1);
+'''
+see_also = ["tea_opt_pointer", "tea_get_pointer", "tea_push_pointer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_range"
+kind = "function"
+since = "1.0"
+tags = ["check", "range"]
+signature = "void tea_check_range(tea_State* T, int index, tea_Number* start, tea_Number* end, tea_Number* step);"
+summary = "Check range"
+description = "Checks that the value at `index` is a range and stores its components in `start`, `end` and `step`."
+errors = "Raises a type error if the value is not a range."
+stack = "[-0, +0, v]"
+example = '''
+tea_Number start, end, step;
+tea_check_range(T, 1, &start, &end, &step);
+'''
+see_also = ["tea_get_range", "tea_push_range"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "start"
+desc = "Receives the range start"
+
+[[entry.params]]
+name = "end"
+desc = "Receives the range end"
+
+[[entry.params]]
+name = "step"
+desc = "Receives the range step"
+
+###
+
+[[entry]]
+name = "tea_check_lstring"
+kind = "function"
+since = "1.0"
+tags = ["check", "string"]
+signature = "const char* tea_check_lstring(tea_State* T, int index, size_t* len);"
+summary = "Check string and length"
+description = "Checks that the value at `index` is a string and returns a pointer to its data. If `len` is not `NULL`, the string length is stored in `*len`. Use the length: Teascript strings may contain embedded zero bytes.\n\nThe pointer is valid as long as the string stays on the stack."
+returns = "A pointer to the string data."
+errors = "Raises a type error if the value is not a string."
+stack = "[-0, +0, v]"
+example = '''
+size_t len;
+const char* data = tea_check_lstring(T, 1, &len);
+'''
+see_also = ["tea_check_string", "tea_opt_lstring", "tea_get_lstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "len"
+desc = "Receives the string length, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_check_string"
+kind = "function"
+since = "1.0"
+tags = ["check", "string"]
+signature = "const char* tea_check_string(tea_State* T, int index);"
+summary = "Check string"
+description = "Checks that the value at `index` is a string and returns a pointer to its data. Equivalent to `tea_check_lstring(T, index, NULL)`. Use `tea_check_lstring` if the string may contain embedded zero bytes."
+returns = "A pointer to the string data."
+errors = "Raises a type error if the value is not a string."
+stack = "[-0, +0, v]"
+example = '''
+const char* path = tea_check_string(T, 1);
+'''
+see_also = ["tea_check_lstring", "tea_opt_string", "tea_get_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_cfunction"
+kind = "function"
+since = "1.0"
+tags = ["check", "cfunction"]
+signature = "tea_CFunction tea_check_cfunction(tea_State* T, int index);"
+summary = "Check C function"
+description = "Checks that the value at `index` is a C function and returns its function pointer."
+returns = "The `tea_CFunction` stored in the value."
+errors = "Raises a type error if the value is not a C function."
+stack = "[-0, +0, v]"
+example = '''
+tea_CFunction cb = tea_check_cfunction(T, 2);
+'''
+see_also = ["tea_opt_cfunction", "tea_is_cfunction", "tea_to_cfunction"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_userdata"
+kind = "function"
+since = "1.0"
+tags = ["check", "userdata"]
+signature = "void* tea_check_userdata(tea_State* T, int index);"
+summary = "Check userdata"
+description = "Checks that the value at `index` is a userdata, of any class, and returns a pointer to its data block. To require a particular class, use `tea_check_udata`."
+returns = "A pointer to the userdata's data block."
+errors = "Raises a type error if the value is not a userdata."
+stack = "[-0, +0, v]"
+example = '''
+void* block = tea_check_userdata(T, 1);
+'''
+see_also = ["tea_check_udata", "tea_opt_userdata", "tea_get_userdata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_udata"
+kind = "function"
+since = "1.0"
+tags = ["check", "userdata"]
+signature = "void* tea_check_udata(tea_State* T, int idx, const char* name);"
+summary = "Check typed userdata"
+description = "Checks that the value at `idx` is a userdata whose class is the one registered under `name`, and returns a pointer to its data block. This is the safe way to receive a userdata created with `tea_new_udata` or `tea_new_udatav`."
+returns = "A pointer to the userdata's data block."
+errors = "Raises a type error naming `name` if the value is not a userdata of that class."
+stack = "[-0, +0, v]"
+example = '''
+Socket* s = (Socket*)tea_check_udata(T, 1, "Socket");
+'''
+see_also = ["tea_test_udata", "tea_new_udata", "tea_check_userdata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "idx"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "name"
+desc = "Name the userdata class was registered with"
+
+###
+
+[[entry]]
+name = "tea_test_udata"
+kind = "function"
+since = "1.0"
+tags = ["check", "userdata"]
+signature = "void* tea_test_udata(tea_State* T, int idx, const char* name);"
+summary = "Test typed userdata"
+description = "Tests whether the value at `idx` is a userdata whose class is the one registered under `name`. If so, returns a pointer to its data block; otherwise returns `NULL`.\n\nThis is the non-raising counterpart of `tea_check_udata`, useful for optional or polymorphic arguments."
+returns = "A pointer to the data block on success; `NULL` otherwise."
+stack = "[-0, +0, -]"
+example = '''
+void* ring = tea_test_udata(T, 1, "RingBuffer");
+if(ring)
+{
+    /* argument 1 is a RingBuffer */
+}
+'''
+see_also = ["tea_check_udata", "tea_new_udata", "tea_type_error"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "idx"
+desc = "Stack index of the value"
+
+[[entry.params]]
+name = "name"
+desc = "Name the userdata class was registered with"
+
+###
+
+[[entry]]
+name = "tea_check_option"
+kind = "function"
+since = "1.0"
+tags = ["check", "string"]
+signature = "int tea_check_option(tea_State* T, int index, const char* def, const char* const options[]);"
+summary = "Check enum option"
+description = "Checks that the value at `index` is a string equal to one of the strings in `options`, which must be terminated by `NULL`, and returns its position in the array. If the argument is absent and `def` is not `NULL`, `def` is used in its place.\n\nIt is the usual way to map a string argument to a C enum."
+returns = "The index in `options` of the selected string."
+errors = "Raises an argument error if the value is not a string, or is not one of the options."
+stack = "[-0, +0, v]"
+example = '''
+static const char* const modes[] = { "read", "write", "append", NULL };
+
+static void open_file(tea_State* T)
+{
+    const char* path = tea_check_string(T, 1);
+    int mode = tea_check_option(T, 2, "read", modes);   /* 0, 1 or 2 */
+    /* ... */
+}
+'''
+see_also = ["tea_check_string", "tea_opt_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Default option used when the argument is absent, or `NULL` for none"
+
+[[entry.params]]
+name = "options"
+desc = "`NULL`-terminated array of accepted strings"
+
+###
+
+[[entry]]
+name = "tea_check_list"
+kind = "macro"
+since = "1.0"
+tags = ["check", "list", "macro"]
+signature = "#define tea_check_list(T, index) tea_check_type(T, (index), TEA_TYPE_LIST)"
+summary = "Check list"
+description = "Checks that the value at `index` is a list. Shorthand for `tea_check_type` with `TEA_TYPE_LIST`."
+errors = "Raises a type error if the value is not a list."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_list(T, 1);
+'''
+see_also = ["tea_check_type", "tea_is_list"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_map"
+kind = "macro"
+since = "1.0"
+tags = ["check", "map", "macro"]
+signature = "#define tea_check_map(T, index) tea_check_type(T, (index), TEA_TYPE_MAP)"
+summary = "Check map"
+description = "Checks that the value at `index` is a map. Shorthand for `tea_check_type` with `TEA_TYPE_MAP`."
+errors = "Raises a type error if the value is not a map."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_map(T, 1);
+'''
+see_also = ["tea_check_type", "tea_is_map"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_function"
+kind = "macro"
+since = "1.0"
+tags = ["check", "macro"]
+signature = "#define tea_check_function(T, index) tea_check_type(T, (index), TEA_TYPE_FUNCTION)"
+summary = "Check function"
+description = "Checks that the value at `index` is a function. Shorthand for `tea_check_type` with `TEA_TYPE_FUNCTION`."
+errors = "Raises a type error if the value is not a function."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_function(T, 1);   /* a callback */
+'''
+see_also = ["tea_check_type", "tea_is_function"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_module"
+kind = "macro"
+since = "1.0"
+tags = ["check", "module", "macro"]
+signature = "#define tea_check_module(T, index) tea_check_type(T, (index), TEA_TYPE_MODULE)"
+summary = "Check module"
+description = "Checks that the value at `index` is a module. Shorthand for `tea_check_type` with `TEA_TYPE_MODULE`."
+errors = "Raises a type error if the value is not a module."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_module(T, 1);
+'''
+see_also = ["tea_check_type", "tea_is_module"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_class"
+kind = "macro"
+since = "1.0"
+tags = ["check", "class", "macro"]
+signature = "#define tea_check_class(T, index) tea_check_type(T, (index), TEA_TYPE_CLASS)"
+summary = "Check class"
+description = "Checks that the value at `index` is a class. Shorthand for `tea_check_type` with `TEA_TYPE_CLASS`."
+errors = "Raises a type error if the value is not a class."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_class(T, 1);
+'''
+see_also = ["tea_check_type", "tea_is_class"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_check_instance"
+kind = "macro"
+since = "1.0"
+tags = ["check", "class", "macro"]
+signature = "#define tea_check_instance(T, index) tea_check_type(T, (index), TEA_TYPE_INSTANCE)"
+summary = "Check instance"
+description = "Checks that the value at `index` is a class instance. Shorthand for `tea_check_type` with `TEA_TYPE_INSTANCE`."
+errors = "Raises a type error if the value is not an instance."
+stack = "[-0, +0, v]"
+example = '''
+tea_check_instance(T, 0);
+'''
+see_also = ["tea_check_type", "tea_is_instance"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"

@@ -1,0 +1,17 @@
+{{ $data := index site.Data.api.tea .Params.apiData }}
+<div class="page-layout page-api page-api-entity" data-toc="false"><aside class="sidebar api-sidebar"><button class="sidebar-close" type="button" aria-label="Close navigation">{{ (resources.Get "svg/x.svg").Content | safeHTML }}</button>{{ partial "sidebar.html" (dict "currentPage" . "apiMode" "tea") }}</aside><main class="page-main api-main"><article class="post-single"><header class="post-header"><div class="post-title-row api-title-row"><button class="sidebar-toggle" type="button" aria-controls="page-sidebar" aria-expanded="false" aria-label="Open navigation"><span class="sidebar-toggle-open">{{ (resources.Get "svg/three-dots.svg").Content | safeHTML }}</span><span class="sidebar-toggle-close">{{ (resources.Get "svg/x.svg").Content | safeHTML }}</span></button><div class="api-entity-heading"><h1 class="post-title">{{ $data.title }}</h1>{{ partial "api/badges.html" $data }}</div></div></header><div class="post-content"><div class="api-entity-description">{{ with $data.description }}{{ . | markdownify }}{{ else }}{{ $data.summary | markdownify }}{{ end }}</div>
+{{ $classes := slice }}
+{{ range $data.entry }}{{ if eq .kind "class" }}{{ $classes = $classes | append .name }}{{ end }}{{ end }}
+{{ range $data.entry }}
+    {{ if eq .kind "class" }}
+        {{ $className := .name }}{{ $prefix := printf "%s:" $className }}
+        {{ partial "api/entry.html" (merge . (dict "teaCategory" $.Params.apiData)) }}
+        {{ range $data.entry }}{{ if strings.HasPrefix .name $prefix }}{{ partial "api/entry.html" (merge . (dict "teaCategory" $.Params.apiData)) }}{{ end }}{{ end }}
+    {{ else if ne .kind "section" }}
+        {{ $entry := . }}
+        {{ $isNested := false }}
+        {{ range $classes }}{{ if strings.HasPrefix $entry.name (printf "%s:" .) }}{{ $isNested = true }}{{ end }}{{ end }}
+        {{ if not $isNested }}{{ partial "api/entry.html" (merge $entry (dict "teaCategory" $.Params.apiData)) }}{{ end }}
+    {{ end }}
+{{ end }}
+</div></article></main></div>

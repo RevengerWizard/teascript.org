@@ -1,0 +1,419 @@
+title = "Push Functions"
+slug = "push"
+summary = "Push C values onto the stack"
+description = "Functions that push a C value onto the stack, converting it into a Teascript value. Each pushes exactly one value. The ones that create objects (strings, ranges, closures) may need to allocate memory, and can raise a memory error."
+
+[[entry]]
+name = "tea_push_nil"
+kind = "function"
+since = "1.0"
+tags = ["push", "nil"]
+signature = "void tea_push_nil(tea_State* T);"
+summary = "Push nil"
+description = "Pushes `nil` onto the stack."
+stack = "[-0, +1, -]"
+example = '''
+tea_push_nil(T);   /* [nil] */
+'''
+see_also = ["tea_push_bool", "tea_is_nil"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_push_true"
+kind = "function"
+since = "1.0"
+tags = ["push", "bool"]
+signature = "void tea_push_true(tea_State* T);"
+summary = "Push true"
+description = "Pushes the boolean `true` onto the stack. Equivalent to `tea_push_bool(T, true)`."
+stack = "[-0, +1, -]"
+example = '''
+tea_push_true(T);   /* [true] */
+'''
+see_also = ["tea_push_false", "tea_push_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_push_false"
+kind = "function"
+since = "1.0"
+tags = ["push", "bool"]
+signature = "void tea_push_false(tea_State* T);"
+summary = "Push false"
+description = "Pushes the boolean `false` onto the stack. Equivalent to `tea_push_bool(T, false)`."
+stack = "[-0, +1, -]"
+example = '''
+tea_push_false(T);   /* [false] */
+'''
+see_also = ["tea_push_true", "tea_push_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_push_bool"
+kind = "function"
+since = "1.0"
+tags = ["push", "bool"]
+signature = "void tea_push_bool(tea_State* T, bool b);"
+summary = "Push boolean"
+description = "Pushes a boolean onto the stack: `true` if `b` is non-zero, `false` otherwise."
+stack = "[-0, +1, -]"
+example = '''
+tea_push_bool(T, false);   /* [false] */
+tea_push_bool(T, true);    /* [false, true] */
+'''
+see_also = ["tea_push_true", "tea_push_false", "tea_get_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "b"
+desc = "Boolean value to push"
+
+###
+
+[[entry]]
+name = "tea_push_number"
+kind = "function"
+since = "1.0"
+tags = ["push", "number"]
+signature = "void tea_push_number(tea_State* T, tea_Number n);"
+summary = "Push number"
+description = "Pushes a number (an IEEE 754 double) onto the stack.\n\nIf `n` is a NaN, it may be normalized into another NaN."
+stack = "[-0, +1, -]"
+example = '''
+tea_push_number(T, 547.98);
+'''
+see_also = ["tea_push_integer", "tea_get_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Number to push"
+
+###
+
+[[entry]]
+name = "tea_push_integer"
+kind = "function"
+since = "1.0"
+tags = ["push", "integer"]
+signature = "void tea_push_integer(tea_State* T, tea_Integer n);"
+summary = "Push integer"
+description = "Pushes an integer onto the stack. Teascript has a single number type, so the integer is stored as a double and very large values may lose precision."
+stack = "[-0, +1, -]"
+example = '''
+tea_push_integer(T, 987);
+'''
+see_also = ["tea_push_number", "tea_get_integer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Integer to push"
+
+###
+
+[[entry]]
+name = "tea_push_pointer"
+kind = "function"
+since = "1.0"
+tags = ["push", "pointer"]
+signature = "void tea_push_pointer(tea_State* T, void* p);"
+summary = "Push C pointer"
+description = "Pushes a raw C pointer onto the stack. The garbage collector does not manage it: the memory it points to must be kept alive by the caller. To tie memory to the lifetime of a Teascript value, use a userdata instead."
+stack = "[-0, +1, -]"
+example = '''
+int data = 42;
+tea_push_pointer(T, &data);   /* [pointer] */
+'''
+see_also = ["tea_get_pointer", "tea_new_userdata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "p"
+desc = "Pointer to push"
+
+###
+
+[[entry]]
+name = "tea_push_lstring"
+kind = "function"
+since = "1.0"
+tags = ["push", "string"]
+signature = "const char* tea_push_lstring(tea_State* T, const char* s, size_t len);"
+summary = "Push string with length"
+description = "Pushes the string made of the `len` bytes at `s` onto the stack. The bytes are copied, so `s` need not stay valid. Unlike `tea_push_string`, the string may contain embedded zero bytes."
+returns = "A pointer to the internal copy of the string."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+tea_push_lstring(T, "foo\0bar", 7);   /* ["foo\0bar"] */
+'''
+see_also = ["tea_push_string", "tea_push_fstring", "tea_push_literal"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "s"
+desc = "Pointer to the string data"
+
+[[entry.params]]
+name = "len"
+desc = "Length of the string in bytes"
+
+###
+
+[[entry]]
+name = "tea_push_string"
+kind = "function"
+since = "1.0"
+tags = ["push", "string"]
+signature = "const char* tea_push_string(tea_State* T, const char* s);"
+summary = "Push C string"
+description = "Pushes the NUL-terminated C string `s` onto the stack. The length is found with `strlen`, and the bytes are copied.\n\nUse `tea_push_lstring` if the string may contain embedded zero bytes."
+returns = "A pointer to the internal copy of the string."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+tea_push_string(T, "foo");       /* ["foo"] */
+tea_push_string(T, "foo\0bar");  /* ["foo", "foo"]: stops at the first zero */
+tea_push_string(T, "");          /* ["foo", "foo", ""] */
+'''
+see_also = ["tea_push_lstring", "tea_push_fstring", "tea_push_literal"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "s"
+desc = "NUL-terminated string"
+
+###
+
+[[entry]]
+name = "tea_push_fstring"
+kind = "function"
+since = "1.0"
+tags = ["push", "string"]
+signature = "const char* tea_push_fstring(tea_State* T, const char* fmt, ...);"
+summary = "Push formatted string"
+description = "Pushes a string built from a `printf`-style format string and the following arguments. Only a limited subset of `printf` specifiers is supported. Equivalent to calling `tea_push_vfstring` with a `va_list` of the arguments."
+returns = "A pointer to the internal copy of the string."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+tea_push_fstring(T, "Hello, %s! You have %d messages.", "Alice", 5);
+/* ["Hello, Alice! You have 5 messages."] */
+'''
+see_also = ["tea_push_vfstring", "tea_push_string", "tea_error"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "fmt"
+desc = "Format string (limited `printf`-like syntax)"
+
+[[entry.params]]
+name = "..."
+desc = "Arguments for the format specifiers"
+
+###
+
+[[entry]]
+name = "tea_push_vfstring"
+kind = "function"
+since = "1.0"
+tags = ["push", "string"]
+signature = "const char* tea_push_vfstring(tea_State* T, const char* fmt, va_list args);"
+summary = "Push formatted string (va_list)"
+description = "Same as `tea_push_fstring`, but takes its arguments as a `va_list`. Use it to build your own variadic formatting functions."
+returns = "A pointer to the internal copy of the string."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+static void push_log(tea_State* T, const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    tea_push_vfstring(T, fmt, args);
+    va_end(args);
+}
+'''
+see_also = ["tea_push_fstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "fmt"
+desc = "Format string (limited `printf`-like syntax)"
+
+[[entry.params]]
+name = "args"
+desc = "`va_list` with the arguments"
+
+###
+
+[[entry]]
+name = "tea_push_literal"
+kind = "macro"
+since = "1.0"
+tags = ["push", "string", "macro"]
+signature = '#define tea_push_literal(T, s) tea_push_lstring(T, "" s, (sizeof(s)/sizeof(char))-1)'
+summary = "Push string literal"
+description = "Pushes a C string literal onto the stack. The length is computed at compile time, so no `strlen` is needed. It only works with literals (the `\"\" s` trick makes the compiler reject anything else)."
+returns = "A pointer to the internal copy of the string."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+tea_push_literal(T, "hello");
+'''
+see_also = ["tea_push_lstring", "tea_push_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "s"
+desc = "String literal"
+
+###
+
+[[entry]]
+name = "tea_push_range"
+kind = "function"
+since = "1.0"
+tags = ["push", "range"]
+signature = "void tea_push_range(tea_State* T, tea_Number start, tea_Number end, tea_Number step);"
+summary = "Push range"
+description = "Pushes a range onto the stack. A range is a numeric sequence defined by a `start`, an `end` and a `step` increment."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+tea_push_range(T, 1, 10, 2);    /* 1 to 10, step 2 */
+tea_push_range(T, 0, 1, 0.1);   /* 0 to 1, step 0.1 */
+'''
+see_also = ["tea_get_range", "tea_check_range"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "start"
+desc = "First value of the range"
+
+[[entry.params]]
+name = "end"
+desc = "End value of the range"
+
+[[entry.params]]
+name = "step"
+desc = "Increment between values"
+
+###
+
+[[entry]]
+name = "tea_push_cclosure"
+kind = "function"
+since = "1.0"
+tags = ["push", "cfunction"]
+signature = "void tea_push_cclosure(tea_State* T, tea_CFunction fn, int nupvalues, int nargs, int nopts);"
+summary = "Push C closure"
+description = "Pushes a new C closure onto the stack: a C function together with a set of upvalues. The top `nupvalues` values of the stack are popped and stored as the closure's upvalues, which the function reads with `tea_upvalue_index`.\n\n`nargs` is the number of required arguments and `nopts` the number of optional ones. Use `TEA_VARG` for a variadic function."
+errors = "May raise a memory error."
+stack = "[-nupvalues, +1, m]"
+example = '''
+tea_push_integer(T, 100);   /* upvalue 1 */
+tea_push_integer(T, 200);   /* upvalue 2 */
+tea_push_cclosure(T, my_func, 2, 1, 0);
+/* [cclosure] holding the upvalues 100 and 200 */
+'''
+see_also = ["tea_push_cfunction", "tea_upvalue_index", "tea_set_funcs"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "fn"
+desc = "C function called when the closure is invoked"
+
+[[entry.params]]
+name = "nupvalues"
+desc = "Number of values to pop from the stack as upvalues"
+
+[[entry.params]]
+name = "nargs"
+desc = "Number of required arguments, or `TEA_VARG`"
+
+[[entry.params]]
+name = "nopts"
+desc = "Number of optional arguments"
+
+###
+
+[[entry]]
+name = "tea_push_cfunction"
+kind = "function"
+since = "1.0"
+tags = ["push", "cfunction"]
+signature = "void tea_push_cfunction(tea_State* T, tea_CFunction fn, int nargs, int nopts);"
+summary = "Push C function"
+description = "Pushes a C function onto the stack. Equivalent to `tea_push_cclosure` with no upvalues.\n\n`nargs` is the number of required arguments and `nopts` the number of optional ones. Use `TEA_VARG` for a variadic function."
+errors = "May raise a memory error."
+stack = "[-0, +1, m]"
+example = '''
+tea_push_cfunction(T, my_func, 2, 1);   /* two required arguments, one optional */
+tea_set_global(T, "my_func");
+'''
+see_also = ["tea_push_cclosure", "tea_set_funcs", "tea_is_cfunction"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "fn"
+desc = "C function to push"
+
+[[entry.params]]
+name = "nargs"
+desc = "Number of required arguments, or `TEA_VARG`"
+
+[[entry.params]]
+name = "nopts"
+desc = "Number of optional arguments"

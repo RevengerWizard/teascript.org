@@ -1,0 +1,190 @@
+title = "String"
+slug = "string"
+kind = "class"
+origin = "builtin"
+since = "1.0"
+summary = "A sequence of byte characters."
+description = "The String class represents immutable byte sequences, commonly used for text encoded as UTF-8. Its methods provide searching, slicing, splitting, case conversion, and other string operations."
+
+[[entry]]
+name = "String.len"
+kind = "attribute"
+signature = "String:len"
+summary = "Byte length of a string."
+description = "The attribute `len` allows to receive the byte length of a Tea string."
+example = "const s = \"Hello, world!\"\nprint(s.len)  // 13\n\nprint(\"Exploding Kittens!\".len) // 19"
+
+###
+
+[[entry]]
+name = "String.upper"
+kind = "method"
+signature = "function String:upper()"
+summary = "Uppercase a string"
+description = "The `upper` method produces a new Tea string copy of the original string with all its characters uppercase."
+example = "var str = \"Hello, world!\"\nstr = my_string.upper()\nprint(str)  // \"HELLO, WORLD!\""
+
+###
+
+[[entry]]
+name = "String.lower"
+kind = "method"
+signature = "function String:lower()"
+summary = "Lowercase a string"
+description = "The `lower` method produces a new Tea string copy of the original string with all its characters lowercase."
+example = "var str = \"Hello, world!\"\nstr = my_string.lower()\nprint(str)  // \"hello, world!\""
+
+###
+
+[[entry]]
+name = "String.reverse"
+kind = "method"
+signature = "function String:reverse()"
+summary = "Reverse a string"
+description = "The `reverse` method produces a new Tea string copy of the original string with its characters reversed in order."
+example = "const str = \"Hello, world!\"\nstr = str.reverse()\nprint(str)  // \"!dlrow ,olleH\""
+
+###
+
+[[entry]]
+name = "String.split"
+kind = "method"
+signature = "function String:split(separator='', maxsplit=nil)"
+summary = "Split a string into a list"
+description = "The `split` method"
+returns = "The method returns a list of string created by splitting the original string at each occurrence of the specified `separator` value, `maxsplit` times."
+example = "var str = \"Hello, world! How are you today?\"\nstr = str.split()\nprint(my_list)  // [\"Hello,\", \"world!\", \"How\", \"are\", \"you\", \"today?\"]"
+
+[[entry.params]]
+name = "separator"
+desc = "A string that specified the character(s) to use as the separator. If `separator` is not specified, the string is split on any white space `\" \"`."
+
+[[entry.params]]
+name = "maxsplit"
+desc = "An optional number that specified the maximum number of splits allowed to perform. If `maxsplit` is not specified, the string is split into as many sub-strings as possible."
+
+###
+
+[[entry]]
+name = "String.contains"
+kind = "method"
+signature = "function String:contains(substr)"
+summary = "Check presence of substring"
+description = "The `contains` method checks whether the specified string is found within the original string."
+returns = "The method returns `true` if the `substring` is found within the original string, or `false` otherwise."
+example = "var str = \"Hello, world!\"\nvar result = str.contains(\"world\")\nprint(result)  // true\n\nresult = str.contains(\"foo\")\nprint(result)  // false"
+
+[[entry.params]]
+name = "substring"
+desc = "The string to search for within the original string."
+
+###
+
+[[entry]]
+name = "String.startswith"
+kind = "method"
+signature = "function String:startswith(prefix)"
+summary = "Check presence of prefix"
+description = "The `startswith` method checks whether the original string starts with a specified string sequence."
+returns = "The method returns `true` if the original string starts with `prefix`, and `false` otherwise."
+example = "var str = \"Hello, world!\"\nvar res = str.startswith(\"Hello\")\nprint(result)  // true\n\nres = str.startswith(\"foo\")\nprint(result)  // false"
+
+[[entry.params]]
+name = "prefix"
+desc = "The string to search for at the start of the original string."
+
+###
+
+[[entry]]
+name = "String.endswith"
+kind = "method"
+signature = "function String:endswith(suffix)"
+summary = "Check presence of suffix"
+description = "The `endswith` method checks whether the original string ends with a specified string sequence."
+returns = "The method returns `true` if the original string ends with `suffix`, and `false` otherwise."
+example = "var str = \"Hello, world!\"\nvar res = str.endswith(\"world!\")\nprint(res)  // true\n\nres = str.endswith(\"foo\")\nprint(res)  // false"
+
+[[entry.params]]
+name = "suffix"
+desc = "The string to search for at the end of the original string."
+
+###
+
+[[entry]]
+name = "String.leftstrip"
+kind = "method"
+signature = "function String:leftstrip()"
+summary = "Strip any leading white spaces"
+description = "The `leftstrip` strips the original string of any leading white spaces."
+returns = "The method returns a copy of the original string with leading white space removed."
+example = "var str = \"   Hello, world!\"\nstr = str.leftstrip()\nprint(str)  // \"Hello, world!\""
+
+###
+
+[[entry]]
+name = "String.rightstrip"
+kind = "method"
+signature = "function String:rightstrip()"
+summary = "Strip any trailing white spaces"
+description = "The `rightstrip` method strips the original string of any trailing white spaces."
+returns = "The method returns a copy of the original string with all trailing white spaces removed."
+example = "var str = \"Hello, world!   \"\nstr = str.rightstrip()\nprint(str)  // \"Hello, world!\""
+
+###
+
+[[entry]]
+name = "String.strip"
+kind = "method"
+signature = "function String:strip()"
+summary = "String leading and trailing white spaces"
+description = "The `strip` method strips the original string of any leading and trailing white spaces."
+returns = "The method returns a copy of the original string with all its trailing and leading white spaces removed."
+example = "var str = \"   Hello, world!   \"\nstr = my_string.strip()\nprint(str)  // \"Hello, world!\""
+
+###
+
+[[entry]]
+name = "String.count"
+kind = "method"
+signature = "function String:count(substr)"
+summary = "Count presences of substring"
+description = "The `count` method counts the number of occurrences of a specified string string within the original string."
+returns = "The method returns the number of occurrences of `substr` within the original string."
+example = "var str = \"Hello, world! Hello, world!\"\nvar res = str.count(\"Hello\")\nprint(res)  // 2\nres = str.count(\"foo\")\nprint(res)  // 0"
+
+[[entry.params]]
+name = "substr"
+desc = "The string to search for within the original string."
+
+###
+
+[[entry]]
+name = "String.find"
+kind = "method"
+signature = "function String:find(substr)"
+summary = "Find substring"
+description = "The `find` method finds the index of the first occurrence of a specified string within the original string."
+returns = "The method returns the index of the first occurrence of `substr` within the original string, or `-1` if the string if not found."
+example = "var str = \"Hello, world!\"\nvar res = str.find(\"world\")\nprint(res)  // 7\nres = str.find(\"foo\")\nprint(res)  // -1"
+
+[[entry.params]]
+name = "substr"
+desc = "The string to search for within the original string."
+
+###
+
+[[entry]]
+name = "String.replace"
+kind = "method"
+signature = "function String:replace(oldstring, newstring)"
+summary = "Replace occurrences of a string"
+description = "The `replace` method replaces all occurrences found of a specified string from the original string with a different string sequence."
+returns = "The method returns a copy of the original string with all occurrences of `oldstring` replaced with `newstring`. If no occurrences have been found, the returned string is exactly the same original string value."
+
+[[entry.params]]
+name = "oldstring"
+desc = "The old string occurrence present within the original string."
+
+[[entry.params]]
+name = "newstring"
+desc = "The string to replace `oldstring` with in the new string."

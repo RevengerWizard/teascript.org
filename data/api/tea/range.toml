@@ -1,0 +1,113 @@
+title = "Range"
+slug = "range"
+kind = "class"
+origin = "builtin"
+since = "1.0"
+summary = "Sequence of numbers, from start to end using step"
+description = "The Range class represents a numeric sequence defined by its start, end, and step values. It supports iteration and operations for checking, reversing, and copying a range."
+
+###
+
+[[entry]]
+name = "Range.start"
+kind = "attribute"
+signature = "Range:start"
+summary = "Start interval"
+description = "The attribute `start` allows to receive the start value of a Tea range."
+example = "const r = 1..10..2\nprint(r.start)  // 1"
+
+###
+
+[[entry]]
+name = "Range.end"
+kind = "attribute"
+signature = "Range:end"
+summary = "End interval"
+description = "The attribute `end` allows to receive the end value of a Tea range."
+example = "const r = 1..10..2\nprint(r.end)  // 10"
+
+###
+
+[[entry]]
+name = "Range.step"
+kind = "attribute"
+signature = "Range:step"
+summary = "Step interval"
+description = "The attribute `step` allows to receive the step value of a Tea range."
+example = "const r = 1..10..2\nprint(r.step)  // 2"
+
+###
+
+[[entry]]
+name = "Range.len"
+kind = "attribute"
+signature = "Range:len"
+summary = "Range length"
+description = "The attribute `len` allows to receive the number of elements in a Tea range."
+example = "const r = 1..10..2\nprint(r.len)  // 4.5"
+
+###
+
+[[entry]]
+name = "Range.new"
+kind = "method"
+signature = "function Range:new(start, end, step=1)"
+summary = "Create new range"
+description = "The `new` method creates a new Tea range."
+example = "var r = 1..10\nprint(r.start)  // 1\nprint(r.end)    // 10\nprint(r.step)   // 1"
+
+[[entry.params]]
+name = "start"
+desc = "The starting value of the range."
+
+[[entry.params]]
+name = "end"
+desc = "The ending value of the range."
+
+[[entry.params]]
+name = "step"
+desc = "An optional number that specifies the increment between each value in the range. If `step` is not specified, the default value is `1`."
+
+###
+
+[[entry]]
+name = "Range.contains"
+kind = "method"
+signature = "Check number presence"
+summary = "The contains method checks whether the specified number is found within the original range."
+description = "The `contains` method checks whether the specified number is found within the original range."
+returns = "The method returns `true` if the `number` is found within the original range, or `false` otherwise."
+example = "var r = 1..10..2\nvar result = r.contains(3)\nprint(result)  // true\n\nresult = r.contains(4)\nprint(result)  // false"
+
+[[entry.params]]
+name = "number"
+desc = "The number to search for within the original range."
+
+###
+
+[[entry]]
+name = "Range.reverse"
+kind = "method"
+signature = "function Range:reverse()"
+summary = "Reverse range intervals"
+description = "The `reverse` method reverses the original range in place."
+example = "var r = 1..10..2\nr.reverse()\nprint(r.start)  // 10\nprint(r.end)    // 1\nprint(r.step)   // -2"
+
+###
+
+[[entry]]
+name = "Range.copy"
+kind = "method"
+signature = "function Range:copy()"
+summary = "Get range copy"
+description = "The `copy` method produces a new Tea range copy of the original range."
+example = "var r = 1..10..2\nvar r2 = r.copy()\nprint(r2.start)  // 1\nprint(r2.end)    // 10\nprint(r2.step)   // 2"
+
+###
+
+[[entry]]
+name = "Range.iter"
+kind = "method"
+signature = "function Range:iter()"
+summary = "Range iterator"
+description = "The `iter` method produces an iterator for the original range."

@@ -1,0 +1,178 @@
+title = "Map"
+slug = "map"
+kind = "class"
+origin = "builtin"
+since = "1.0"
+summary = "Key-value pairs collection"
+description = "The Map class stores key-value pairs and provides methods for reading, updating, removing, and iterating over entries. Maps can also be combined with the supported map operators."
+
+[[entry]]
+name = "Map.count"
+kind = "attribute"
+signature = "Map.count"
+summary = "Number of key-value entries"
+description = "The `count` attribute returns the number of key-value pairs stored in the map."
+example = "var inventory = {\n    [\"sword\"] = 1,\n    [\"shield\"] = 1,\n    [\"potion\"] = 5,\n    [\"gold\"] = 250\n}\n\nprint(inventory.count)  // 4\n\nvar empty = {}\nprint(empty.count)  // 0"
+
+###
+
+[[entry]]
+name = "Map.keys"
+kind = "attribute"
+signature = "Map.keys"
+summary = "List of map keys"
+description = "The `keys` attribute returns a list containing all the keys present in the map."
+example = "var player = {\n    [\"name\"] = \"Aria\",\n    [\"class\"] = \"Ranger\",\n    [\"level\"] = 17,\n    [\"guild\"] = \"Silverwood\"\n}\n\nvar k = player.keys\nprint(k)  // [\"name\", \"class\", \"level\", \"guild\"]\n\n// Iterate over a map's keys\nfor const key in player.keys\n{\n    print(\"Field: \" + key)\n}"
+
+###
+
+[[entry]]
+name = "Map.values"
+kind = "attribute"
+signature = "Map.values"
+summary = "List of map values"
+description = "The `values` attribute returns a list containing all the values present in the map."
+example = "var high_scores = {\n    [\"Aria\"] = 9820,\n    [\"Bram\"] = 7415,\n    [\"Cyrus\"] = 10230\n}\n\nvar v = high_scores.values\nprint(v)  // [9820, 7415, 10230]\n\n// Sum all values\nvar total = 0\nfor const score in high_scores.values\n{\n    total += score\n}\nprint(total)  // 27465"
+
+###
+
+[[entry]]
+name = "Map.new"
+kind = "method"
+signature = "function Map:new()"
+summary = "Create new map"
+description = "The `new` method creates a new empty map."
+example = "var party = Map.new()\nparty.set(\"tank\", \"Bram\")\nparty.set(\"healer\", \"Lyra\")\nparty.set(\"dps\", \"Cyrus\")\n\nprint(party.count)  // 3"
+
+###
+
+[[entry]]
+name = "Map.get"
+kind = "method"
+signature = "function Map:get(key)"
+summary = "Get key's value"
+description = "The `get` method retrieves the value associated with the specified key in the map. If the key does not exist, `nil` is returned."
+returns = "The method returns the value associated with `key`, or `nil` if the key is not present."
+example = "var config = {\n    [\"volume\"] = 0.8,\n    [\"difficulty\"] = \"hard\",\n    [\"subtitles\"] = true\n}\n\nprint(config.get(\"volume\"))       // 0.8\nprint(config.get(\"difficulty\"))   // \"hard\"\nprint(config.get(\"mouse_speed\"))  // nil"
+
+[[entry.params]]
+name = "key"
+desc = "The key to look up in the map."
+
+###
+
+[[entry]]
+name = "Map.set"
+kind = "method"
+signature = "function Map:set(key, value)"
+summary = "Set/update key"
+description = "The `set` method inserts or updates a key-value pair in the map. If the key already exists, its value is updated; otherwise, a new entry is created. If no value is provided, the key is set to `nil`."
+example = "var stats = {}\n\nstats.set(\"strength\", 12)\nstats.set(\"dexterity\", 18)\nstats.set(\"intelligence\", 9)\n\nprint(stats.get(\"dexterity\"))  // 18\n\n// Update an existing key\nstats.set(\"strength\", 15)\nprint(stats.get(\"strength\"))   // 15\n\n// Add a key with no value\nstats.set(\"luck\")\nprint(stats.get(\"luck\"))       // nil"
+
+[[entry.params]]
+name = "key"
+desc = "The key to insert or update in the map."
+
+[[entry.params]]
+name = "value"
+desc = "The value to associate with `key`. Optional, defaults to `nil`."
+
+###
+
+[[entry]]
+name = "Map.update"
+kind = "method"
+signature = "function Map:update(other)"
+summary = "Merge key-values"
+description = "The `update` method merges all key-value pairs from another map into the original map, overwriting any existing keys that collide."
+example = "var defaults = {\n    [\"theme\"] = \"dark\",\n    [\"font_size\"] = 14,\n    [\"auto_save\"] = true\n}\n\nvar user_prefs = {\n    [\"theme\"] = \"light\",\n    [\"font_size\"] = 18\n}\n\ndefaults.update(user_prefs)\nprint(defaults)\n// { \"theme\": \"light\", \"font_size\": 18, \"auto_save\": true }"
+
+[[entry.params]]
+name = "other"
+desc = "The map whose entries will be merged into the original map."
+
+###
+
+[[entry]]
+name = "Map.clear()"
+kind = "method"
+signature = "function Map:clear()"
+summary = "Clear all map entries"
+description = "The `clear` method removes all key-value pairs from the map, leaving it empty."
+example = "var cart = {\n    [\"apples\"] = 3,\n    [\"bread\"] = 1,\n    [\"milk\"] = 2\n}\n\nprint(cart.count)  // 3\ncart.clear()\nprint(cart.count)  // 0\nprint(cart)        // {}"
+
+###
+
+[[entry]]
+name = "Map.contains"
+kind = "method"
+signature = "function Map:contains(key)"
+summary = "Check key presence"
+description = "The `contains` method checks whether a given key exists in the map."
+returns = "The method returns `true` if the `key` is found in the map, or `false` otherwise."
+example = "var spellbook = {\n    [\"fireball\"] = 12,\n    [\"ice_shard\"] = 8,\n    [\"lightning\"] = 15\n}\n\nprint(spellbook.contains(\"fireball\"))   // true\nprint(spellbook.contains(\"meteor\"))     // false"
+
+[[entry.params]]
+name = "key"
+desc = "The key to search for within the map."
+
+###
+
+[[entry]]
+name = "Map.delete"
+kind = "method"
+signature = "function Map:delete(key)"
+summary = "Delete key entry"
+description = "The `delete` method removes the key-value pair associated with the specified key from the map. If the key is not present, an error is raised."
+example = "var inventory = {\n    [\"sword\"] = 1,\n    [\"shield\"] = 1,\n    [\"potion\"] = 5\n}\n\ninventory.delete(\"potion\")\nprint(inventory.contains(\"potion\"))  // false\nprint(inventory)\n// { \"sword\": 1, \"shield\": 1 }\n\n// Deleting a missing key raises an error\ninventory.delete(\"bow\")  // error: map key not found"
+
+[[entry.params]]
+name = "key"
+desc = "The key to remove from the map."
+
+###
+
+[[entry]]
+name = "Map.copy"
+kind = "method"
+signature = "function Map:copy()"
+summary = "Get shallow copy"
+description = "The `copy` method produces a shallow copy of the map. The new map contains the same key-value pairs, but is a separate object."
+example = "var original = {\n    [\"hp\"] = 100,\n    [\"mp\"] = 50\n}\n\nvar clone = original.copy()\nclone.set(\"hp\", 1)\n\nprint(original.get(\"hp\"))  // 100\nprint(clone.get(\"hp\"))     // 1"
+
+###
+
+[[entry]]
+name = "Map.foreach"
+kind = "method"
+signature = "function Map:foreach(callback)"
+summary = "Callback iterate"
+description = "The `foreach` method iterates over every key-value pair in the map, invoking the given callback function with the key and value as arguments. The callback should accept two parameters: `key` and `value`."
+example = "var roster = {\n    [\"Aria\"] = \"Ranger\",\n    [\"Bram\"] = \"Warrior\",\n    [\"Lyra\"] = \"Cleric\"\n}\n\nroster.foreach(function(key, value) {\n    print(key + \" plays a \" + value)\n})\n// Aria plays a Ranger\n// Bram plays a Warrior\n// Lyra plays a Cleric\n\n// A callback that ignores the key can still use the value\nvar total = 0\nvar prices = {[\"apple\"] = 2, [\"banana\"] = 3, [\"cherry\"] = 5}\nprices.foreach(function(_, value) {\n    total = total + value\n})\nprint(total)  // 10"
+
+[[entry.params]]
+name = "callback"
+desc = "A function called once per entry, receiving the entry's key and value."
+
+###
+
+[[entry]]
+name = "Map.iter"
+kind = "method"
+signature = "function Map:iter()"
+summary = "Map iterator"
+description = "The `iter` method returns an iterator over the map's key-value pairs. Each step yields a two-element list `[key, value]`, which can be conveniently unpacked in a `for` loop."
+example = "var scores = {\n    [\"Aria\"] = 9820,\n    [\"Bram\"] = 7415,\n    [\"Cyrus\"] = 10230\n}\n\nfor const entry in scores.iter() {\n    print(tostring(entry[0]) + \" scored \" + tostring(entry[1]))\n}\n// Aria scored 9820\n// Bram scored 7415\n// Cyrus scored 10230"
+
+###
+
+[[entry]]
+name = "Map.+"
+kind = "operator"
+signature = "operator Map:+(other)"
+summary = "New merged map"
+description = "The `+` operator creates a new map containing all key-value pairs from both the original map and `other`. When the same key appears in both maps, the value from the right-hand map (`other`) wins."
+
+[[entry.params]]
+name = "other"
+desc = "The map to combine with the original map."

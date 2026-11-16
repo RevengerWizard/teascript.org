@@ -1,0 +1,127 @@
+title = "Variable Access"
+slug = "variables"
+summary = "Read and write globals and module variables"
+description = "Functions for reading and writing global variables and module variables. Globals live in the state's global table; module variables live in the exports table of a named module. These functions are shortcuts for reaching those tables without pushing the keys by hand."
+
+[[entry]]
+name = "tea_get_global"
+kind = "function"
+since = "1.0"
+tags = ["var", "global"]
+signature = "bool tea_get_global(tea_State* T, const char* name);"
+summary = "Get global"
+description = "{{< stack before=\"...\" after=\"...,value\" >}}\n\nPushes the value of the global variable `name`. Returns `true` if the global exists and was pushed. If it does not, returns `false` and pushes nothing."
+returns = "`true` if the global exists and its value was pushed; `false` otherwise."
+stack = "[-0, +(1|0), -]"
+example = '''
+tea_push_integer(T, 42);
+tea_set_global(T, "answer");              /* globals.answer = 42 */
+
+bool ok = tea_get_global(T, "answer");    /* ok = true, pushes 42 */
+tea_pop(T, 1);
+ok = tea_get_global(T, "missing");        /* ok = false, nothing pushed */
+'''
+see_also = ["tea_set_global", "tea_get_var"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the global variable"
+
+###
+
+[[entry]]
+name = "tea_set_global"
+kind = "function"
+since = "1.0"
+tags = ["var", "global"]
+signature = "void tea_set_global(tea_State* T, const char* name);"
+summary = "Set global"
+description = "{{< stack before=\"...,value\" after=\"...\" >}}\n\nPops the value on top of the stack and assigns it to the global variable `name`, creating the global or overwriting it."
+errors = "May raise a memory error."
+stack = "[-1, +0, m]"
+example = '''
+tea_push_string(T, "hello");
+tea_set_global(T, "greeting");   /* globals.greeting = "hello" */
+
+tea_push_integer(T, 7);
+tea_set_global(T, "count");      /* globals.count = 7 */
+'''
+see_also = ["tea_get_global", "tea_set_var"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the global variable"
+
+###
+
+[[entry]]
+name = "tea_get_var"
+kind = "function"
+since = "1.0"
+tags = ["var", "module"]
+signature = "bool tea_get_var(tea_State* T, const char* name, const char* var);"
+summary = "Get module variable"
+description = "{{< stack before=\"...\" after=\"...,value\" >}}\n\nPushes the variable `var` from the exports table of the module called `name`. Returns `true` if the module exists and has the variable. Otherwise returns `false` and pushes nothing."
+returns = "`true` if the module and the variable exist and the value was pushed; `false` otherwise."
+stack = "[-0, +(1|0), -]"
+example = '''
+/* assume the module "mathx" is loaded and exports "pi" */
+bool ok = tea_get_var(T, "mathx", "pi");    /* ok = true, pushes 3.14159... */
+tea_pop(T, 1);
+ok = tea_get_var(T, "mathx", "tau");        /* ok = false, nothing pushed */
+'''
+see_also = ["tea_set_var", "tea_get_global", "tea_import"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the module that owns the variable"
+
+[[entry.params]]
+name = "var"
+desc = "Name of the exported variable"
+
+###
+
+[[entry]]
+name = "tea_set_var"
+kind = "function"
+since = "1.0"
+tags = ["var", "module"]
+signature = "void tea_set_var(tea_State* T, const char* name, const char* var);"
+summary = "Set module variable"
+description = "{{< stack before=\"...,value\" after=\"...\" >}}\n\nPops the value on top of the stack and assigns it to the variable `var` in the exports table of the module called `name`, creating the entry or overwriting it."
+errors = "May raise a memory error."
+stack = "[-1, +0, m]"
+example = '''
+/* assume the module "config" exists */
+tea_push_bool(T, true);
+tea_set_var(T, "config", "debug");       /* config.debug = true */
+
+tea_push_string(T, "1.0.0");
+tea_set_var(T, "config", "version");     /* config.version = "1.0.0" */
+'''
+see_also = ["tea_get_var", "tea_set_global"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the module that owns the variable"
+
+[[entry.params]]
+name = "var"
+desc = "Name of the exported variable"

@@ -1,0 +1,12 @@
+title = "Buffer"
+kind = "class"
+origin = "builtin"
+since = "1.0"
+summary = "Growable sequence of byte characters"
+description = "The Buffer class provides mutable, growable byte storage. Use it to assemble byte sequences as data is produced, then access the resulting contents."
+
+[[entry]]
+name = "Buffer.iter"
+kind = "method"
+signature = "function Buffer:iter()"
+summary = "?"

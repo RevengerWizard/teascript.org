@@ -1,0 +1,650 @@
+title = "Math"
+slug = "math"
+kind = "module"
+origin = "modules"
+since = "1.0"
+summary = "Maths"
+description = "The math module collects numeric constants and mathematical functions, including common arithmetic, trigonometric, rounding, and floating-point classification operations."
+
+[[entry]]
+name = "math.pi"
+kind = "attribute"
+signature = "math.pi = 3.14159265358979323846"
+summary = "The mathematical constant π (pi)"
+description = "The mathematical constant π (pi), the ratio of a circle's circumference to its diameter."
+example = "import math\n\n// Calculate the area of a circle with radius 5\nvar radius = 5\nvar area = math.pi * radius * radius\nprint(\"Area of circle:\", area)  // Area of circle: 78.53981633974483\n\n// Convert 180 degrees to radians\nvar radians = 180 * (math.pi / 180)\nprint(\"180 degrees in radians:\", radians)  // 180 degrees in radians: 3.141592653589793"
+
+###
+
+[[entry]]
+name = "math.tau"
+kind = "attribute"
+signature = "math.tau = 6.28318530717958647692"
+summary = "The mathematical constant τ (tau)"
+description = "The mathematical constant τ (tau), equal to 2π. Represents one full turn in radians."
+example = "import math\n\n// A full circle is tau radians\nprint(\"Full circle: \" + math.tau + \" radians\")  // Full circle: 6.283185307179586 radians\n\n// Calculate the circumference of a circle with radius 3\nvar circumference = math.tau * 3\nprint(\"Circumference:\", circumference)  // Circumference: 18.84955592153876"
+
+###
+
+[[entry]]
+name = "math.e"
+kind = "attribute"
+signature = "math.e = 2.71828182845904523536"
+summary = "The mathematical constant e"
+description = "The mathematical constant e, the base of natural logarithms."
+example = "import math\n\n// Continuous compound interest formula: A = P * e^(rt)\nvar principal = 1000\nvar rate = 0.05\nvar time = 10\nvar amount = principal * math.e ** (rate * time)\nprint(\"Investment after 10 years:\", amount)  // Investment after 10 years: 1648.7212707001282"
+
+###
+
+[[entry]]
+name = "math.phi"
+kind = "attribute"
+signature = "math.phi = 1.61803398874989484820"
+summary = "The golden ratio φ (phi)"
+description = "The golden ratio φ (phi), approximately 1.618033988749895."
+example = "import math\n\n// Generate a golden spiral\nvar a = 1\nvar b = 1\nfor i in range(10) {\n    var next = a + b\n    a = b\n    b = next\n    print(\"Ratio: \" + (b / a) + \" vs phi: \" + math.phi)\n}\n\n// Output shows convergence toward phi:\n// Ratio: 2 vs phi: 1.618033988749895\n// Ratio: 1.5 vs phi: 1.618033988749895\n// Ratio: 1.6666666666666667 vs phi: 1.618033988749895\n// Ratio: 1.6 vs phi: 1.618033988749895\n// ..."
+
+###
+
+[[entry]]
+name = "math.infinity"
+kind = "attribute"
+signature = "math.infinity"
+summary = "Positive infinity."
+description = "Represents positive infinity. This is a special floating-point value that is greater than any finite number."
+example = "import math\n\n// Division by zero results in infinity\nvar result = 1 / 0\nprint(\"1/0 = \" + result)  // 1/0 = inf\n\n// Check if a value is infinite\nprint(\"Is infinity? \" + math.isinfinity(result))  // Is infinity? true\n\n// Infinity propagates through calculations\nprint(\"Infinity + 100 = \" + (math.infinity + 100))  // Infinity + 100 = inf\nprint(\"Infinity * 2 = \" + (math.infinity * 2))      // Infinity * 2 = inf"
+
+###
+
+[[entry]]
+name = "math.nan"
+kind = "attribute"
+signature = "math.nan"
+summary = "\"Not a Number\""
+description = "Represents \"Not a Number\", a special floating-point value resulting from undefined operations."
+example = "import math\n\n// Certain operations produce NaN\nvar result = 0 / 0\nprint(\"0/0 = \" + result)  // 0/0 = nan\n\n// Check if a value is NaN\nprint(\"Is NaN? \" + math.isnan(result))  // Is NaN? true\n\n// NaN is not equal to itself\nprint(\"NaN == NaN: \" + (math.nan == math.nan))  // NaN == NaN: false\n\n// NaN propagates through calculations\nprint(\"NaN + 5 = \" + (math.nan + 5))  // NaN + 5 = nan"
+
+###
+
+[[entry]]
+name = "math.maxinteger"
+kind = "attribute"
+signature = "math.maxinteger"
+summary = "The maximum safe integer."
+description = "The maximum value that can be represented as a Teascript integer."
+value = "The largest representable integer"
+example = "import math\n\nprint(\"Max integer:\", math.maxinteger)\n\n// Demonstrating overflow behavior\nvar max = math.maxinteger\nprint(\"Max + 1 = \" + (max + 1))  // May wrap or convert to float depending on implementation\n\n// Safe increment check\nif max < math.maxinteger {\n    print(\"Safe to increment\")\n} else {\n    print(\"At maximum integer value\")\n}"
+
+###
+
+[[entry]]
+name = "math.mininteger"
+kind = "attribute"
+signature = "math.mininteger"
+summary = "The minimum safe integer."
+description = "The minimum value that can be represented as a Teascript integer."
+value = "The smallest representable integer"
+example = "import math\n\nprint(\"Min integer:\", math.mininteger)\n\n// Range of representable integers\nvar range_size = math.maxinteger - math.mininteger + 1\nprint(\"Number of representable integers:\", range_size)\n\n// Check for underflow\nvar min = math.mininteger\nif min > math.mininteger {\n    print(\"Safe to decrement\")\n} else {\n    print(\"At minimum integer value\")\n}"
+
+###
+
+[[entry]]
+name = "math.min()"
+kind = "function"
+signature = "function math.min(...)\nfunction math.min(iter)"
+summary = "Smallest value among arguments"
+description = "The function `min` provides the smallest value among its given arguments."
+returns = "The minimum value"
+example = "import math\n\n// Find minimum among multiple arguments\nprint(math.min(5, 2, 8, 1, 9))  // 1\n\n// Find minimum in a list\nvar temperatures = [72, 68, 75, 65, 80, 63]\nprint(\"Lowest temperature:\", math.min(temperatures))  // 63\n\n// Practical example: find the coldest day\nvar weekly_temps = [72, 68, 75, 65, 80, 63, 70]\nvar coldest = math.min(weekly_temps)\nprint(\"Coldest day was \" + coldest + \" degrees\")  // Coldest day was 63 degrees\n\n// Compare player scores\nvar player1_score = 1500\nvar player2_score = 2300\nvar player3_score = 1800\nprint(\"Lowest score:\", math.min(player1_score, player2_score, player3_score))  // 1500"
+
+[[entry.params]]
+name = "..."
+desc = "Two or more numbers, or a single list of numbers"
+
+###
+
+[[entry]]
+name = "math.max()"
+kind = "function"
+signature = "function math.max(...)\nfunction math.max(iter)"
+summary = "Largest value among arguments"
+description = "The function `max` provides the largest value among its arguments."
+returns = "The maximum value"
+example = "import math\n\n// Find maximum among multiple arguments\nprint(math.max(5, 2, 8, 1, 9))  // 9\n\n// Find maximum in a list\nvar high_scores = [1200, 3400, 2800, 4100, 3900]\nprint(\"High score:\", math.max(high_scores))  // 4100\n\n// Practical example: find the hottest day\nvar weekly_temps = [72, 68, 75, 65, 80, 63, 70]\nvar hottest = math.max(weekly_temps)\nprint(\"Hottest day was \" + hottest + \" degrees\")  // Hottest day was 80 degrees\n\n// Compare player scores\nvar player1_score = 1500\nvar player2_score = 2300\nvar player3_score = 1800\nprint(\"Highest score:\", math.max(player1_score, player2_score, player3_score))  // 2300"
+
+[[entry.params]]
+name = "..."
+desc = "Two or more numbers, or a single list of numbers"
+
+###
+
+[[entry]]
+name = "math.mid()"
+kind = "function"
+signature = "function math.mid(x, y, z)"
+summary = "Middle value"
+description = "The function `mid` provides the middle value among three numbers."
+returns = "The middle value"
+example = "import math\n\n// Basic usage\nprint(math.mid(1, 2, 3))   // 2\nprint(math.mid(3, 1, 2))   // 2\nprint(math.mid(2, 3, 1))   // 2\n\n// Practical example: find the median price\nvar price_a = 45.99\nvar price_b = 32.50\nvar price_c = 67.25\nprint(\"Median price:\", math.mid(price_a, price_b, price_c))  // 45.99\n\n// Find the middle value in a sorted range\nvar low = 10\nvar high = 100\nvar value = 55\nvar middle = math.mid(low, value, high)\nprint(\"Middle value:\", middle)  // 55\n\n// Useful for clamping values to a range\nvar player_x = 150\nvar min_x = 0\nvar max_x = 100\nvar clamped_x = math.mid(min_x, player_x, max_x)\nprint(\"Clamped position:\", clamped_x)  // 100"
+
+[[entry.params]]
+name = "x"
+desc = "The first number"
+
+[[entry.params]]
+name = "y"
+desc = "The second number"
+
+[[entry.params]]
+name = "z"
+desc = "The third number"
+
+###
+
+[[entry]]
+name = "math.clamp()"
+kind = "function"
+signature = "function math.clamp(d, min, max)"
+summary = "The function clamp restricts a numeric value to a specified range."
+description = "The function `clamp` restricts a numeric value to a specified range."
+returns = "The clamped value"
+example = "import math\n\n// Basic clamping\nprint(math.clamp(5, 1, 10))    // 5\nprint(math.clamp(-5, 1, 10))   // 1\nprint(math.clamp(15, 1, 10))   // 10\n\n// Practical example: limit player health\nvar health = 150\nvar max_health = 100\nvar min_health = 0\nhealth = math.clamp(health, min_health, max_health)\nprint(\"Health after healing:\", health)  // 100\n\n// Damage calculation with clamping\nvar current_hp = 50\nvar damage = 75\nvar new_hp = math.clamp(current_hp - damage, 0, 100)\nprint(\"HP after damage:\", new_hp)  // 0\n\n// Clamp color values to valid range\nvar red = 300\nvar green = -50\nvar blue = 128\nvar r = math.clamp(red, 0, 255)     // 255\nvar g = math.clamp(green, 0, 255)   // 0\nvar b = math.clamp(blue, 0, 255)    // 128\nprint(\"RGB: \" + r + \" \" + g + \" \" + b)  // RGB: 255 0 128"
+
+[[entry.params]]
+name = "d"
+desc = "The value to clamp"
+
+[[entry.params]]
+name = "min"
+desc = "The minimum allowed value"
+
+[[entry.params]]
+name = "max"
+desc = "The maximum allowed value"
+
+###
+
+[[entry]]
+name = "math.floor"
+kind = "function"
+signature = "function math.floor(x)"
+summary = "The function floor provides the largest integer less than or equal to a number."
+description = "The function `floor` provides the largest integer less than or equal to a number."
+returns = "The floor of `x`"
+example = "import math\n\n// Basic usage\nprint(math.floor(3.7))    // 3\nprint(math.floor(3.2))    // 3\nprint(math.floor(-3.2))   // -4\nprint(math.floor(-3.7))   // -4\n\n// Practical example: convert to grid coordinates\nvar pixel_x = 157\nvar tile_size = 32\nvar tile_x = math.floor(pixel_x / tile_size)\nprint(\"Tile X coordinate:\", tile_x)  // 4\n\n// Calculate pages needed for pagination\nvar total_items = 47\nvar items_per_page = 10\nvar total_pages = math.floor(total_items / items_per_page) + 1\nprint(\"Pages needed:\", total_pages)  // 5\n\n// Convert seconds to minutes\nvar seconds = 185\nvar minutes = math.floor(seconds / 60)\nvar remaining = seconds % 60\nprint(minutes + \" minutes and \" + remaining + \" seconds\")  // 3 minutes and 5 seconds"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.ceil"
+kind = "function"
+signature = "function math.ceil(x)"
+summary = "The function ceil provides the smallest integer greater than or equal to a number."
+description = "The function `ceil` provides the smallest integer greater than or equal to a number."
+returns = "The ceiling of `x`"
+example = "import math\n\n// Basic usage\nprint(math.ceil(3.2))    // 4\nprint(math.ceil(3.7))    // 4\nprint(math.ceil(-3.2))   // -3\nprint(math.ceil(-3.7))   // -3\n\n// Practical example: calculate shipping boxes needed\nvar items = 47\nvar items_per_box = 10\nvar boxes_needed = math.ceil(items / items_per_box)\nprint(\"Boxes needed:\", boxes_needed)  // 5\n\n// Calculate minimum servers needed\nvar requests_per_second = 15000\nvar capacity_per_server = 2000\nvar servers = math.ceil(requests_per_second / capacity_per_server)\nprint(\"Servers needed:\", servers)  // 8\n\n// Calculate needed storage\nvar data_size_gb = 47.5\nvar disk_size_gb = 10\nvar disks = math.ceil(data_size_gb / disk_size_gb)\nprint(\"Disks needed:\", disks)  // 5"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.round"
+kind = "function"
+signature = "function math.round(x)"
+summary = "Rounds to nearest integer."
+description = "The function `round` rounds `x` to the nearest integer."
+returns = "The rounded value"
+example = "import math\n\n// Basic usage\nprint(math.round(3.4))    // 3\nprint(math.round(3.5))    // 4\nprint(math.round(3.6))    // 4\nprint(math.round(-3.5))   // -4\n\n// Practical example: round prices\nvar price = 19.995\nvar rounded_price = math.round(price * 100) / 100\nprint(\"Rounded price:\", rounded_price)  // 20.0\n\n// Round game scores\nvar score = 1567.8\nprint(\"Rounded score:\", math.round(score))  // 1568\n\n// Round to specific decimal places\nvar pi_approx = math.pi\nvar rounded_pi = math.round(pi_approx * 1000) / 1000\nprint(\"Pi to 3 decimals:\", rounded_pi)  // 3.142"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.acos"
+kind = "function"
+signature = "function math.acos(x)"
+summary = "Arc cosine in radians."
+description = "The function `acos` provides the arc cosine of a number in radians."
+returns = "The arc cosine in radians"
+example = "import math\n\n// Basic usage\nprint(math.acos(1))      // 0\nprint(math.acos(0))      // 1.5707963267948966 (π/2)\nprint(math.acos(-1))     // 3.141592653589793 (π)\n\n// Practical example: calculate angle from adjacent/hypotenuse\nvar adjacent = 3\nvar hypotenuse = 5\nvar angle = math.acos(adjacent / hypotenuse)\nprint(\"Angle:\", math.deg(angle), \"degrees\")  // 53.13010235415598 degrees\n\n// Find angle between two vectors (dot product method)\nvar dot_product = 0.5\nvar angle = math.acos(dot_product)\nprint(\"Angle between vectors:\", math.deg(angle), \"degrees\")  // 60 degrees"
+
+[[entry.params]]
+name = "x"
+desc = "A number between -1 and 1"
+
+###
+
+[[entry]]
+name = "math.acosh"
+kind = "function"
+signature = "function math.acosh(x)"
+summary = "Inverse hyperbolic cosine"
+description = "The function `acosh` provides the inverse hyperbolic cosine of a number."
+returns = "The inverse hyperbolic cosine"
+example = "import math\n\n// Basic usage\nprint(math.acosh(1))      // 0\nprint(math.acosh(2))      // 1.3169578969248166\n\n// Practical example: calculate cable length in a catenary curve\nvar height = 5\nvar distance = 10\nvar a = height\nvar length = 2 * a * math.acosh(distance / (2 * a))\nprint(\"Cable length:\", length)"
+
+[[entry.params]]
+name = "x"
+desc = "A number greater than or equal to 1"
+
+###
+
+[[entry]]
+name = "math.cos"
+kind = "function"
+signature = "function math.cos(x)"
+summary = "Cosine in radians."
+description = "The function `cos` provides the cosine of a number, where the number is in radians."
+returns = "The cosine of `x`, between -1 and 1"
+example = "import math\n\n// Basic usage\nprint(math.cos(0))           // 1\nprint(math.cos(math.pi))     // -1\nprint(math.cos(math.pi / 2)) // 0\n\n// Practical example: circular motion\nvar angle = math.pi / 4\nvar radius = 10\nvar x = radius * math.cos(angle)\nvar y = radius * math.sin(angle)\nprint(\"Position: \" + x + \" \" + y)  // 7.0710678118654755 7.0710678118654755\n\n// Generate a cosine wave\nfor const i in 0..360..45\n{\n    var rad = math.rad(i)\n    print(\"cos(\" + i + \"°) = \" + tostring(math.cos(rad)))\n}"
+
+[[entry.params]]
+name = "x"
+desc = "An angle in radians"
+
+###
+
+[[entry]]
+name = "math.cosh"
+kind = "function"
+signature = "function math.cosh(x)"
+summary = "Hyperbolic cosine"
+description = "The function `cosh` provides the hyperbolic cosine of a number."
+returns = "The hyperbolic cosine of `x`"
+example = "import math\n\n// Basic usage\nprint(math.cosh(0))     // 1\nprint(math.cosh(1))     // 1.5430806348152437\n\n// Practical example: catenary curve (hanging cable)\nvar a = 10\nvar x = 5\nvar y = a * math.cosh(x / a)\nprint(\"Cable height at x=5:\", y)"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.asin"
+kind = "function"
+signature = "function math.asin(x)"
+summary = "Arc sine in radians."
+description = "The function `asin` provides the arc sine of a number in radians."
+returns = "The arc sine in radians"
+example = "import math\n\n// Basic usage\nprint(math.asin(0))      // 0\nprint(math.asin(1))      // 1.5707963267948966 (π/2)\nprint(math.asin(-1))     // -1.5707963267948966 (-π/2)\n\n// Practical example: calculate angle from opposite/hypotenuse\nvar opposite = 4\nvar hypotenuse = 5\nvar angle = math.asin(opposite / hypotenuse)\nprint(\"Angle:\", math.deg(angle), \"degrees\")  // 53.13010235415598 degrees\n\n// Find launch angle for projectile\nvar vertical_velocity = 20\nvar total_velocity = 25\nvar angle = math.asin(vertical_velocity / total_velocity)\nprint(\"Launch angle:\", math.deg(angle), \"degrees\")  // 53.13010235415598 degrees"
+
+[[entry.params]]
+name = "x"
+desc = "A number between -1 and 1"
+
+###
+
+[[entry]]
+name = "math.asinh"
+kind = "function"
+signature = "function math.asinh(x)"
+summary = "Inverse hyperbolic sine"
+description = "The function `asinh` provides the inverse hyperbolic sine of a number."
+returns = "The inverse hyperbolic sine"
+example = "import math\n\n// Basic usage\nprint(math.asinh(0))     // 0\nprint(math.asinh(1))     // 0.881373587019543\n\n// Practical example: signal processing\nvar value = 2.5\nvar result = math.asinh(value)\nprint(\"asinh(\" + value + \") = \" + result)"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.sin"
+kind = "function"
+signature = "function math.sin(x)"
+summary = "Sine in radians"
+description = "The function `sin` provides the sine of a number, where the number is in radians."
+returns = "The sine of `x`, between -1 and 1"
+example = "import math\n\n// Basic usage\nprint(math.sin(0))           // 0\nprint(math.sin(math.pi / 2)) // 1\nprint(math.sin(math.pi))     // 0 (approximately)\n\n// Practical example: generate a sine wave\nfor const i in 0..360..45\n{\n    var rad = math.rad(i)\n    var bar = \"\"\n    var value = math.sin(rad)\n    var height = math.round((value + 1) * 10)\n    for const j in 0..height\n    {\n        bar += \"*\"\n    }\n    print(i + \"°: \" + bar)\n}\n\n// Calculate vertical position in circular motion\nvar angle = math.pi / 6\nvar radius = 5\nvar y = radius * math.sin(angle)\nprint(\"Y position:\", y)  // 2.5"
+
+[[entry.params]]
+name = "x"
+desc = "An angle in radians"
+
+###
+
+[[entry]]
+name = "math.sinh"
+kind = "function"
+signature = "function math.sinh(x)"
+summary = "Hyperbolic sine"
+description = "The function `sinh` provides the hyperbolic sine of a number."
+returns = "The hyperbolic sine of `x`"
+example = "import math\n\n// Basic usage\nprint(math.sinh(0))     // 0\nprint(math.sinh(1))     // 1.1752011936438014\n\n// Practical example: hyperbolic functions\nvar x = 2\nprint(\"sinh(2) = \" + math.sinh(x))\nprint(\"cosh(2) = \" + math.cosh(x))\nprint(\"cosh² - sinh² = \" + (math.cosh(x) ** 2 - math.sinh(x) ** 2))  // Should be 1"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.atan"
+kind = "function"
+signature = "function math.atan(x)"
+summary = "Arc tangent in radians."
+description = "The function `atan` provides the arc tangent of a number in radians."
+returns = "The arc tangent in radians"
+example = "import math\n\n// Basic usage\nprint(math.atan(0))      // 0\nprint(math.atan(1))      // 0.7853981633974483 (π/4)\n\n// Practical example: calculate angle from opposite/adjacent\nvar opposite = 3\nvar adjacent = 4\nvar angle = math.atan(opposite / adjacent)\nprint(\"Angle:\", math.deg(angle), \"degrees\")  // 36.86989764584402 degrees\n\n// Slope to angle conversion\nvar slope = 0.5\nvar angle = math.atan(slope)\nprint(\"Slope angle:\", math.deg(angle), \"degrees\")  // 26.56505117707799 degrees"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.atanh"
+kind = "function"
+signature = "function math.atanh(x)"
+summary = "Inverse hyperbolic tangent"
+description = "The function `atanh` provides the inverse hyperbolic tangent of a number."
+returns = "The inverse hyperbolic tangent"
+example = "import math\n\n// Basic usage\nprint(math.atanh(0))     // 0\nprint(math.atanh(0.5))   // 0.5493061443340549\n\n// Practical example: rapidity in special relativity\nvar velocity = 0.5  // fraction of speed of light\nvar rapidity = math.atanh(velocity)\nprint(\"Rapidity:\", rapidity)"
+
+[[entry.params]]
+name = "x"
+desc = "A number between -1 and 1"
+
+###
+
+[[entry]]
+name = "math.atan2"
+kind = "function"
+signature = "function math.atan2(y, x)"
+summary = "Arc tangent of two coordinates in radians"
+description = "The function `atan2` provides the arc tangent of of two numbers representing the coordinates in radians, using the signs of both arguments to determine the correct quadrant."
+returns = "The angle in radians, in the range `[-π, π]`"
+example = "import math\n\n// Basic usage\nprint(math.atan2(1, 1))    // 0.7853981633974483 (π/4)\nprint(math.atan2(1, -1))   // 2.356194490192345 (3π/4)\nprint(math.atan2(-1, -1))  // -2.356194490192345 (-3π/4)\n\n// Practical example: calculate direction to target\nvar player_x = 5\nvar player_y = 5\nvar target_x = 10\nvar target_y = 8\n\nvar dx = target_x - player_x\nvar dy = target_y - player_y\nvar angle = math.atan2(dy, dx)\nprint(\"Direction to target:\", math.deg(angle), \"degrees\")  // 30.96375653207352 degrees\n\n// Convert Cartesian to polar coordinates\nvar x = 3\nvar y = 4\nvar r = math.sqrt(x * x + y * y)\nvar theta = math.atan2(y, x)\nprint(\"Polar coordinates: r=\" + r + \", theta=\" + math.deg(theta) + \"°\")"
+
+[[entry.params]]
+name = "y"
+desc = "The y-coordinate"
+
+[[entry.params]]
+name = "x"
+desc = "The x-coordinate"
+
+###
+
+[[entry]]
+name = "math.tan"
+kind = "function"
+signature = "function math.tan(x)"
+summary = "Tangent in radians"
+description = "The function `tan` provides the tangent of a number, where the number is in radians."
+returns = "The tangent of `x`"
+example = "import math\n\n// Basic usage\nprint(math.tan(0))           // 0\nprint(math.tan(math.pi / 4)) // 0.9999999999999999 (approximately 1)\n\n// Practical example: calculate height using tangent\nvar distance = 100\nvar angle = math.rad(30)\nvar height = distance * math.tan(angle)\nprint(\"Height:\", height)  // 57.73502691896258\n\n// Calculate slope\nvar angle = math.rad(45)\nvar slope = math.tan(angle)\nprint(\"Slope at 45°:\", slope)  // 0.9999999999999999"
+
+[[entry.params]]
+name = "x"
+desc = "An angle in radians"
+
+###
+
+[[entry]]
+name = "math.tanh"
+kind = "function"
+signature = "function math.tanh(x)"
+summary = "Hyperbolic tangent"
+description = "The function `tanh` provides the hyperbolic tangent of number."
+returns = "The hyperbolic tangent of `x`, between -1 and 1"
+example = "import math\n\n// Basic usage\nprint(math.tanh(0))      // 0\nprint(math.tanh(1))      // 0.7615941559557649\n\n// Practical example: activation function in neural networks\nvar input = 2.5\nvar output = math.tanh(input)\nprint(\"tanh(\" + input + \") = \" + output)\n\n// Sigmoid-like behavior\nfor const i in -3..4\n{\n    print(\"tanh(\" + i + \") = \" + math.tanh(i))\n}"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.sign"
+kind = "function"
+signature = "function math.sign(x)"
+summary = "Sign of a number"
+description = "The function `sign` provides the sign of a number."
+returns = "-1 if `x` is negative, 1 if `x` is positive, and 0 if `x` is zero"
+example = "import math\n\n// Basic usage\nprint(math.sign(42))    // 1\nprint(math.sign(-42))   // -1\nprint(math.sign(0))     // 0\n\n// Practical example: determine direction\nvar velocity = -15\nvar direction = math.sign(velocity)\nif direction < 0\n{\n    print(\"Moving left\")\n}\nelse if direction > 0\n{\n    print(\"Moving right\")\n}\nelse\n{\n    print(\"Stationary\")\n}\n\n// Compare two values\nvar a = 10\nvar b = 20\nvar comparison = math.sign(a - b)\nprint(\"Comparison:\", comparison)  // -1 (a < b)"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.abs"
+kind = "function"
+signature = "function math.abs(x)"
+summary = "Absolute value"
+description = "The function `abs` provides the absolute value of number."
+returns = "The absolute value of `x`"
+example = "import math\n\n// Basic usage\nprint(math.abs(5))     // 5\nprint(math.abs(-5))    // 5\nprint(math.abs(0))     // 0\n\n// Practical example: calculate distance\nvar x1 = 10\nvar x2 = 25\nvar distance = math.abs(x2 - x1)\nprint(\"Distance:\", distance)  // 15\n\n// Error margin check\nvar expected = 100\nvar actual = 95\nvar error = math.abs(expected - actual)\nprint(\"Error:\", error)  // 5\n\n// Temperature difference\nvar temp1 = -10\nvar temp2 = 15\nvar diff = math.abs(temp1 - temp2)\nprint(\"Temperature difference: \" + diff + \" degrees\")  // 25 degrees"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.sqrt"
+kind = "function"
+signature = "function math.sqrt(x)"
+summary = "Square root"
+description = "The function `sqrt` provides the square root of a number."
+returns = "The square root of `x`"
+example = "import math\n\n// Basic usage\nprint(math.sqrt(16))    // 4\nprint(math.sqrt(25))    // 5\nprint(math.sqrt(2))     // 1.4142135623730951\n\n// Practical example: calculate distance between points\nvar x1 = 0\nvar y1 = 0\nvar x2 = 3\nvar y2 = 4\nvar distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)\nprint(\"Distance:\", distance)  // 5\n\n// Calculate hypotenuse\nvar a = 6\nvar b = 8\nvar c = math.sqrt(a * a + b * b)\nprint(\"Hypotenuse:\", c)  // 10\n\n// Standard deviation calculation\nvar values = [2, 4, 4, 4, 5, 5, 7, 9]\nvar mean = 5\nvar sum_sq_diff = 0\nfor const v in values\n{\n    sum_sq_diff = sum_sq_diff + (v - mean) ** 2\n}\nvar std_dev = math.sqrt(sum_sq_diff / values)\nprint(\"Standard deviation:\", std_dev)  // 2.0"
+
+[[entry.params]]
+name = "x"
+desc = "A non-negative number"
+
+###
+
+[[entry]]
+name = "math.deg"
+kind = "function"
+signature = "function math.deg(x)"
+summary = "Converts radians to degrees"
+description = "The function `deg` converts an angle from radians to degrees."
+returns = "The angle in degrees"
+example = "import math\n\n// Basic usage\nprint(math.deg(math.pi))       // 180\nprint(math.deg(math.pi / 2))   // 90\nprint(math.deg(math.pi / 4))   // 45\n\n// Practical example: display angles in degrees\nvar angles_rad = [0, math.pi/6, math.pi/4, math.pi/3, math.pi/2]\nfor const rad in angles_rad\n{\n    print(math.deg(rad) + \" degrees\")\n}\n\n// Convert rotation to degrees\nvar rotation_rad = 1.5\nprint(\"Rotation: \" + math.deg(rotation_rad) + \" degrees\")  // 85.94366926962348 degrees"
+
+[[entry.params]]
+name = "x"
+desc = "An angle in radians"
+
+###
+
+[[entry]]
+name = "math.rad"
+kind = "function"
+signature = "function math.rad(x)"
+summary = "Converts from degrees to radians"
+description = "The function `rad` converts an angle from degrees to radians."
+returns = "The angle in radians"
+example = "import math\n\n// Basic usage\nprint(math.rad(180))    // 3.141592653589793\nprint(math.rad(90))     // 1.5707963267948966\nprint(math.rad(45))     // 0.7853981633974483\n\n// Practical example: use degrees in trigonometric functions\nvar angle_deg = 30\nvar angle_rad = math.rad(angle_deg)\nprint(\"sin(30°) = \" + math.sin(angle_rad))  // 0.49999999999999994\n\n// Rotate a point\nvar x = 10\nvar y = 0\nvar rotation_deg = 45\nvar rotation_rad = math.rad(rotation_deg)\nvar new_x = x * math.cos(rotation_rad) - y * math.sin(rotation_rad)\nvar new_y = x * math.sin(rotation_rad) + y * math.cos(rotation_rad)\nprint(\"Rotated point: \" + new_x + \" \" + new_y)  // 7.0710678118654755 7.0710678118654755"
+
+[[entry.params]]
+name = "x"
+desc = "An angle in degrees"
+
+###
+
+[[entry]]
+name = "math.exp"
+kind = "function"
+signature = "function math.exp(x)"
+summary = "e raised to the power of x"
+description = "The function `exp` provides e raised to the power of a number."
+returns = "e^x"
+example = "import math\n\n// Basic usage\nprint(math.exp(0))     // 1\nprint(math.exp(1))     // 2.718281828459045\nprint(math.exp(2))     // 7.38905609893065\n\n// Practical example: exponential growth\nvar initial = 100\nvar rate = 0.05\nfor const year in 1..11\n{\n    var value = initial * math.exp(rate * year)\n    print(\"Year \" + year + \": $\" + math.round(value * 100) / 100)\n}\n\n// Radioactive decay\nvar half_life = 5.0\nvar time = 10.0\nvar remaining = math.exp(-0.693 * time / half_life)\nprint(\"Remaining fraction:\", remaining)  // 0.25 (approximately)"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.trunc"
+kind = "function"
+signature = "function math.trunc(x)"
+summary = "Integer part of number"
+description = "The function `trunc` provides the integer part of a number by removing the fractional part."
+returns = "The truncated value"
+example = "import math\n\n// Basic usage\nprint(math.trunc(3.7))    // 3\nprint(math.trunc(3.2))    // 3\nprint(math.trunc(-3.7))   // -3\nprint(math.trunc(-3.2))   // -3\n\n// Difference from floor\nprint(\"floor(-3.7) = \" + math.floor(-3.7))  // -4\nprint(\"trunc(-3.7) = \" + math.trunc(-3.7))  // -3\n\n// Practical example: extract integer part\nvar price = 19.99\nvar dollars = math.trunc(price)\nvar cents = math.round((price - dollars) * 100)\nprint(\"$\" + dollars + \".\" + cents)  // $19.99"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.frexp"
+kind = "function"
+signature = "function math.frexp(x)"
+summary = "Normalized fraction and an exponent"
+description = "The function `frexp` breaks a number into a normalized fraction and an exponent."
+returns = "A list `[exponent, mantissa]` such that `x = mantissa * 2^exponent`"
+example = "import math\n\n// Basic usage\nvar result = math.frexp(8)\nprint(\"Exponent:\", result[0])    // 4\nprint(\"Mantissa:\", result[1])    // 0.5\n// 8 = 0.5 * 2^4\n\n// Practical example: analyze floating-point representation\nvar value = 123.456\nvar parts = math.frexp(value)\nprint(value + \" = \" + parts[1] + \" * 2^\" + parts[0])\n\n// Reconstruct the original value\nvar reconstructed = parts[1] * (2 ** parts[0])\nprint(\"Reconstructed:\", reconstructed)  // 123.456"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.ldexp"
+kind = "function"
+signature = "function math.ldexp(x, exp)"
+summary = "x * 2^exp"
+description = "The function `ldexp` provides x * 2^exp. This is the inverse of `frexp`."
+returns = "x * 2^exp"
+example = "import math\n\n// Basic usage\nprint(math.ldexp(0.5, 4))    // 8\nprint(math.ldexp(1, 10))     // 1024\n\n// Practical example: reconstruct from frexp\nvar original = 123.456\nvar parts = math.frexp(original)\nvar reconstructed = math.ldexp(parts[1], parts[0])\nprint(\"Original:\", original)\nprint(\"Reconstructed:\", reconstructed)  // 123.456\n\n// Power of 2 calculations\nfor const i in 0..11\n{\n    print(\"2^\" + i + \" = \" + math.ldexp(1, i))\n}"
+
+[[entry.params]]
+name = "x"
+desc = "The mantissa"
+
+[[entry.params]]
+name = "exp"
+desc = "The exponent"
+
+###
+
+[[entry]]
+name = "math.log"
+kind = "function"
+signature = "function math.log(x)"
+summary = "Natural logarithm (base e)"
+description = "The function `log` provides the natural logarithm (base e) of a certain number."
+returns = "The natural logarithm of `x`"
+example = "import math\n\n// Basic usage\nprint(math.log(1))      // 0\nprint(math.log(math.e)) // 1\nprint(math.log(10))     // 2.302585092994046\n\n// Practical example: calculate time for growth\nvar initial = 100\nvar target = 200\nvar rate = 0.05\nvar time = math.log(target / initial) / rate\nprint(\"Time to double: \" + time + \" years\")  // 13.862943611198906 years\n\n// Richter scale calculation\nvar amplitude = 1000\nvar reference = 1\nvar magnitude = math.log(amplitude / reference) / math.log(10)\nprint(\"Magnitude:\", magnitude)  // 3.0\n\n// Information entropy\nvar probability = 0.25\nvar information = -math.log(probability) / math.log(2)\nprint(\"Information content: \" + information + \" bits\")  // 2.0 bits"
+
+[[entry.params]]
+name = "x"
+desc = "A positive number"
+
+###
+
+[[entry]]
+name = "math.log1p"
+kind = "function"
+signature = "function math.log1p(x)"
+summary = "Natural logarithm of 1 + x"
+description = "The function `log1p` provides the natural logarithm of 1 + x. This is more accurate than `math.log(1 + x)`, when `x` is close to zero."
+returns = "The natural logarithm of `1 + x`"
+example = "import math\n\n// Basic usage\nprint(math.log1p(0))     // 0\nprint(math.log1p(1))     // 0.6931471805599453\n\n// More accurate for small values\nvar x = 1e-10\nprint(\"log(1 + x): \" + math.log(1 + x))    // May lose precision\nprint(\"log1p(x): \" + math.log1p(x))        // More accurate\n\n// Practical example: compound interest\nvar rate = 0.05\nvar periods = 1\nvar effective_rate = math.log1p(rate)\nprint(\"Effective continuous rate:\", effective_rate)"
+
+[[entry.params]]
+name = "x"
+desc = "A number greater than -1"
+
+###
+
+[[entry]]
+name = "math.log2"
+kind = "function"
+signature = "function math.log2(x)"
+summary = "Base-2 logarithm"
+description = "The function `log2` provides the base-2 logarithm of a certain number."
+returns = "The base-2 logarithm of `x`"
+example = "import math\n\n// Basic usage\nprint(math.log2(1))     // 0\nprint(math.log2(2))     // 1\nprint(math.log2(8))     // 3\nprint(math.log2(1024))  // 10\n\n// Practical example: calculate bits needed\nvar values = 1000\nvar bits = math.ceil(math.log2(values))\nprint(\"Bits needed:\", bits)  // 10\n\n// Binary tree depth\nvar nodes = 100\nvar depth = math.ceil(math.log2(nodes + 1))\nprint(\"Tree depth:\", depth)  // 7\n\n// Data compression ratio\nvar original_size = 1024\nvar compressed_size = 128\nvar ratio = math.log2(original_size / compressed_size)\nprint(\"Compression ratio (log2):\", ratio)  // 3.0"
+
+[[entry.params]]
+name = "x"
+desc = "A positive number"
+
+###
+
+[[entry]]
+name = "math.log10"
+kind = "function"
+signature = "function math.log10(x)"
+summary = "Base-10 logarithm"
+description = "The function `log10` provides the base-10 logarithm of a certain number."
+returns = "The base-10 logarithm of `x`"
+example = "import math\n\n// Basic usage\nprint(math.log10(1))      // 0\nprint(math.log10(10))     // 1\nprint(math.log10(100))    // 2\nprint(math.log10(1000))   // 3\n\n// Practical example: calculate order of magnitude\nvar value = 5000\nvar magnitude = math.floor(math.log10(value))\nprint(\"Order of magnitude:\", magnitude)  // 3 (thousands)\n\n// Decibel calculation\nvar power_ratio = 100\nvar decibels = 10 * math.log10(power_ratio)\nprint(\"Decibels:\", decibels)  // 20\n\n// pH calculation\nvar hydrogen_concentration = 0.001\nvar pH = -math.log10(hydrogen_concentration)\nprint(\"pH:\", pH)  // 3.0"
+
+[[entry.params]]
+name = "x"
+desc = "A positive number"
+
+###
+
+[[entry]]
+name = "math.classify"
+kind = "function"
+signature = "function math.classify(x)"
+summary = "Classify floating-point value"
+description = "The function `classify` classifies a floating-point value into one of five categories."
+returns = "A string: \"infinity\", \"nan\", \"normal\", \"subnormal\", or \"zero\""
+example = "import math\n\n// Basic usage\nprint(math.classify(1.0))        // \"normal\"\nprint(math.classify(0.0))        // \"zero\"\nprint(math.classify(math.infinity))  // \"infinity\"\nprint(math.classify(math.nan))   // \"nan\"\n\n// Practical example: validate numeric input\nvar values = [1.0, 0.0, -0.0, 1/0, -1/0, 0/0, 1e-320]\nfor const v in values\n{\n    print(v + \": \" + math.classify(v))\n}\n\n// Check for valid numbers\nvar input = 42.5\nvar category = math.classify(input)\nif category == \"normal\"\n{\n    print(\"Valid number\")\n}\nelse\n{\n    print(\"Invalid or special number: \" + category)\n}"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.isinfinity"
+kind = "function"
+signature = "function math.isinfinity(x)"
+summary = "Check for infinity"
+description = "The function `isinfinity` checks if `x` is positive or negative infinity."
+returns = "`true` if `x` is infinite, `false` otherwise"
+example = "import math\n\n// Basic usage\nprint(math.isinfinity(1.0))          // false\nprint(math.isinfinity(math.infinity)) // true\nprint(math.isinfinity(-math.infinity)) // true\nprint(math.isinfinity(math.nan))     // false\n\n// Practical example: check for overflow\nvar result = math.exp(1000)\nif math.isinfinity(result)\n{\n    print(\"Overflow detected!\")\n}\nelse\n{\n    print(\"Result:\", result)\n}\n\n// Safe division\nvar numerator = 10\nvar denominator = 0\nvar result = numerator / denominator\nif math.isinfinity(result)\n{\n    print(\"Cannot divide by zero\")\n}\nelse\n{\n    print(\"Result:\", result)\n}"
+
+[[entry.params]]
+name = "x"
+desc = "A number"
+
+###
+
+[[entry]]
+name = "math.isnan"
+kind = "function"
+signature = "function math.isnan(x)"
+summary = "Check for \"Not a Number\""
+description = "The function `isnan` checks if `x` is NaN (Not a Number)."
+returns = "`true` if `x` is NaN, `false` otherwise."
+
+[[entry.params]]
+name = "x"
+desc = "A number"

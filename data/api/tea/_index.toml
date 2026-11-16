@@ -1,0 +1,79 @@
+[[entities]]
+title = "Core"
+slug = "core"
+data = "core"
+
+[[entities]]
+title = "Buffer"
+slug = "buffer"
+data = "buffer"
+
+[[entities]]
+title = "Debug"
+slug = "debug"
+data = "debug"
+
+[[entities]]
+title = "IO"
+slug = "io"
+data = "io"
+
+[[entities]]
+title = "List"
+slug = "list"
+data = "list"
+
+[[entities]]
+title = "Map"
+slug = "map"
+data = "map"
+
+[[entities]]
+title = "Math"
+slug = "math"
+data = "math"
+
+[[entities]]
+title = "OS"
+slug = "os"
+data = "os"
+
+[[entities]]
+title = "Random"
+slug = "random"
+data = "random"
+
+[[entities]]
+title = "Range"
+slug = "range"
+data = "range"
+
+[[entities]]
+title = "String"
+slug = "string"
+data = "string"
+
+[[entities]]
+title = "Sys"
+slug = "sys"
+data = "sys"
+
+[[entities]]
+title = "Time"
+slug = "time"
+data = "time"
+
+[[entities]]
+title = "UTF-8"
+slug = "utf8"
+data = "utf8"
+
+[[entities]]
+title = "FFI"
+slug = "ffi"
+data = "ffi"
+
+[[entities]]
+title = "SQLite3"
+slug = "sqlite3"
+data = "sqlite3"

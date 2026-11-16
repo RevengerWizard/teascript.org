@@ -1,0 +1,86 @@
+title = "C API"
+summary = "Functions, macros, types, and constants declared by tea.h."
+
+[[categories]]
+title = "Definitions"
+slug = "definitions"
+
+[[categories]]
+title = "State"
+slug = "state"
+
+[[categories]]
+title = "Stack"
+slug = "stack"
+
+[[categories]]
+title = "Calls"
+slug = "calls"
+
+[[categories]]
+title = "Code Loading"
+slug = "loading"
+
+[[categories]]
+title = "Errors"
+slug = "errors"
+
+[[categories]]
+title = "Garbage Collection"
+slug = "gc"
+
+[[categories]]
+title = "Memory Management"
+slug = "memory"
+
+[[categories]]
+title = "Types"
+slug = "types"
+
+[[categories]]
+title = "Get Functions"
+slug = "get"
+
+[[categories]]
+title = "Value Conversion"
+slug = "value"
+
+[[categories]]
+title = "Push Functions"
+slug = "push"
+
+[[categories]]
+title = "Object Creation"
+slug = "object"
+
+[[categories]]
+title = "Collections"
+slug = "collections"
+
+[[categories]]
+title = "Fields"
+slug = "fields"
+
+[[categories]]
+title = "Attributes"
+slug = "attributes"
+
+[[categories]]
+title = "Variable Access"
+slug = "variables"
+
+[[categories]]
+title = "Function and Method Registration"
+slug = "registration"
+
+[[categories]]
+title = "Argument Checking"
+slug = "check"
+
+[[categories]]
+title = "Optional Arguments"
+slug = "optionals"
+
+[[categories]]
+title = "String Operations"
+slug = "string"

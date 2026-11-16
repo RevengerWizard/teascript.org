@@ -25,11 +25,11 @@
     {{- end }}
     {{- $title := or .AlertTitle (T (printf "admonitions.%s" $type)) (title $type) }}
     {{- $iconFile := index $icons $type }}
-    {{- $partial := printf "admonitions/icons/%s" $iconFile }}
+    {{- $icon := resources.Get (printf "svg/%s" $iconFile) }}
 
     {{- /* Check if icon exists */}}
-    {{- if not (templates.Exists (printf "partials/%s" $partial)) }}
-        {{- errorf "The blockquote render hook was unable to find the icon partial at layouts/partials/%s for admonition type '%s'." $partial $type }}
+    {{- if not $icon }}
+        {{- errorf "The blockquote render hook was unable to find the admonition icon at assets/svg/%s for type '%s'." $iconFile $type }}
     {{- end }}
 
     {{- /* Check if .AlertSign exists to determine if it's foldable */}}
@@ -38,7 +38,7 @@
         {{- /* The 'open' attribute could be conditionally added based on .AlertSign, e.g., if eq .AlertSign "-" */}}
         <details class="admonition {{ $type }}">
         <summary class="admonition-header">
-            {{- partialCached $partial . }}
+            {{- $icon.Content | safeHTML }}
             <span>{{ $title }}</span>
             {{- /* Optional: Add a custom chevron/indicator here via span/svg if you hide the default one */}}
         </summary>
@@ -54,7 +54,7 @@
         <div class="admonition {{ $type }}{{ if $headless }} admonition--headless{{ end }}">
         {{- if not $headless }}
         <div class="admonition-header">
-            {{- partialCached $partial . }}
+            {{- $icon.Content | safeHTML }}
             <span>{{ $title }}</span>
         </div>
         {{- end }}

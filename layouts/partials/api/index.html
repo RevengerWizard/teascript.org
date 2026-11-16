@@ -1,0 +1,53 @@
+{{ if eq .Params.apiIndex "c" }}
+{{ $tagValues := slice }}{{ $kindValues := slice }}
+{{ range site.Data.api.c._index.categories }}{{ $data := index site.Data.api.c .slug }}{{ range $data.entry }}
+    {{ $kindValues = $kindValues | append .kind }}
+    {{ range .tags }}{{ $tagValues = $tagValues | append . }}{{ end }}
+{{ end }}{{ end }}
+<div class="api-index-tools">
+    <div class="api-index-filter" aria-label="C API filters">
+        <div><span>Kind</span>{{ range (uniq $kindValues) }}<button class="api-filter-chip" data-kind="{{ . }}" type="button">{{ . }}</button>{{ end }}</div>
+        <div><span>Tags</span>{{ range (uniq $tagValues) }}<a class="api-filter-chip" data-tag="{{ . }}" href="/api/c/tag/{{ . }}/">{{ . }}</a>{{ end }}</div>
+        <label>Filter symbols <input type="search" data-api-filter placeholder="Name or summary"></label>
+    </div>
+</div>
+<div class="api-index-table-wrap"><table class="api-index-table">
+    <thead><tr><th>Name</th><th>Category</th><th>Kind</th><th>Summary</th></tr></thead>
+    <tbody>
+    {{ range site.Data.api.c._index.categories }}{{ $category := . }}{{ $data := index site.Data.api.c .slug }}{{ range $data.entry }}
+    <tr data-kind="{{ .kind }}" data-tags="{{ with .tags }}{{ delimit . " " }}{{ end }}"><td><a href="/api/c/{{ $category.slug }}/#{{ .name }}">{{ .name }}</a></td><td><a href="/api/c/{{ $category.slug }}/">{{ $category.title }}</a></td><td><span class="api-pill api-pill--kind api-pill--kind-{{ .kind | urlize }}">{{ .kind }}</span></td><td>{{ .summary }}</td></tr>
+    {{ end }}{{ end }}
+    </tbody>
+</table></div>
+{{ $filter := resources.Get "js/api-filter.js" | minify | fingerprint }}
+<script src="{{ $filter.RelPermalink }}" integrity="{{ $filter.Data.Integrity }}" crossorigin="anonymous" defer></script>
+{{ else }}
+{{ $origins := slice }}{{ $tagValues := slice }}{{ $kindValues := slice }}
+{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+    {{ with $data.kind }}{{ $kindValues = $kindValues | append . }}{{ end }}
+    {{ with $data.origin }}{{ $origins = $origins | append . }}{{ end }}
+    {{ $tagValues = $tagValues | append $entity.slug }}
+    {{ range $data.entry }}{{ if ne .kind "section" }}{{ $kindValues = $kindValues | append .kind }}{{ $tags := .tags | default (slice $entity.slug) }}{{ range $tags }}{{ $tagValues = $tagValues | append . }}{{ end }}{{ end }}{{ end }}
+{{ end }}
+<div class="api-index-tools">
+    <div class="api-index-filter" aria-label="Teascript API filters">
+        <div><span>Kind</span>{{ range (uniq $kindValues) }}<button class="api-filter-chip" data-kind="{{ . }}" type="button">{{ . }}</button>{{ end }}</div>
+        <div><span>Tags</span>{{ range (uniq $tagValues) }}<a class="api-filter-chip" data-tag="{{ . }}" href="/api/tea/tag/{{ . }}/">{{ . }}</a>{{ end }}</div>
+        <div><span>Origin</span>{{ range (uniq $origins) }}<button class="api-filter-chip" data-origin="{{ . }}" type="button">{{ . }}</button>{{ end }}</div>
+        <label>Filter entries <input type="search" data-api-filter placeholder="Name or summary"></label>
+    </div>
+</div>
+<div class="api-index-table-wrap"><table class="api-index-table">
+    <thead><tr><th>Name</th><th>Category</th><th>Kind</th><th>Origin</th><th>Summary</th></tr></thead>
+    <tbody>
+    {{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+    <tr data-kind="{{ $data.kind }}" data-origin="{{ $data.origin }}" data-tags="{{ $entity.slug }}"><td><a href="/api/tea/{{ $entity.slug }}/">{{ $data.title }}</a></td><td>—</td><td><span class="api-pill api-pill--kind api-pill--kind-{{ $data.kind | urlize }}">{{ $data.kind }}</span></td><td>{{ $data.origin }}</td><td>{{ $data.summary | markdownify }}</td></tr>
+    {{ range $data.entry }}{{ if ne .kind "section" }}{{ $entry := . }}{{ $entryTags := $entry.tags | default (slice $entity.slug) }}
+    <tr data-kind="{{ $entry.kind }}" data-origin="{{ $data.origin }}" data-tags="{{ delimit $entryTags " " }}"><td><a href="/api/tea/{{ $entity.slug }}/#{{ $entry.name }}">{{ $entry.name }}</a></td><td><a href="/api/tea/{{ $entity.slug }}/">{{ $data.title }}</a></td><td><span class="api-pill api-pill--kind api-pill--kind-{{ $entry.kind | urlize }}">{{ $entry.kind }}</span></td><td>{{ $data.origin }}</td><td>{{ $entry.summary | markdownify }}</td></tr>
+    {{ end }}{{ end }}
+    {{ end }}
+    </tbody>
+</table></div>
+{{ $filter := resources.Get "js/api-filter.js" | minify | fingerprint }}
+<script src="{{ $filter.RelPermalink }}" integrity="{{ $filter.Data.Integrity }}" crossorigin="anonymous" defer></script>
+{{ end }}

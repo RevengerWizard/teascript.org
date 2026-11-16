@@ -1,0 +1,128 @@
+title = "Definitions"
+slug = "definitions"
+summary = "Version information and numeric types"
+description = "Version information for the Teascript library and the numeric types used throughout the C API. The version constants are defined in `tea.h` and can be used both at compile time and at run time to check which version of the API a program was built against."
+
+[[entry]]
+name = "TEA_REPOSITORY"
+kind = "const"
+since = "1.0"
+tags = ["version", "string", "const"]
+signature = '#define TEA_REPOSITORY "https://github.com/RevengerWizard/teascript"'
+summary = "Repository URL"
+description = "String literal with the URL of the Teascript source repository."
+example = '''
+printf("Teascript: %s\n", TEA_REPOSITORY);
+'''
+see_also = ["TEA_VERSION"]
+
+###
+
+[[entry]]
+name = "TEA_VERSION_MAJOR"
+kind = "const"
+since = "1.0"
+tags = ["version", "number", "const"]
+signature = "#define TEA_VERSION_MAJOR 0"
+summary = "Major version"
+description = "The major version number of Teascript."
+example = '''
+#if TEA_VERSION_MAJOR < 1
+#warning "built against a pre-1.0 Teascript"
+#endif
+'''
+see_also = ["TEA_VERSION_MINOR", "TEA_VERSION_PATCH", "TEA_VERSION_NUMBER"]
+
+###
+
+[[entry]]
+name = "TEA_VERSION_MINOR"
+kind = "const"
+since = "1.0"
+tags = ["version", "number", "const"]
+signature = "#define TEA_VERSION_MINOR 0"
+summary = "Minor version"
+description = "The minor version number of Teascript."
+example = '''
+printf("%d.%d\n", TEA_VERSION_MAJOR, TEA_VERSION_MINOR);
+'''
+see_also = ["TEA_VERSION_MAJOR", "TEA_VERSION_PATCH", "TEA_VERSION_NUMBER"]
+
+###
+
+[[entry]]
+name = "TEA_VERSION_PATCH"
+kind = "const"
+since = "1.0"
+tags = ["version", "number", "const"]
+signature = "#define TEA_VERSION_PATCH 0"
+summary = "Patch version"
+description = "The patch version number of Teascript."
+example = '''
+printf("%d.%d.%d\n", TEA_VERSION_MAJOR, TEA_VERSION_MINOR, TEA_VERSION_PATCH);
+'''
+see_also = ["TEA_VERSION_MAJOR", "TEA_VERSION_MINOR", "TEA_VERSION_NUMBER"]
+
+###
+
+[[entry]]
+name = "TEA_VERSION_NUMBER"
+kind = "const"
+since = "1.0"
+tags = ["version", "number", "const"]
+signature = "#define TEA_VERSION_NUMBER (TEA_VERSION_MAJOR * 10000 + TEA_VERSION_MINOR * 100 + TEA_VERSION_PATCH)"
+summary = "Numeric version"
+description = "The version as a single integer, `major * 10000 + minor * 100 + patch`, so that versions compare with ordinary integer comparison. For example, version `1.2.3` is `10203`."
+example = '''
+#if TEA_VERSION_NUMBER >= 10200
+/* requires Teascript 1.2.0 or later */
+#endif
+'''
+see_also = ["TEA_VERSION_MAJOR", "TEA_VERSION_MINOR", "TEA_VERSION_PATCH", "TEA_VERSION"]
+
+###
+
+[[entry]]
+name = "TEA_VERSION"
+kind = "const"
+since = "1.0"
+tags = ["version", "string", "const"]
+signature = '#define TEA_VERSION "0.0.0"'
+summary = "Version string"
+description = "The version as a string literal in the form `\"major.minor.patch\"`."
+example = '''
+printf("Teascript %s\n", TEA_VERSION);
+'''
+see_also = ["TEA_VERSION_NUMBER", "TEA_REPOSITORY"]
+
+###
+
+[[entry]]
+name = "tea_Number"
+kind = "typedef"
+since = "1.0"
+tags = ["number", "typedef"]
+signature = "typedef double tea_Number;"
+summary = "Floating-point number type"
+description = "The type of numbers in Teascript, a double-precision IEEE 754 floating-point number. Every Teascript number has this type, whether or not it has a fractional part."
+example = '''
+tea_Number half = tea_check_number(T, 1) / 2;
+tea_push_number(T, half);
+'''
+see_also = ["tea_Integer", "tea_push_number", "tea_get_number", "tea_check_number"]
+
+###
+
+[[entry]]
+name = "tea_Integer"
+kind = "typedef"
+since = "1.0"
+tags = ["integer", "typedef"]
+signature = "typedef ptrdiff_t tea_Integer;"
+summary = "Integer type"
+description = "The signed integer type used by the C API for counts, indices and integer keys. It is a `ptrdiff_t`, so it matches the platform's pointer width.\n\nTeascript numbers are doubles, so converting to a `tea_Integer` truncates the fractional part, and values beyond `2^53` cannot be represented exactly when converted back."
+example = '''
+tea_Integer n = tea_check_integer(T, 1);
+tea_push_integer(T, n * 2);
+'''
+see_also = ["tea_Number", "tea_push_integer", "tea_get_integer", "tea_check_integer"]

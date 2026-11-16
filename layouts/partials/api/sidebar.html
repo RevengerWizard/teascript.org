@@ -1,0 +1,7 @@
+<aside class="api-sidebar">
+    <a class="api-sidebar-home" href="/api/">API</a>
+    {{ if eq .mode "c" }}<strong>Categories</strong>
+    {{ range site.Data.api.c._index.categories }}<a class="{{ if eq $.page.Params.apiData .slug }}active{{ end }}" href="/api/c/{{ .slug }}/">{{ .title }}</a>{{ end }}
+    {{ else }}{{ partial "api/tea-nav.html" . }}
+    {{ end }}
+</aside>

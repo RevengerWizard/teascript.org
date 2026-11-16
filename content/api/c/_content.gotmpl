@@ -1,0 +1,17 @@
+{{ $index := dict "kind" "page" "path" "." "title" "C API" "type" "api-index" "params" (dict "apiIndex" "c" "toc" false) }}
+{{ .AddPage $index }}
+{{ range site.Data.api.c._index.categories }}
+  {{ $page := dict "kind" "page" "path" .slug "title" .title "type" "api-c" "params" (dict "apiData" .slug "toc" false) }}
+  {{ $.AddPage $page }}
+{{ end }}
+{{ $tags := slice }}
+{{ range site.Data.api.c._index.categories }}
+  {{ $data := index site.Data.api.c .slug }}
+  {{ range $data.entry }}{{ range .tags }}{{ if not (in $tags .) }}{{ $tags = $tags | append . }}{{ end }}{{ end }}{{ end }}
+{{ end }}
+{{ range $tags }}
+  {{ $page := dict "kind" "page" "path" (printf "tag/%s" .) "title" (printf "Tag: %s" .) "type" "api-tag" "params" (dict "apiTagType" "tag" "apiTag" . "toc" false) }}
+  {{ $.AddPage $page }}
+{{ end }}
+{{ $page := dict "kind" "page" "path" "since/1.0" "title" "Since 1.0" "type" "api-tag" "params" (dict "apiTagType" "since" "apiTag" "1.0" "toc" false) }}
+{{ .AddPage $page }}

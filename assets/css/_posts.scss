@@ -184,6 +184,12 @@
     direction: ltr;
 }
 
+.api-entry-field > .highlight,
+.api-entry-field > .highlight pre {
+    margin: 0;
+    text-align: left;
+}
+
 /* Keep the homepage example block visually consistent with Markdown code */
 .highlight {
     margin: 10px auto;
@@ -244,6 +250,11 @@
     max-height: none;
     font-size: 0.86rem;
     line-height: 1.45;
+}
+
+.highlight:not(.homepage-snippet) pre,
+.highlight:not(.homepage-snippet) pre code {
+    padding: .4rem .6rem;
 }
 
 .post-content .highlight,

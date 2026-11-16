@@ -1,0 +1,23 @@
+{{ $index := dict "kind" "page" "path" "." "title" "Tea API" "type" "api-index" "params" (dict "apiIndex" "tea" "toc" false) }}
+{{ .AddPage $index }}
+{{ range site.Data.api.tea._index.entities }}
+  {{ $page := dict "kind" "page" "path" .slug "title" .title "type" "api-tea" "params" (dict "apiData" .data "toc" false) }}
+  {{ $.AddPage $page }}
+{{ end }}
+{{ $tags := slice }}{{ $sinceValues := slice }}
+{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+  {{ $tags = $tags | append $entity.slug }}
+  {{ with $data.since }}{{ $sinceValues = $sinceValues | append . }}{{ end }}
+  {{ range $data.entry }}{{ if ne .kind "section" }}
+    {{ $entryTags := .tags | default (slice $entity.slug) }}{{ range $entryTags }}{{ if not (in $tags .) }}{{ $tags = $tags | append . }}{{ end }}{{ end }}
+    {{ $entrySince := .since | default $data.since }}{{ with $entrySince }}{{ if not (in $sinceValues .) }}{{ $sinceValues = $sinceValues | append . }}{{ end }}{{ end }}
+  {{ end }}{{ end }}
+{{ end }}
+{{ range $tags }}
+  {{ $page := dict "kind" "page" "path" (printf "tag/%s" .) "title" (printf "Tag: %s" .) "type" "api-tag" "params" (dict "apiTagAPI" "tea" "apiTagType" "tag" "apiTag" . "toc" false) }}
+  {{ $.AddPage $page }}
+{{ end }}
+{{ range $sinceValues }}
+  {{ $page := dict "kind" "page" "path" (printf "since/%s" .) "title" (printf "Since %s" .) "type" "api-tag" "params" (dict "apiTagAPI" "tea" "apiTagType" "since" "apiTag" . "toc" false) }}
+  {{ $.AddPage $page }}
+{{ end }}

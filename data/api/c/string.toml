@@ -1,0 +1,32 @@
+title = "String Operations"
+slug = "string"
+summary = "String helpers on the stack"
+description = "String operations that work directly on values on the stack. To push strings, see the Push Functions section; to read them, see the Get Functions and Value Conversion sections."
+
+[[entry]]
+name = "tea_concat"
+kind = "function"
+since = "1.0"
+tags = ["string"]
+signature = "void tea_concat(tea_State* T, int n);"
+summary = "Concatenate strings"
+description = "{{< stack before=\"...,str1,...,strN\" after=\"...,str\" >}}\n\nConcatenates the top `n` values of the stack, which must all be strings, and replaces them with the resulting string. This is the `+` string concatenation of Teascript, at the C API level.\n\nIf `n` is `0`, an empty string is pushed, the neutral element of concatenation. If `n` is `1`, nothing is done, since the single value is already the result."
+errors = "May raise a memory error."
+stack = "[-n, +1, m]"
+example = '''
+tea_push_string(T, "hello");
+tea_push_string(T, ", ");
+tea_push_string(T, "world");
+tea_concat(T, 3);               /* ["hello, world"] */
+
+tea_concat(T, 0);               /* ["hello, world", ""] */
+'''
+see_also = ["tea_push_string", "tea_push_fstring", "tea_to_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Number of values to concatenate"

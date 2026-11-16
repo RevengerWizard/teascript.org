@@ -1,0 +1,670 @@
+title = "List"
+slug = "list"
+kind = "class"
+origin = "builtin"
+since = "1.0"
+summary = "Ordered collection values"
+description = "The List class represents an ordered, mutable collection of Teascript values. Its methods support adding, removing, searching, transforming, and iterating over elements."
+
+[[entry]]
+name = "List.len"
+kind = "attribute"
+signature = "List:len"
+summary = "Number of elements"
+description = "The attribute `len` allows to receive the number of elements in a Tea list."
+example = '''
+const fruits = ["apple", "banana", "cherry"]
+print(fruits.len)  // 3
+
+print([].len)  // 0
+'''
+
+###
+
+[[entry]]
+name = "List.new"
+kind = "method"
+signature = "function List:new(size=0)"
+summary = "Create new list"
+description = "The `new` method creates a new list, optionally pre-allocated with a given size. This is useful when you know in advance how many elements the list will hold, as it can improve performance by reducing the number of internal reallocations."
+example = '''
+var empty = List:new()
+print(empty.len)  // 0
+
+var preallocated = List:new(10)
+print(preallocated.len)  // 0, but capacity is pre-allocated
+
+// Building a list of squares with known size
+var squares = List:new(5)
+for const i in 1..5
+{
+    squares.add(i * i)
+}
+print(squares)  // [1, 4, 9, 16, 25]
+'''
+
+[[entry.params]]
+name = "size"
+desc = "An optional number indicating the initial capacity of the list. If not specified, defaults to `0`."
+
+###
+
+[[entry]]
+name = "List.add"
+kind = "method"
+signature = "function List:add(value, ...)"
+summary = "Append values"
+description = "The `add` method appends one or more values to the end of the list."
+returns = "The method returns the list itself, allowing for method chaining."
+example = '''
+var shopping = ["milk", "eggs"]
+shopping.add("bread")
+print(shopping)  // ["milk", "eggs", "bread"]
+
+// Add multiple items at once
+shopping.add("butter", "cheese", "jam")
+print(shopping)  // ["milk", "eggs", "bread", "butter", "cheese", "jam"]
+
+// Chaining
+var nums = [1, 2]
+nums.add(3).add(4).add(5)
+print(nums)  // [1, 2, 3, 4, 5]
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The first value to append to the list."
+
+[[entry.params]]
+name = "..."
+desc = "Additional values to append, if any."
+
+###
+
+[[entry]]
+name = "List.remove"
+kind = "method"
+signature = "function List:remove(value)"
+summary = "Remove specific value"
+description = "The `remove` method removes the first occurrence of a specified value from the list. If the value is not found, an error is raised."
+example = '''
+var guests = ["Alice", "Bob", "Charlie", "Bob"]
+guests.remove("Bob")
+print(guests)  // ["Alice", "Charlie", "Bob"] (only first Bob removed)
+
+guests.remove("Charlie")
+print(guests)  // ["Alice", "Bob"]
+
+// Removing a non-existent value raises an error
+// guests.remove("Dave")  // Error: Value does not exist within the list
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The value to remove from the list."
+
+###
+
+[[entry]]
+name = "List.delete"
+kind = "method"
+signature = "function List:delete(index)"
+summary = "Delete element at index"
+description = "The `delete` method removes the element at the specified index from the list. All subsequent elements are shifted down by one position. If the index is out of bounds, an error is raised."
+example = '''
+var playlist = ["Song A", "Song B", "Song C", "Song D"]
+playlist.delete(1)
+print(playlist)  // ["Song A", "Song C", "Song D"]
+
+playlist.delete(0)
+print(playlist)  // ["Song C", "Song D"]
+
+// Deleting from an empty list is a no-op
+var empty = []
+empty.delete(0)
+print(empty)  // []
+
+// Out-of-bounds access raises an error
+// playlist.delete(10)  // Error: Index out of bounds
+'''
+
+[[entry.params]]
+name = "index"
+desc = "The zero-based index of the element to remove."
+
+###
+
+[[entry]]
+name = "List.clear"
+kind = "method"
+signature = "function List:clear()"
+summary = "Empty a list"
+description = "The `clear` method removes all elements from the list, leaving it empty."
+example = '''
+var cart = ["laptop", "mouse", "keyboard"]
+cart.clear()
+print(cart)  // []
+
+// Clearing an already empty list is safe
+cart.clear()
+print(cart)  // []
+'''
+
+###
+
+[[entry]]
+name = "List.insert"
+kind = "method"
+signature = "function List:insert(value, index)"
+summary = "Insert value at index"
+description = "The `insert` method inserts a value at the specified index in the list. All elements at and after that index are shifted up by one position. If the index is out of bounds, an error is raised."
+example = '''
+var queue = ["first", "third", "fourth"]
+queue.insert("second", 1)
+print(queue)  // ["first", "second", "third", "fourth"]
+
+queue.insert("zeroth", 0)
+print(queue)  // ["zeroth", "first", "second", "third", "fourth"]
+
+// Inserting at the end is equivalent to add
+queue.insert("fifth", queue.len - 1)
+print(queue)  // ["zeroth", "first", "second", "third", "fourth", "fifth"]
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The value to insert into the list."
+
+[[entry.params]]
+name = "index"
+desc = "The zero-based index at which to insert the value."
+
+###
+
+[[entry]]
+name = "List.extend"
+kind = "method"
+signature = "function List:extend(other)"
+summary = "Concatenate with another list"
+description = "The `extend` method appends all elements from another list to the end of the original list."
+example = '''
+var first = [1, 2, 3]
+var second = [4, 5, 6]
+first.extend(second)
+print(first)  // [1, 2, 3, 4, 5, 6]
+
+// Extending with an empty list does nothing
+first.extend([])
+print(first)  // [1, 2, 3, 4, 5, 6]
+
+// Merging multiple lists
+var combined = ["a"]
+combined.extend(["b", "c"])
+combined.extend(["d", "e"])
+print(combined)  // ["a", "b", "c", "d", "e"]
+'''
+
+[[entry.params]]
+name = "other"
+desc = "The list whose elements will be appended."
+
+###
+
+[[entry]]
+name = "List.reverse"
+kind = "method"
+signature = "function List:reverse()"
+summary = "Reverse list elements order"
+description = "The `reverse` method reverses the order of elements in the list in place."
+example = '''
+var countdown = [5, 4, 3, 2, 1]
+countdown.reverse()
+print(countdown)  // [1, 2, 3, 4, 5]
+
+var letters = ["a", "b", "c", "d"]
+letters.reverse()
+print(letters)  // ["d", "c", "b", "a"]
+
+// Reversing a single-element list has no effect
+var single = [42]
+single.reverse()
+print(single)  // [42]
+'''
+
+###
+
+[[entry]]
+name = "List.contains"
+kind = "method"
+signature = "function List:contains(value)"
+summary = "Check value presence"
+description = "The `contains` method checks whether the specified value is present in the list."
+returns = "The method returns `true` if the value is found in the list, or `false` otherwise."
+example = '''
+var inventory = ["sword", "shield", "potion"]
+print(inventory.contains("shield"))  // true
+print(inventory.contains("bow"))     // false
+
+// Works with different types
+var mixed = [1, "two", 3.0, true]
+print(mixed.contains("two"))   // true
+print(mixed.contains(3))       // false (3 is not 3.0)
+print(mixed.contains(true))    // true
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The value to search for within the list."
+
+###
+
+[[entry]]
+name = "List.count"
+kind = "method"
+signature = "function List:count(value)"
+summary = "Count occurrences of value"
+description = "The `count` method counts the number of occurrences of a specified value within the list."
+returns = "The method returns the number of times the value appears in the list."
+example = '''
+var votes = ["yes", "no", "yes", "yes", "abstain", "no"]
+print(votes.count("yes"))      // 3
+print(votes.count("no"))       // 2
+print(votes.count("abstain"))  // 1
+print(votes.count("maybe"))    // 0
+
+// Counting duplicates in a list of numbers
+var nums = [1, 2, 2, 3, 3, 3, 4]
+print(nums.count(3))  // 3
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The value to count within the list"
+
+###
+
+[[entry]]
+name = "List.fill"
+kind = "method"
+signature = "function List:fill(value)"
+summary = "Value fill all elements"
+description = "The `fill` method replaces every element in the list with the specified value."
+example = '''
+var grid = [0, 0, 0, 0, 0]
+grid.fill(1)
+print(grid)  // [1, 1, 1, 1, 1]
+
+var board = ["empty", "empty", "empty"]
+board.fill("X")
+print(board)  // ["X", "X", "X"]
+
+// Filling with a list reference
+var buckets = [nil, nil, nil]
+buckets.fill([])
+print(buckets)  // [[], [], []] (all elements reference the same list)
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The value to fill the list with."
+
+###
+
+[[entry]]
+name = "List.sort"
+kind = "method"
+signature = "function List:sort(comparator=nil)"
+summary = "Sort all elements"
+description = "The `sort` method sorts the elements of the list in place. If no comparator is provided, the elements are sorted in ascending order (numeric comparison). If a comparator function is provided, it must take two arguments and return `true` if the first should come before the second."
+example = '''
+var scores = [88, 42, 95, 67, 73]
+scores.sort()
+print(scores)  // [42, 67, 73, 88, 95]
+
+// Sorting in descending order with a custom comparator
+var descending = [3, 1, 4, 1, 5, 9, 2, 6]
+descending.sort(function(a, b) {
+    return a > b
+})
+print(descending)  // [9, 6, 5, 4, 3, 2, 1, 1]
+
+// Sorting strings by length
+var words = ["banana", "apple", "cherry", "date"]
+words.sort(function(a, b) {
+    return a.len < b.len
+})
+print(words)  // ["date", "apple", "banana", "cherry"]
+'''
+
+[[entry.params]]
+name = "comparator"
+desc = "An optional function that takes two elements and returns a boolean indicating their order. If not specified, numerical ascending order is used."
+
+###
+
+[[entry]]
+name = "List.index"
+kind = "method"
+signature = "function List:index(value)"
+summary = "Get index of value"
+description = "The `index` method finds the index of the first occurrence of a specified value within the list."
+returns = "The method returns the index of the first occurrence of the value, or `-1` if the value is not found."
+example = '''
+var colors = ["red", "green", "blue", "green"]
+print(colors.index("green"))  // 1 (first occurrence)
+print(colors.index("blue"))   // 2
+print(colors.index("yellow")) // -1
+
+// Using index to check existence
+if colors.index("red") != -1
+{
+    print("Red is in the list!")
+}
+'''
+
+###
+
+[[entry]]
+name = "List.join"
+kind = "method"
+signature = "function List:join(separator=\"\")"
+summary = "Join list into string"
+description = "The `join` method concatenates all elements of the list into a single string, with an optional separator between each element."
+returns = "The method returns a string containing all elements joined together."
+example = '''
+var words = ["Hello", "world", "from", "Tea"]
+print(words.join(" "))   // "Hello world from Tea"
+print(words.join("-"))   // "Hello-world-from-Tea"
+print(words.join())      // "HelloworldfromTea"
+
+// Joining numbers
+var nums = [1, 2, 3, 4, 5]
+print(nums.join(", "))   // "1, 2, 3, 4, 5"
+
+// Building a CSV line
+var row = ["Alice", "30", "Engineer"]
+print(row.join(","))     // "Alice,30,Engineer"
+'''
+
+[[entry.params]]
+name = "separator"
+desc = 'An optional string to place between elements. If not specified, defaults to an empty string `""`.'
+
+###
+
+[[entry]]
+name = "List.copy"
+kind = "method"
+signature = "function List:copy()"
+summary = "Get shallow copy"
+description = "The `copy` method creates a shallow copy of the list. The new list contains references to the same elements as the original list."
+returns = "The method returns a new list containing the same elements as the original."
+example = '''
+var original = [1, 2, 3]
+var duplicate = original.copy()
+duplicate.add(4)
+print(original)   // [1, 2, 3]
+print(duplicate)  // [1, 2, 3, 4]
+
+// Shallow copy: nested lists are shared
+var nested = [[1, 2], [3, 4]]
+var shallow = nested.copy()
+shallow[0].add(99)
+print(nested)   // [[1, 2, 99], [3, 4]] (original affected!)
+'''
+
+###
+
+[[entry]]
+name = "List.find"
+kind = "method"
+signature = "function List:find(predicate)"
+summary = "Find first element"
+description = "The `find` method returns the first element in the list for which the predicate function returns `true`. If no element satisfies the predicate, `nil` is returned."
+example = '''
+var numbers = [1, 3, 5, 8, 9, 12]
+var firstEven = numbers.find(function(n) {
+    return n % 2 == 0
+})
+print(firstEven)  // 8
+
+// Finding a specific object
+var users = [
+    {name ="Alice", age = 30},
+    {name ="Bob", age = 25},
+    {name ="Charlie", age = 35}
+]
+var bob = users.find(function(user) {
+    return user.name == "Bob"
+})
+print(bob)  // {name: "Bob", age: 25}
+
+// No match returns nil
+var none = numbers.find(function(n) { return n > 100 })
+print(none)  // nil
+'''
+
+[[entry.params]]
+name = "predicate"
+desc = "A function that takes an element and returns a boolean."
+
+###
+
+[[entry]]
+name = "List.flat"
+kind = "method"
+signature = "function List:flat()"
+summary = "Flatten sub-list elements"
+description = "The `flat` method creates a new list with all sub-list elements concatenated into it recursively."
+returns = "The method returns a new flattened list."
+example = '''
+var nested = [1, [2, 3], [4, [5, 6]]]
+var flat = nested.flat()
+print(flat)  // [1, 2, 3, 4, 5, 6]
+
+// Deeply nested structure
+var deep = [[[[1]]], [[2, [3]]]]
+print(deep.flat())  // [1, 2, 3]
+
+// Already flat lists remain unchanged
+print([1, 2, 3].flat())  // [1, 2, 3]
+'''
+
+###
+
+[[entry]]
+name = "List.map"
+kind = "method"
+signature = "function List:map(transform)"
+summary = "Map new list"
+description = "The `map` method creates a new list by applying a transformation function to each element of the original list."
+returns = "The method returns a new list containing the transformed elements."
+example = '''
+var numbers = [1, 2, 3, 4]
+var squares = numbers.map(function(n) {
+    return n * n
+})
+print(squares)  // [1, 4, 9, 16]
+
+// Converting temperatures
+var celsius = [0, 20, 37, 100]
+var fahrenheit = celsius.map(function(c) {
+    return c * 9 / 5 + 32
+})
+print(fahrenheit)  // [32, 68, 98.6, 212]
+
+// Extracting a field from objects
+var people = [
+    {name = "Alice", age = 30},
+    {name = "Bob", age = 25}
+]
+var names = people.map(function(p) { return p.name })
+print(names)  // ["Alice", "Bob"]
+'''
+
+[[entry.params]]
+name = "transform"
+desc = "A function that takes an element and returns a new value."
+
+###
+
+[[entry]]
+name = "List.filter"
+kind = "method"
+signature = "function List:filter(predicate)"
+summary = "Filter new list"
+description = "The `filter` method creates a new list containing only the elements for which the predicate function returns `true`."
+returns = "The method returns a new list with the elements that passed the test."
+example = '''
+var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+var evens = numbers.filter(function(n) {
+    return n % 2 == 0
+})
+print(evens)  // [2, 4, 6, 8, 10]
+
+// Filtering objects
+var products = [
+    {name: "Laptop", price: 999, inStock: true},
+    {name: "Phone", price: 699, inStock: false},
+    {name: "Tablet", price: 499, inStock: true}
+]
+var available = products.filter(function(p) {
+    return p.inStock
+})
+print(available.len)  // 2
+'''
+
+[[entry.params]]
+name = "predicate"
+desc = "A function that takes an element and returns a boolean."
+
+###
+
+[[entry]]
+name = "List.reduce"
+kind = "method"
+signature = "function List:reduce(accumulator)"
+summary = "Reduce new list"
+description = "The `reduce` method applies a function against an accumulator and each element of the list (from left to right) to reduce it to a single value. The first element of the list is used as the initial accumulator value."
+returns = "The method returns the final accumulated value."
+example = '''
+var numbers = [1, 2, 3, 4, 5]
+var sum = numbers.reduce(function(acc, n) {
+    return acc + n
+})
+print(sum)  // 15
+
+// Finding the maximum value
+var values = [3, 7, 2, 9, 4]
+var max = values.reduce(function(acc, n) {
+    if n > acc { return n }
+    return acc
+})
+print(max)  // 9
+
+// Building a sentence
+var words = ["Tea", "is", "delicious"]
+var sentence = words.reduce(function(acc, w) {
+    return acc + " " + w
+})
+print(sentence)  // "Tea is delicious"
+
+// Reducing an empty list returns nil
+print([].reduce(function(a, b) { return a + b }))  // nil
+'''
+
+[[entry.params]]
+name = "accumulator"
+desc = "A function that takes the accumulator and the current element, and returns the new accumulator value."
+
+###
+
+[[entry]]
+name = "List.foreach"
+kind = "method"
+signature = "function List:foreach(action)"
+summary = "Callback iterate"
+description = "The `foreach` method executes a provided function once for each list element."
+example = '''
+var fruits = ["apple", "banana", "cherry"]
+fruits.foreach(function(fruit) {
+    print("I like " + fruit)
+})
+// Output:
+// I like apple
+// I like banana
+// I like cherry
+
+// Summing with side effects
+var total = 0
+[10, 20, 30].foreach(function(n) {
+    total = total + n
+})
+print(total)  // 60
+'''
+
+[[entry.params]]
+name = "action"
+desc = "A function to execute for each element."
+
+###
+
+[[entry]]
+name = "List.iter"
+kind = "method"
+signature = "function List:iter()"
+summary = "List iterator"
+description = "The `iter` method returns an iterator function that can be used to traverse the list. Each call to the iterator returns the next element in the list, or `nil` when the iteration is complete."
+example = '''
+var colors = ["red", "green", "blue"]
+var iter = colors.iter()
+
+print(iter())  // "red"
+print(iter())  // "green"
+print(iter())  // "blue"
+print(iter())  // nil
+
+// Using iter in a while loop
+var it = [1, 2, 3].iter()
+var value = it()
+while value != nil
+{
+    print(value)
+    value = it()
+}
+// Output: 1 2 3
+'''
+
+###
+
+[[entry]]
+name = "Operators"
+kind = "section"
+signature = "Operators"
+summary = "Operators"
+
+[[entry]]
+name = "List.+"
+kind = "operator"
+signature = "function List:+(other)"
+summary = "New concatenated list"
+description = "The `+` operator creates a new list by concatenating two lists together."
+returns = "The method returns a new list containing all elements from both lists."
+example = '''
+var a = [1, 2, 3]
+var b = [4, 5, 6]
+var c = a + b
+print(c)  // [1, 2, 3, 4, 5, 6]
+
+// Original lists are unchanged
+print(a)  // [1, 2, 3]
+print(b)  // [4, 5, 6]
+
+// Chaining concatenations
+var combined = [1] + [2] + [3] + [4]
+print(combined)  // [1, 2, 3, 4]
+
+// Concatenating with empty lists
+print([1, 2] + [])  // [1, 2]
+print([] + [3, 4])  // [3, 4]
+'''

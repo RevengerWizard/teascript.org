@@ -1,0 +1,260 @@
+title = "State Manipulation"
+slug = "state"
+summary = "Create, configure and close states"
+description = "Functions for creating, configuring and destroying a Teascript state. A `tea_State` represents the entire interpreter context and must exist before any other function of the C API can be called. This section covers creating a state, providing a custom memory allocator, storing command-line arguments for scripts to access, and installing a panic handler for unprotected errors. Creating a state at startup and closing it at shutdown ensures that all resources, including userdata with finalizers, are released cleanly."
+
+[[entry]]
+name = "tea_State"
+kind = "typedef"
+since = "1.0"
+tags = ["state", "typedef"]
+signature = "typedef struct tea_State tea_State;"
+summary = "Interpreter state"
+description = "An opaque structure that holds the whole interpreter context: the stack, the garbage collector, the global and module environments, and the allocator. Every function of the C API takes a pointer to a `tea_State` as its first argument (named `T` throughout this documentation).\n\nA state is created with `tea_new_state` or `tea_open` and destroyed with `tea_close`. Its contents are private and must only be accessed through the API."
+example = '''
+tea_State* T = tea_open();
+/* ... pass T to every other API function ... */
+tea_close(T);
+'''
+see_also = ["tea_new_state", "tea_open", "tea_close"]
+
+###
+
+[[entry]]
+name = "tea_new_state"
+kind = "function"
+since = "1.0"
+tags = ["state"]
+signature = "tea_State* tea_new_state(tea_Alloc allocf, void* ud);"
+summary = "Create state"
+description = "Creates a new Teascript state. This is the first function to call when embedding Teascript into an application. The state holds the entire interpreter context, including the stack, the garbage collector, and the global and module environments.\n\nIf `allocf` is `NULL`, the default allocator is used. Use `tea_open` for the common case of a state with the default allocator."
+returns = "A pointer to the new state, or `NULL` if the allocation of the state fails."
+example = '''
+tea_State* T = tea_new_state(NULL, NULL);
+if(T == NULL)
+{
+    fprintf(stderr, "Failed to create Tea state\n");
+    return 1;
+}
+/* ... use the state ... */
+tea_close(T);
+'''
+see_also = ["tea_open", "tea_close", "tea_set_allocf"]
+
+[[entry.params]]
+name = "allocf"
+desc = "A custom memory allocator function, or `NULL` to use the default allocator"
+
+[[entry.params]]
+name = "ud"
+desc = "An opaque pointer passed as the first argument to `allocf`; may be `NULL`"
+
+###
+
+[[entry]]
+name = "tea_open"
+kind = "macro"
+since = "1.0"
+tags = ["state", "macro"]
+signature = "#define tea_open() tea_new_state(NULL, NULL)"
+summary = "Create default state"
+description = "Creates a new Teascript state with the default allocator. Equivalent to `tea_new_state(NULL, NULL)`."
+returns = "A pointer to the new state, or `NULL` if the allocation of the state fails."
+example = '''
+tea_State* T = tea_open();
+if(T == NULL)
+    return 1;
+tea_close(T);
+'''
+see_also = ["tea_new_state", "tea_close"]
+
+###
+
+[[entry]]
+name = "tea_close"
+kind = "function"
+since = "1.0"
+tags = ["state"]
+signature = "void tea_close(tea_State* T);"
+summary = "Destroy state"
+description = "Closes and destroys the state, releasing all memory associated with it. Any userdata finalizers are called during this process.\n\nAfter calling this function, the state pointer **must not** be used again."
+example = '''
+tea_State* T = tea_open();
+tea_do_file(T, "script.tea");
+tea_close(T);   /* T is no longer valid */
+'''
+see_also = ["tea_new_state", "tea_open", "tea_set_finalizer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state to close"
+
+###
+
+[[entry]]
+name = "tea_set_argv"
+kind = "function"
+since = "1.0"
+tags = ["state"]
+signature = "void tea_set_argv(tea_State* T, int argc, char** argv, int argf);"
+summary = "Store command-line arguments"
+description = "Stores command-line arguments in the state, making them accessible to scripts. `argf` is the index in `argv` of the first non-option argument, or `0` if there is none. Scripts typically use this to parse their own options.\n\nThe array is stored by reference, not copied: `argv` and the strings it points to must stay valid for the lifetime of the state."
+example = '''
+int main(int argc, char** argv)
+{
+    tea_State* T = tea_open();
+    /* argv[1] is the script, so the first non-option argument is at 1 */
+    tea_set_argv(T, argc, argv, 1);
+    tea_do_file(T, argv[1]);
+    tea_close(T);
+    return 0;
+}
+'''
+see_also = ["tea_get_argv"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "argc"
+desc = "Number of command-line arguments"
+
+[[entry.params]]
+name = "argv"
+desc = "Array of C strings holding the arguments"
+
+[[entry.params]]
+name = "argf"
+desc = "Index of the first non-option argument, or `0` if none"
+
+###
+
+[[entry]]
+name = "tea_get_argv"
+kind = "function"
+since = "1.0"
+tags = ["state"]
+signature = "int tea_get_argv(tea_State* T, char*** argv, int* argf);"
+summary = "Get command-line arguments"
+description = "Retrieves the command-line arguments previously stored with `tea_set_argv`. `argv` and `argf` may be `NULL` if only the argument count is needed."
+returns = "The number of command-line arguments."
+example = '''
+char** argv;
+int argf;
+int argc = tea_get_argv(T, &argv, &argf);
+printf("Script received %d arguments\n", argc);
+for(int i = argf; i < argc; i++)
+    printf("  arg[%d] = %s\n", i, argv[i]);
+'''
+see_also = ["tea_set_argv"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "argv"
+desc = "Receives the argument array, or `NULL`"
+
+[[entry.params]]
+name = "argf"
+desc = "Receives the index of the first non-option argument, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_atpanic"
+kind = "function"
+since = "1.0"
+tags = ["state", "error"]
+signature = "tea_CFunction tea_atpanic(tea_State* T, tea_CFunction panicf);"
+summary = "Set panic handler"
+description = "Sets a new panic function and returns the old one. The panic function is called when an unprotected error occurs (for example, an error raised outside of any `tea_pcall`). It receives the state with the error value on top of the stack.\n\nThe default panic function prints a message to `stderr` and aborts the program. A custom panic function must not return normally: it must terminate the process or recover by other means, such as a long jump."
+returns = "The previous panic function."
+example = '''
+static void my_panic(tea_State* T)
+{
+    const char* msg = tea_to_string(T, -1);
+    fprintf(stderr, "PANIC: %s\n", msg ? msg : "(no message)");
+    exit(EXIT_FAILURE);
+}
+
+tea_atpanic(T, my_panic);
+'''
+see_also = ["tea_error", "tea_throw", "tea_pcall"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "panicf"
+desc = "The new panic function, or `NULL` to keep the current one"
+
+###
+
+[[entry]]
+name = "tea_get_allocf"
+kind = "function"
+since = "1.0"
+tags = ["state", "memory"]
+signature = "tea_Alloc tea_get_allocf(tea_State* T, void** ud);"
+summary = "Get allocator"
+description = "Returns the memory allocator function currently used by the state and, optionally, its user data pointer. Use it when you need allocations that are tracked by the same allocator."
+returns = "The current allocator function."
+example = '''
+void* ud;
+tea_Alloc alloc = tea_get_allocf(T, &ud);
+char* buf = (char*)alloc(ud, NULL, 0, 256);   /* allocate 256 bytes */
+/* ... use buf ... */
+alloc(ud, buf, 256, 0);                       /* free it */
+'''
+see_also = ["tea_set_allocf", "tea_new_state", "tea_alloc"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "ud"
+desc = "Receives the allocator user data, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_set_allocf"
+kind = "function"
+since = "1.0"
+tags = ["state", "memory"]
+signature = "void tea_set_allocf(tea_State* T, tea_Alloc f, void* ud);"
+summary = "Set allocator"
+description = "Changes the memory allocator used by the state. This is only safe when no other Teascript resources are live, typically right after creating the state.\n\nIf `f` is `NULL`, the allocator is left unchanged. Likewise, if `ud` is `NULL`, the user data is left unchanged, so it cannot be reset to `NULL` with this function."
+example = '''
+static void* my_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
+{
+    (void)ud; (void)osize;
+    if(nsize == 0)
+    {
+        free(ptr);
+        return NULL;
+    }
+    return realloc(ptr, nsize);
+}
+
+tea_State* T = tea_open();
+tea_set_allocf(T, my_alloc, NULL);
+'''
+see_also = ["tea_get_allocf", "tea_new_state"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "f"
+desc = "The new allocator function, or `NULL` to keep the current one"
+
+[[entry.params]]
+name = "ud"
+desc = "The allocator user data, or `NULL` to keep the current one"

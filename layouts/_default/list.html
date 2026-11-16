@@ -1,7 +1,16 @@
 {{ define "main" }}
 
-<article>
-    <h1>
+{{ if eq .Section "api" }}
+<div class="page-layout page-api page-api-landing"><main class="page-main api-main"><article class="post-single"><header class="post-header"><h1 class="post-title">API</h1></header><div class="post-content"><div class="api-landing-cards"><a class="api-landing-card" href="/api/tea/"><span class="api-landing-card__eyebrow">Language reference</span><strong>Teascript API</strong><span>Builtins, classes, functions, and bundled modules.</span><span class="api-landing-card__link">Browse the Teascript API →</span></a><a class="api-landing-card" href="/api/c/"><span class="api-landing-card__eyebrow">Embedding reference</span><strong>C API</strong><span>Functions, macros, types, and constants declared by tea.h.</span><span class="api-landing-card__link">Browse the C API →</span></a></div></div></article></main></div>
+{{ else }}
+
+<div class="page-layout{{ if eq .Section "guide" }} page-guide{{ else if eq .Section "docs" }} page-reference{{ end }}">
+    <aside class="sidebar">
+        {{ partial "sidebar.html" (dict "currentPage" . "nodes" .Pages) }}
+    </aside>
+    <main class="page-main">
+    <article class="post-single section-landing">
+    <h1 class="post-title">
         {{ if eq .CurrentSection .FirstSection }}
             {{ .Section | humanize }}
         {{ else }}
@@ -9,16 +18,22 @@
         {{ end }}
     </h1>
     {{ .Content }}
-    {{ $currentSection := .CurrentSection }}
-    {{ range where .Site.RegularPages.ByTitle "Section" .Section }}
-        {{ if in (.RelPermalink | string) $currentSection.RelPermalink }}
-            <div>
-                <div>
-                    <a href="{{ .RelPermalink }}">{{ .Params.title }} &rarr;</a>
-                </div>
-            </div>
+    <div class="section-landing-cards">
+        {{ range .Sections.ByWeight }}
+        {{ $part := . }}
+        {{ range .RegularPages.ByWeight }}
+        <a class="section-landing-card" href="{{ .RelPermalink }}">
+            {{ with .Params.number }}<span class="section-landing-card__eyebrow">{{ $part.Params.number }}{{ . }}</span>{{ else }}<span class="section-landing-card__eyebrow">{{ $part.Title }}</span>{{ end }}
+            <strong>{{ .LinkTitle }}</strong>
+            {{ with .Description }}<span>{{ . }}</span>{{ end }}
+            <span class="section-landing-card__link">Read chapter →</span>
+        </a>
         {{ end }}
-    {{ end }}
-</article>
+        {{ end }}
+    </div>
+    </article>
+    </main>
+</div>
 
+{{ end }}
 {{ end }}

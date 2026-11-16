@@ -1,0 +1,10 @@
+{{ $name := .name }}{{ $href := printf "#%s" $name }}{{ $found := false }}
+{{ if .isC }}
+    {{ $current := index site.Data.api.c .category }}
+    {{ range $current.entry }}{{ if and (not $found) (eq .name $name) }}{{ $href = printf "/api/c/%s/#%s" $.category $name }}{{ $found = true }}{{ end }}{{ end }}
+    {{ if not $found }}{{ range site.Data.api.c._index.categories }}{{ $category := . }}{{ $data := index site.Data.api.c .slug }}{{ range $data.entry }}{{ if and (not $found) (eq .name $name) }}{{ $href = printf "/api/c/%s/#%s" $category.slug $name }}{{ $found = true }}{{ end }}{{ end }}{{ end }}{{ end }}
+{{ else }}
+    {{ range site.Data.api.tea._index.entities }}{{ if and (not $found) (eq .data $.teaCategory) }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}{{ if eq $data.title $name }}{{ $href = printf "/api/tea/%s/" $entity.slug }}{{ $found = true }}{{ end }}{{ range $data.entry }}{{ if and (not $found) (eq .name $name) }}{{ $href = printf "/api/tea/%s/#%s" $entity.slug $name }}{{ $found = true }}{{ end }}{{ end }}{{ end }}{{ end }}
+    {{ if not $found }}{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}{{ if eq $data.title $name }}{{ $href = printf "/api/tea/%s/" $entity.slug }}{{ $found = true }}{{ end }}{{ range $data.entry }}{{ if and (not $found) (eq .name $name) }}{{ $href = printf "/api/tea/%s/#%s" $entity.slug $name }}{{ $found = true }}{{ end }}{{ end }}{{ end }}{{ end }}
+{{ end }}
+{{ return $href }}

@@ -1,0 +1,70 @@
+title = "Memory Management"
+slug = "memory"
+summary = "C API entries for Memory Management."
+
+[[entry]]
+name = "tea_alloc"
+kind = "function"
+since = "1.0"
+tags = ["memory"]
+signature = "void* tea_alloc(tea_State* T, size_t size);"
+summary = "Allocator call"
+description = "Allocates a raw block of `size` bytes using the state's allocator. The returned pointer is not initialized and may be `NULL` if the allocation fails.\n\nIf `size` is zero, the behavior is allocator-dependent; prefer to avoid zero-size allocations."
+returns = "Pointer to the newly allocated block, or `NULL` on failure."
+example = "char* buf = (char*)tea_alloc(T, 256);\nif(buf)\n{\n    memcpy(buf, \"hello\", 6);\n    /* ... use buf ... */\n    tea_free(T, buf);\n}"
+see_also = ["tea_realloc", "tea_free"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Number of bytes to allocate"
+
+###
+
+[[entry]]
+name = "tea_realloc"
+kind = "function"
+since = "1.0"
+tags = ["memory"]
+signature = "void* tea_realloc(tea_State* T, void* p, size_t size);"
+summary = "Allocator call"
+description = "Resizes the block at `p` to `size` bytes. If `p` is `NULL`, this behaves like `tea_alloc`. If `size` is zero, the block is freed and `NULL` may be returned. Otherwise the block is grown or shrunk, preserving as much of the existing contents as possible, and the (possibly new) pointer is returned.\n\nBecause the block may move, always assign the result back to your pointer."
+returns = "Pointer to the resized block, or `NULL` on failure or when `size` is zero."
+example = "char* buf = (char*)tea_alloc(T, 64);\nbuf = (char*)tea_realloc(T, buf, 128);\nif(buf)\n{\n    /* use enlarged buf */\n    tea_free(T, buf);\n}"
+see_also = ["tea_alloc", "tea_free"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "p"
+desc = "Pointer to an existing block allocated by this state, or `NULL`"
+
+[[entry.params]]
+name = "size"
+desc = "New size in bytes"
+
+###
+
+[[entry]]
+name = "tea_free"
+kind = "function"
+since = "1.0"
+tags = ["memory"]
+signature = "void tea_free(tea_State* T, void* p);"
+summary = "Allocator call"
+description = "Frees the raw memory block at `p`, which must have been allocated by this same state (via `tea_alloc` or `tea_realloc`). Passing `NULL` is a no-op. Passing any other pointer is undefined behavior."
+example = "void* p = tea_alloc(T, 128);\n/* ... */\ntea_free(T, p);"
+see_also = ["tea_alloc", "tea_realloc"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "p"
+desc = "Pointer to a block previously allocated by this state, or `NULL`"

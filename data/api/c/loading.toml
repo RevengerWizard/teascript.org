@@ -1,0 +1,445 @@
+title = "Code Loading"
+slug = "loading"
+summary = "Load, dump and import code"
+description = "Functions for loading Teascript source or precompiled bytecode, serializing compiled functions, evaluating strings and importing modules. Loading never runs the code: a successful load pushes the compiled chunk as a function, which you then run with `tea_call` or `tea_pcall`. Each loader comes in two forms: the `x` variant takes a `mode` argument selecting text or binary input, and the plain variant accepts both.\n\nCalling a loaded chunk is covered in the Calls section."
+
+[[entry]]
+name = "TEA_SIGNATURE"
+kind = "const"
+since = "1.0"
+tags = ["load", "string", "const"]
+signature = '#define TEA_SIGNATURE "\x1bTea"'
+summary = "Bytecode signature"
+description = "The bytes (`<esc>Tea`) that start every precompiled chunk produced by `tea_dump`. The loaders use it to tell binary chunks from source text."
+see_also = ["tea_dump", "tea_loadx"]
+
+###
+
+[[entry]]
+name = "tea_Reader"
+kind = "typedef"
+since = "1.0"
+tags = ["load", "typedef"]
+signature = "typedef const char* (*tea_Reader)(tea_State* T, void* ud, size_t* sz);"
+summary = "Chunk reader callback"
+description = "Type of the function that `tea_load` and `tea_loadx` call repeatedly to get successive pieces of a chunk. Each call returns a pointer to the next piece and stores its size in `*sz`. To signal the end of the chunk, return `NULL` and set `*sz` to `0`.\n\nThe returned piece must stay valid until the next call to the reader."
+example = '''
+typedef struct Source
+{
+    const char* text;
+    int done;
+} Source;
+
+static const char* string_reader(tea_State* T, void* ud, size_t* sz)
+{
+    Source* s = (Source*)ud;
+    (void)T;
+    if(s->done)
+    {
+        *sz = 0;
+        return NULL;
+    }
+    s->done = 1;
+    *sz = strlen(s->text);
+    return s->text;
+}
+'''
+see_also = ["tea_load", "tea_loadx"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "ud"
+desc = "User data given to the loader"
+
+[[entry.params]]
+name = "sz"
+desc = "Receives the size of the returned piece"
+
+###
+
+[[entry]]
+name = "tea_Writer"
+kind = "typedef"
+since = "1.0"
+tags = ["load", "typedef"]
+signature = "typedef int (*tea_Writer)(tea_State* T, void* ud, const void* p, size_t sz);"
+summary = "Chunk writer callback"
+description = "Type of the function that `tea_dump` calls with each successive piece of the serialized chunk. `p` points to `sz` bytes. Return `0` to continue; any other value stops the dump and is returned by `tea_dump`."
+example = '''
+static int file_writer(tea_State* T, void* ud, const void* p, size_t sz)
+{
+    (void)T;
+    return fwrite(p, 1, sz, (FILE*)ud) == sz ? 0 : 1;
+}
+'''
+see_also = ["tea_dump"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "ud"
+desc = "User data given to `tea_dump`"
+
+[[entry.params]]
+name = "p"
+desc = "Pointer to the piece of data"
+
+[[entry.params]]
+name = "sz"
+desc = "Size of the piece in bytes"
+
+###
+
+[[entry]]
+name = "tea_loadx"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_loadx(tea_State* T, tea_Reader reader, void* data, const char* name, const char* mode);"
+summary = "Load chunk with mode"
+description = "Loads a chunk using the reader function `reader`, which is called repeatedly to supply successive pieces of it. `data` is passed through to the reader.\n\n`name` is the chunk's name, used in error messages and as the module environment name. `mode` controls what is accepted: `\"t\"` for text source, `\"b\"` for binary bytecode, and `\"bt\"` for both. `NULL` is the same as `\"bt\"`.\n\nOn success the compiled chunk is pushed as a function, ready to be called. On failure an error code is returned and the error message is pushed instead."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, v]"
+example = '''
+Source src = { "return 1 + 2", 0 };   /* Source and string_reader: see tea_Reader */
+
+if(tea_loadx(T, string_reader, &src, "=inline", "t") == TEA_OK)
+{
+    tea_pcall(T, 0);                   /* run it: the result replaces the function */
+    printf("%g\n", tea_get_number(T, -1));   /* 3 */
+    tea_pop(T, 1);
+}
+'''
+see_also = ["tea_load", "tea_dump", "tea_load_bufferx", "tea_load_filex"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "reader"
+desc = "Callback that returns the next piece of the chunk"
+
+[[entry.params]]
+name = "data"
+desc = "User data passed to `reader`"
+
+[[entry.params]]
+name = "name"
+desc = "Chunk name, used in error messages and as the module environment name"
+
+[[entry.params]]
+name = "mode"
+desc = "Accepted input: `\"t\"`, `\"b\"`, `\"bt\"` or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_load"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_load(tea_State* T, tea_Reader reader, void* data, const char* name);"
+summary = "Load chunk"
+description = "Equivalent to `tea_loadx` with `mode` set to `NULL`, accepting both text and binary chunks."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, v]"
+example = '''
+Source src = { "return 'hello'", 0 };   /* Source and string_reader: see tea_Reader */
+
+if(tea_load(T, string_reader, &src, "=greeting") == TEA_OK
+   && tea_pcall(T, 0) == TEA_OK)
+{
+    printf("%s\n", tea_get_string(T, -1));
+}
+tea_pop(T, 1);   /* the result, or the error message */
+'''
+see_also = ["tea_loadx", "tea_load_buffer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "reader"
+desc = "Callback that returns the next piece of the chunk"
+
+[[entry.params]]
+name = "data"
+desc = "User data passed to `reader`"
+
+[[entry.params]]
+name = "name"
+desc = "Chunk name, used in error messages and as the module environment name"
+
+###
+
+[[entry]]
+name = "tea_load_filex"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_load_filex(tea_State* T, const char* filename, const char* name, const char* mode);"
+summary = "Load file with mode"
+description = "Loads a chunk from the file `filename`. `name` is used in error messages and as the module environment name; if it is `NULL`, `filename` is used instead. `mode` has the same meaning as in `tea_loadx`."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, v]"
+example = '''
+if(tea_load_filex(T, "script.tea", "=script", "t") == TEA_OK)
+{
+    tea_pcall(T, 0);
+    tea_pop(T, 1);
+}
+'''
+see_also = ["tea_load_file", "tea_loadx", "tea_do_file"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "filename"
+desc = "Path of the file to load"
+
+[[entry.params]]
+name = "name"
+desc = "Chunk name used in error messages; may be `NULL`"
+
+[[entry.params]]
+name = "mode"
+desc = "Accepted input: `\"t\"`, `\"b\"`, `\"bt\"` or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_load_file"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_load_file(tea_State* T, const char* filename, const char* name);"
+summary = "Load file"
+description = "Equivalent to `tea_load_filex` with `mode` set to `NULL`."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, v]"
+example = '''
+if(tea_load_file(T, "config.tea", "=config") == TEA_OK)
+    tea_pcall(T, 0);
+'''
+see_also = ["tea_load_filex", "tea_do_file"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "filename"
+desc = "Path of the file to load"
+
+[[entry.params]]
+name = "name"
+desc = "Chunk name used in error messages; may be `NULL`"
+
+###
+
+[[entry]]
+name = "tea_load_bufferx"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_load_bufferx(tea_State* T, const char* buffer, size_t size, const char* name, const char* mode);"
+summary = "Load buffer with mode"
+description = "Loads a chunk directly from the in-memory buffer `buffer` of `size` bytes. `name` and `mode` behave as in `tea_loadx`. The buffer may contain embedded NUL bytes."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, v]"
+example = '''
+const char* src = "return 6 * 7";
+if(tea_load_bufferx(T, src, strlen(src), "=answer", "t") == TEA_OK
+   && tea_pcall(T, 0) == TEA_OK)
+{
+    printf("%d\n", (int)tea_get_integer(T, -1));   /* 42 */
+}
+tea_pop(T, 1);
+'''
+see_also = ["tea_load_buffer", "tea_loadx", "tea_eval"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "buffer"
+desc = "Pointer to the chunk data"
+
+[[entry.params]]
+name = "size"
+desc = "Size of the buffer in bytes"
+
+[[entry.params]]
+name = "name"
+desc = "Chunk name used in error messages; may be `NULL`"
+
+[[entry.params]]
+name = "mode"
+desc = "Accepted input: `\"t\"`, `\"b\"`, `\"bt\"` or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_load_buffer"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_load_buffer(tea_State* T, const char* buffer, size_t size, const char* name);"
+summary = "Load buffer"
+description = "Equivalent to `tea_load_bufferx` with `mode` set to `NULL`."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, v]"
+example = '''
+const char* src = "return 'buffered'";
+if(tea_load_buffer(T, src, strlen(src), "=buf") == TEA_OK)
+    tea_pcall(T, 0);
+tea_pop(T, 1);
+'''
+see_also = ["tea_load_bufferx", "tea_eval"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "buffer"
+desc = "Pointer to the chunk data"
+
+[[entry.params]]
+name = "size"
+desc = "Size of the buffer in bytes"
+
+[[entry.params]]
+name = "name"
+desc = "Chunk name used in error messages; may be `NULL`"
+
+###
+
+[[entry]]
+name = "tea_dump"
+kind = "function"
+since = "1.0"
+tags = ["load"]
+signature = "int tea_dump(tea_State* T, tea_Writer writer, void* data);"
+summary = "Serialize function"
+description = "Serializes the function on top of the stack into bytecode, calling `writer` with successive pieces of the output. `data` is passed through to the writer. The function is not popped.\n\nThis is the counterpart of `tea_loadx`: use it to precompile chunks or to save compiled code. The output starts with `TEA_SIGNATURE`."
+returns = "`TEA_OK` on success; otherwise the non-zero value returned by the writer."
+stack = "[-0, +0, v]"
+example = '''
+/* a compiled function is on top of the stack; file_writer: see tea_Writer */
+FILE* fp = fopen("out.tbc", "wb");
+int status = tea_dump(T, file_writer, fp);
+fclose(fp);
+tea_pop(T, 1);
+'''
+see_also = ["tea_Writer", "tea_loadx", "TEA_SIGNATURE"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "writer"
+desc = "Callback invoked with each piece of output"
+
+[[entry.params]]
+name = "data"
+desc = "User data passed to `writer`"
+
+###
+
+[[entry]]
+name = "tea_eval"
+kind = "function"
+since = "1.0"
+tags = ["load", "call"]
+signature = "int tea_eval(tea_State* T, const char* s);"
+summary = "Evaluate string"
+description = "Loads the NUL-terminated string `s`, runs it, and leaves the result on the stack. On failure an error code is returned and the error value is left on the stack instead.\n\n> [!NOTE]\n> Unlike `tea_load_buffer`, the source is a C string and cannot contain embedded NUL bytes."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +?, e]"
+example = '''
+if(tea_eval(T, "1 + 2 * 3") == TEA_OK)
+{
+    printf("%g\n", tea_get_number(T, -1));   /* 7 */
+}
+tea_pop(T, 1);   /* the result, or the error value */
+'''
+see_also = ["tea_load_buffer", "tea_pcall"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "s"
+desc = "Source code to evaluate"
+
+###
+
+[[entry]]
+name = "tea_import"
+kind = "function"
+since = "1.0"
+tags = ["load", "module"]
+signature = "void tea_import(tea_State* T, const char* name);"
+summary = "Import module"
+description = "Imports the module with the logical name `name`, loading and running it first if it has not been loaded yet, and pushes the module onto the stack. This is the C counterpart of the `import` statement in Teascript."
+stack = "[-0, +1, e]"
+example = '''
+tea_import(T, "math");
+if(tea_get_key(T, -1, "sqrt"))
+{
+    tea_push_number(T, 16.0);
+    tea_call(T, 1);
+    printf("%g\n", tea_get_number(T, -1));   /* 4 */
+    tea_pop(T, 1);   /* the result */
+}
+tea_pop(T, 1);       /* the module */
+'''
+see_also = ["tea_get_var", "tea_get_global"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Logical name of the module"
+
+###
+
+[[entry]]
+name = "tea_do_file"
+kind = "macro"
+since = "1.0"
+tags = ["load", "call", "macro"]
+signature = "#define tea_do_file(T, fn) (tea_load_file(T, fn, NULL) || tea_pcall(T, 0))"
+summary = "Load and run file"
+description = "Loads the file `fn` and runs it in protected mode. Leaves exactly one value on the stack: the chunk's result on success, or the error value on failure."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +1, -]"
+example = '''
+if(tea_do_file(T, "script.tea") != TEA_OK)
+    fprintf(stderr, "%s\n", tea_get_string(T, -1));
+tea_pop(T, 1);
+'''
+see_also = ["tea_load_file", "tea_pcall"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "fn"
+desc = "Path of the file to run"

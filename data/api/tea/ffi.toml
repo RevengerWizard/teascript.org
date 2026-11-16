@@ -1,0 +1,709 @@
+title = "FFI"
+kind = "module"
+origin = "bundled"
+since = "1.0"
+summary = "Foreign function interface"
+description = "The FFI module lets Teascript programs describe C types and function signatures, load shared libraries, call native functions, and work with C memory. It provides the bridge for using native libraries from Teascript."
+
+###
+
+[[entry]]
+name = "ffi.cdef"
+kind = "function"
+signature = "function ffi.cdef(declarations)"
+summary = "Registers C types, typedefs and function prototypes."
+description = "Parse C declarations and register types, typedefs, and function prototypes. Declarations end with semicolons. Registered names can then be used in any function that accepts a C type, and registered function prototypes become available as attributes of a `CLib` returned by `ffi.load` or of `ffi.C`. The declarations must match the platform ABI and the real signatures of the library functions they describe."
+returns = "Nothing."
+errors = '''
+- Raises an error if `declarations` is not a string.
+- Raises an error if the declarations cannot be parsed or use a type that is not supported.
+'''
+example = '''
+import ffi
+
+ffi.cdef(```
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int abs(int value);
+```)
+
+print(ffi.sizeof("Point")) // 8
+print(ffi.C.abs(-5))       // 5
+'''
+
+[[entry.params]]
+name = "declarations"
+desc = "A string containing valid C declarations, each terminated by a semicolon."
+
+###
+
+[[entry]]
+name = "ffi.load"
+kind = "function"
+signature = "function ffi.load(path, global = false)"
+summary = "Loads a shared library."
+description = "Load the shared library at `path` and return a `CLib` object, representing the loaded C library. When `global` is true, request global symbol visibility. Declared functions are accessed as attributes of the returned object, such as `lib.printf`. Only functions previously declared with `ffi.cdef` can be looked up."
+returns = "A `CLib` object."
+errors = '''
+- Raises an error if `path` is not a string.
+- Raises an error if the shared library cannot be loaded.
+'''
+example = '''
+import os, ffi
+
+ffi.cdef("int printf(const char* fmt, ...);")
+
+const clib = os.name == "windows" ? ffi.load("msvcrt") : ffi.C
+
+clib.printf("Hello, %s! Number: %d\n", "everybody", 123)
+'''
+
+[[entry.params]]
+name = "path"
+desc = "The name or path of the shared library to load."
+
+[[entry.params]]
+name = "global"
+desc = "(Optional) When `true`, request global symbol visibility for the loaded library. Defaults to `false`."
+
+###
+
+[[entry]]
+name = "ffi.cnew"
+kind = "function"
+signature = "function ffi.cnew(ctype, initializer)"
+summary = "Allocates a new C data object."
+description = "Allocate a `CData` value of the given C type. Without an initializer, the storage is zero-initialized. An optional list initializes the elements of an array, and an optional map initializes the fields of a record. Scalar types accept a single value."
+returns = "A `CData` object of type `ctype`."
+errors = '''
+- Raises an error if `ctype` is not a valid or known C type.
+- Raises an error if more than one initializer is given.
+- Raises an error if the initializer cannot be converted to the requested type.
+'''
+example = '''
+import ffi
+
+ffi.cdef(```
+typedef struct {
+    int x;
+    int y;
+    const char* name;
+} Point;
+```)
+
+// Zero-initialized array of ten integers
+const numbers = ffi.cnew("int[10]")
+numbers[0] = 42
+
+// Array initialized from a list
+const values = ffi.cnew("int[3]", [10, 20, 30])
+print(values[2]) // 30
+
+// Record initialized from a map
+const p = ffi.cnew("Point", { x = 30, y = 40, name = "point" })
+print(p.x, p.y, ffi.string(p.name))
+
+// Array of records
+const points = ffi.cnew("Point[3]")
+points[1].x = 10
+'''
+
+[[entry.params]]
+name = "ctype"
+desc = "A C type declaration, a `CType`, or the name of a type registered with `ffi.cdef`, such as `\"int[10]\"` or `\"Point\"`."
+
+[[entry.params]]
+name = "initializer"
+desc = "(Optional) A list to initialize an array, a map to initialize the fields of a record, or a single value to initialize a scalar."
+
+###
+
+[[entry]]
+name = "ffi.cast"
+kind = "function"
+signature = "function ffi.cast(ctype, value)"
+summary = "Converts a value to a C type."
+description = "Convert `value` to the given C type and return it as `CData`. When `ctype` is a function-pointer type, `value` may be a Teascript callable, which is wrapped as a C callback that native code can invoke. The callback remains valid for as long as the returned `CData` is alive, so keep a reference to it while native code may call it."
+returns = "A `CData` object of type `ctype`."
+errors = '''
+- Raises an error if `ctype` is not a valid or known C type.
+- Raises an error if `value` cannot be converted to `ctype`.
+'''
+example = '''
+import ffi
+
+// Reinterpret a raw pointer as a char pointer
+ffi.cdef("void* malloc(size_t size);")
+const buf = ffi.cast("char*", ffi.C.malloc(16))
+
+// Wrap a Teascript function as a C callback
+ffi.cdef("typedef int (*Comparator)(const void* a, const void* b);")
+
+function compare(a, b)
+{
+    return ffi.cast("const int*", a)[0] - ffi.cast("const int*", b)[0]
+}
+
+const callback = ffi.cast("Comparator", compare)
+'''
+
+[[entry.params]]
+name = "ctype"
+desc = "The target C type, as a C type declaration or a `CType`."
+
+[[entry.params]]
+name = "value"
+desc = "The value to convert: a number, string, boolean, `nil`, `CData`, or, for function-pointer types, a Teascript callable."
+
+###
+
+[[entry]]
+name = "ffi.typeof"
+kind = "function"
+signature = "function ffi.typeof(value)"
+summary = "Returns the C type of a value or declaration."
+description = "Return the `CType` for a C type declaration, a `CType`, or a `CData` value. Types are interned, so equivalent declarations yield the same `CType`."
+returns = "A `CType` object."
+errors = '''
+- Raises an error if `value` is not a valid C type declaration, `CType` or `CData`.
+'''
+example = '''
+import ffi
+
+const t = ffi.typeof("int")
+print(t) // ctype<int>
+
+const arr = ffi.cnew("double[4]")
+print(ffi.typeof(arr)) // ctype<double[4]>
+'''
+
+[[entry.params]]
+name = "value"
+desc = "A C type declaration string, a `CType`, or a `CData` value."
+
+###
+
+[[entry]]
+name = "ffi.addressof"
+kind = "function"
+signature = "function ffi.addressof(cdata)"
+summary = "Returns a pointer to the storage of a C data object."
+description = "Return a pointer `CData` to the storage occupied by `cdata`. The pointer type is a pointer to the type of `cdata`. The pointer does not keep `cdata` alive, so it must not be used after `cdata` has been collected."
+returns = "A pointer `CData` to `cdata`."
+errors = '''
+- Raises an error if `cdata` is not a `CData` object.
+'''
+example = '''
+import ffi
+
+const value = ffi.cnew("int", 7)
+const ptr = ffi.addressof(value)
+
+print(ptr) // cdata<int*>: 0x...
+ptr[0] = 99
+print(value) // 99
+'''
+
+[[entry.params]]
+name = "cdata"
+desc = "A `CData` object whose address is requested."
+
+###
+
+[[entry]]
+name = "ffi.gc"
+kind = "function"
+signature = "function ffi.gc(cdata, finalizer)"
+summary = "Sets the finalizer of a C data object."
+description = "Set the finalizer called with `cdata` when it is collected. Use it to release externally allocated resources, for example a pointer returned by `malloc`. Omitting the finalizer clears the current one. Setting a new finalizer replaces any previous one. The finalizer is called with `cdata` as its only argument."
+returns = "The same `cdata`, so the call can be chained, as in `return ffi.gc(ptr, ffi.C.free)`."
+errors = '''
+- Raises an error if `cdata` is not a `CData` object.
+'''
+example = '''
+import ffi
+
+ffi.cdef(```
+void* malloc(size_t size);
+void free(void* ptr);
+```)
+
+function allocate_string(str)
+{
+    const buf = ffi.cast("char*", ffi.C.malloc(str.len + 1))
+
+    ffi.copy(buf, str)
+
+    // free() is called automatically when buf is collected
+    return ffi.gc(buf, ffi.C.free)
+}
+
+const str = allocate_string("Hello world!")
+print(ffi.string(str))
+'''
+
+[[entry.params]]
+name = "cdata"
+desc = "The `CData` object to attach the finalizer to."
+
+[[entry.params]]
+name = "finalizer"
+desc = "(Optional) A callable, such as a Teascript function or a C function pointer, invoked with `cdata` on collection. When omitted, the current finalizer is cleared."
+
+###
+
+[[entry]]
+name = "ffi.sizeof"
+kind = "function"
+signature = "function ffi.sizeof(ctype)"
+summary = "Returns the size of a C type in bytes."
+description = "Return the size in bytes of a C type."
+returns = "The size of `ctype` in bytes, as a number."
+errors = '''
+- Raises an error if `ctype` is not a valid or known C type.
+'''
+example = '''
+import ffi
+
+print(ffi.sizeof("int"))      // 4
+print(ffi.sizeof("int[10]"))  // 40
+print(ffi.sizeof("void*"))    // 8 on 64-bit targets
+'''
+
+[[entry.params]]
+name = "ctype"
+desc = "A C type declaration or a `CType`."
+
+###
+
+[[entry]]
+name = "ffi.offsetof"
+kind = "function"
+signature = "function ffi.offsetof(ctype, field)"
+summary = "Returns the byte offset of a record field."
+description = "Return a record field's byte offset from the start of the record, or `nil` if the named field is not found. For types that are not records, no value is returned."
+returns = "The byte offset of `field` as a number, `nil` if the record has no such field, or no value if `ctype` is not a record type."
+errors = '''
+- Raises an error if `ctype` is not a valid or known C type.
+- Raises an error if `field` is not a string.
+'''
+example = '''
+import ffi
+
+ffi.cdef(```
+typedef struct {
+    char tag;
+    int value;
+    double ratio;
+} Item;
+```)
+
+print(ffi.offsetof("Item", "tag"))    // 0
+print(ffi.offsetof("Item", "value"))  // 4
+print(ffi.offsetof("Item", "ratio"))  // 8
+print(ffi.offsetof("Item", "other"))  // nil
+'''
+
+[[entry.params]]
+name = "ctype"
+desc = "A record (`struct` or `union`) type declaration or a `CType`."
+
+[[entry.params]]
+name = "field"
+desc = "The name of the field to look up."
+
+###
+
+[[entry]]
+name = "ffi.alignof"
+kind = "function"
+signature = "function ffi.alignof(ctype)"
+summary = "Returns the alignment of a C type in bytes."
+description = "Return the C type's alignment in bytes."
+returns = "The alignment of `ctype` in bytes, as a number."
+errors = '''
+- Raises an error if `ctype` is not a valid or known C type.
+'''
+example = '''
+import ffi
+
+print(ffi.alignof("char"))    // 1
+print(ffi.alignof("int"))     // 4
+print(ffi.alignof("double"))  // 8
+'''
+
+[[entry.params]]
+name = "ctype"
+desc = "A C type declaration or a `CType`."
+
+###
+
+[[entry]]
+name = "ffi.istype"
+kind = "function"
+signature = "function ffi.istype(ctype, cdata)"
+summary = "Checks whether a C data object has a given type."
+description = "Return whether `cdata` has exactly the same interned `CType` as `ctype`. No implicit conversions are considered, so `int` and `const int`, or `int*` and `void*`, are different types."
+returns = "`true` if the type of `cdata` is `ctype`, `false` otherwise."
+errors = '''
+- Raises an error if `ctype` is not a valid or known C type.
+- Raises an error if `cdata` is not a `CData` object.
+'''
+example = '''
+import ffi
+
+const n = ffi.cnew("int", 5)
+
+print(ffi.istype("int", n))     // true
+print(ffi.istype("double", n))  // false
+'''
+
+[[entry.params]]
+name = "ctype"
+desc = "A C type declaration or a `CType` to compare against."
+
+[[entry.params]]
+name = "cdata"
+desc = "The `CData` object whose type is checked."
+
+###
+
+[[entry]]
+name = "ffi.tonumber"
+kind = "function"
+signature = "function ffi.tonumber(cdata)"
+summary = "Converts scalar C data to a number."
+description = "Convert scalar numeric C data to a Teascript number. Returns `nil` for non-scalar types such as records, arrays, pointers and functions."
+returns = "The value as a Teascript number, or `nil` if `cdata` is not a scalar numeric type."
+errors = '''
+- Raises an error if `cdata` is not a `CData` object.
+'''
+example = '''
+import ffi
+
+const n = ffi.cnew("uint8_t", 200)
+print(ffi.tonumber(n)) // 200
+
+const arr = ffi.cnew("int[2]")
+print(ffi.tonumber(arr)) // nil
+'''
+
+[[entry.params]]
+name = "cdata"
+desc = "A `CData` object holding a scalar value."
+
+###
+
+[[entry]]
+name = "ffi.string"
+kind = "function"
+signature = "function ffi.string(cdata, length)"
+summary = "Reads a Teascript string from C memory."
+description = "Read a NUL-terminated string from a `char*`, `void*`, or `char` array. When `length` is given, exactly that many bytes are read from a pointer, array, or record's storage, regardless of any NUL bytes, which allows reading binary data. For a `char` array, the string stops at the first NUL byte or at the end of the array, whichever comes first. Reading from a pointer does not check that the memory is valid."
+returns = "A string containing the bytes read."
+errors = '''
+- Raises an error if `cdata` is not a `CData` object.
+- Raises an error if `cdata` cannot be converted to a string, such as a pointer to a non-character type.
+- Raises an error if `length` is given and is not an integer.
+'''
+example = '''
+import ffi
+
+const p = ffi.cnew("char[16]")
+ffi.copy(p, "Hello")
+
+print(ffi.string(p))     // Hello
+print(ffi.string(p, 3))  // Hel
+'''
+
+[[entry.params]]
+name = "cdata"
+desc = "A `char*`, `void*`, or `char` array. With `length`, any pointer, array, or record."
+
+[[entry.params]]
+name = "length"
+desc = "(Optional) The exact number of bytes to read. When omitted, the string ends at the first NUL byte."
+
+###
+
+[[entry]]
+name = "ffi.copy"
+kind = "function"
+signature = "function ffi.copy(dst, src, length)"
+summary = "Copies bytes into C memory."
+description = "Copy bytes to a C pointer, array, or record. Without `length`, `src` must be a string: its bytes and a trailing NUL are copied. With `length`, `src` may be a string or `CData`, and exactly `length` bytes are copied with no trailing NUL. The destination must be large enough to receive the data, as no bounds are checked."
+returns = "The number of bytes copied, including the trailing NUL when `length` is omitted."
+errors = '''
+- Raises an error if `dst` is not a `CData` object.
+- Raises an error if `length` is omitted and `src` is not a string.
+- Raises an error if `length` is given and is not an integer.
+- Raises an error if `length` is given and `src` is neither a string nor a `CData` object.
+'''
+example = '''
+import ffi
+
+const buf = ffi.cnew("char[32]")
+
+const n = ffi.copy(buf, "Hello")
+print(n)                // 6, includes the trailing NUL
+print(ffi.string(buf))  // Hello
+
+const copy = ffi.cnew("char[32]")
+ffi.copy(copy, buf, 5)
+print(ffi.string(copy, 5)) // Hello
+'''
+
+[[entry.params]]
+name = "dst"
+desc = "The destination: a C pointer, array, or record."
+
+[[entry.params]]
+name = "src"
+desc = "The source: a string, or a `CData` when `length` is given."
+
+[[entry.params]]
+name = "length"
+desc = "(Optional) The number of bytes to copy. When omitted, `src` must be a string and its trailing NUL is copied as well."
+
+###
+
+[[entry]]
+name = "ffi.fill"
+kind = "function"
+signature = "function ffi.fill(dst, length, byte = 0)"
+summary = "Fills C memory with a byte value."
+description = "Fill `length` bytes at a C pointer, array, or record with `byte`. The destination must be at least `length` bytes long, as no bounds are checked."
+returns = "Nothing."
+errors = '''
+- Raises an error if `dst` is not a `CData` object.
+- Raises an error if `length` or `byte` is not an integer.
+'''
+example = '''
+import ffi
+
+const buf = ffi.cnew("uint8_t[8]")
+
+ffi.fill(buf, 8, 0xFF)
+print(buf[0]) // 255
+
+ffi.fill(buf, 8) // reset to zero
+print(buf[0]) // 0
+'''
+
+[[entry.params]]
+name = "dst"
+desc = "The destination: a C pointer, array, or record."
+
+[[entry.params]]
+name = "length"
+desc = "The number of bytes to fill."
+
+[[entry.params]]
+name = "byte"
+desc = "(Optional) The byte value to write. Defaults to `0`."
+
+###
+
+[[entry]]
+name = "ffi.errno"
+kind = "function"
+signature = "function ffi.errno(value)"
+summary = "Gets or sets the C errno value."
+description = "Return the current C `errno`. If `value` is supplied, `errno` is set to it, and the value returned is the previous one. Call it immediately after the native call whose status you want to inspect, since other operations may modify `errno`."
+returns = "The value of `errno` before any change was made, as a number."
+errors = '''
+- Raises an error if `value` is given and is not an integer.
+'''
+example = '''
+import ffi
+
+ffi.errno(0)            // clear errno
+
+ffi.cdef("int close(int fd);")
+ffi.C.close(-1)         // fails
+
+print(ffi.errno())      // 9 (EBADF) on most systems
+'''
+
+[[entry.params]]
+name = "value"
+desc = "(Optional) A new value to store into `errno`."
+
+###
+
+[[entry]]
+name = "ffi.abi"
+kind = "function"
+signature = "function ffi.abi(name)"
+summary = "Tests the target ABI."
+description = "Return whether the target matches an ABI name. Recognized names are `\"32bit\"`, `\"64bit\"`, `\"le\"` (little-endian), and `\"be\"` (big-endian)."
+returns = "`true` if the target matches `name`, `false` otherwise."
+errors = '''
+- Raises an error if `name` is not a string.
+'''
+example = '''
+import ffi
+
+if ffi.abi("64bit") and ffi.abi("le")
+{
+    print("64-bit little-endian target")
+}
+'''
+
+[[entry.params]]
+name = "name"
+desc = "The ABI name to test: `\"32bit\"`, `\"64bit\"`, `\"le\"` or `\"be\"`."
+
+###
+
+[[entry]]
+name = "ffi.C"
+kind = "attribute"
+signature = "ffi.C"
+summary = "The process C library."
+description = "A `CLib` object giving access to the symbols of the C library already loaded in the process. Functions must be declared with `ffi.cdef` before they can be accessed."
+returns = "A `CLib` object."
+errors = '''
+- Accessing a function that has not been declared with `ffi.cdef` raises an error.
+'''
+example = '''
+import ffi
+
+ffi.cdef("int printf(const char* fmt, ...);")
+
+ffi.C.printf("Integer: %d\n", 42)
+ffi.C.printf("Float: %.2f\n", 3.14159)
+ffi.C.printf("Character: %c\n", 65)
+'''
+
+###
+
+[[entry]]
+name = "CData"
+kind = "class"
+signature = "class CData"
+summary = "A value living in C memory."
+description = """
+A value stored in C memory, returned by `ffi.cnew`, `ffi.cast`, `ffi.addressof`, and library function lookups, and by calls returning pointers or records. Scalar values are converted to Teascript numbers or booleans where appropriate.
+
+Pointer and array values are indexed with zero-based integer indices, as in `ptr[i]` and `array[i]`. Pointer access is unchecked.
+
+Record fields are accessed as attributes, as in `record.x`. Pointers to records support the same syntax, as in `ptr.x`. Assignments write through to C memory, and const-qualified data cannot be assigned to. Nested records and arrays are returned as `CData` that refer to the original storage.
+
+C pointers can be compared with other C pointers and with `nil`; a null pointer compares equal to `nil`. Records, arrays, and function values do not compare equal.
+
+Function-pointer data is called directly. Fixed parameters are converted according to the declared prototype. Variadic functions accept additional arguments with the default C promotions: booleans and integers are passed as integers, other numbers as `double`, strings and `nil` as pointers, and records and arrays as pointers to their storage. The call must supply all fixed arguments, and non-variadic functions require exactly the declared number.
+
+`tostring(cdata)` produces a type-and-address representation such as `cdata<int*>: 0x...`.
+"""
+returns = "A `CData` object."
+errors = '''
+- Indexing a value that is neither a pointer nor an array raises an error.
+- Indexing a `void*` raises an error, and so does indexing with a value that is not a number.
+- Accessing a field that does not exist raises an error stating the C type has no such member.
+- Accessing an attribute of a value that is neither a record nor a pointer to a record raises an error.
+- Assigning to const-qualified data raises an error.
+- Calling a value that is not a function pointer raises an error.
+- Calling a function with the wrong number of arguments raises an error.
+- Passing a value of an unsupported type as a variadic argument raises an error.
+- Calling a function whose return type is not supported raises an error.
+'''
+example = '''
+import ffi
+
+ffi.cdef(```
+typedef struct {
+    int x;
+    int y;
+} Point;
+```)
+
+const p = ffi.cnew("Point", { x = 1, y = 2 })
+p.x = p.x + 10
+print(p.x, p.y) // 11 2
+
+const ptr = ffi.addressof(p)
+print(ptr.y)    // 2
+print(ptr == nil) // false
+
+const numbers = ffi.cnew("int[4]", [1, 2, 3, 4])
+numbers[0] *= 10
+print(numbers[0]) // 10
+'''
+
+###
+
+[[entry]]
+name = "CType"
+kind = "class"
+signature = "class CType"
+summary = "A description of a C type."
+description = """
+Describes a C type. A `CType` is accepted wherever a C type declaration can be used, and is returned by `ffi.typeof`. Types are interned, so equal types are represented by the same object, which is what `ffi.istype` relies on.
+
+`tostring(ffi.typeof("int"))` produces `ctype<int>`.
+
+The type parser supports scalar and pointer types, arrays, records (`struct` and `union`), typedefs, function declarations, and variadic function declarations, subject to the types supported by this module and libffi. Common C scalar types and fixed-width integer types such as `int32_t`, `uint64_t`, and `size_t` are predefined.
+"""
+returns = "A `CType` object."
+errors = '''
+- Using a string that is not a valid or known C type declaration raises an error.
+'''
+example = '''
+import ffi
+
+const t = ffi.typeof("uint64_t")
+print(t)                   // ctype<uint64_t>
+print(ffi.sizeof(t))       // 8
+print(ffi.typeof(t) == t)  // true
+'''
+
+###
+
+[[entry]]
+name = "CLib"
+kind = "class"
+signature = "class CLib"
+summary = "A loaded C shared library."
+description = """
+Represents a shared library, returned by `ffi.load`. The process C library is also available as `ffi.C`.
+
+Reading a declared function name from a `CLib` looks up that symbol in the shared library and returns callable function-pointer `CData`. The result is cached on the library object. The function must have been declared beforehand with `ffi.cdef`, and the declaration must match the actual signature of the symbol in the library.
+
+The library is unloaded when the `CLib` object is collected.
+"""
+returns = "A `CLib` object."
+errors = '''
+- Looking up a name that has no prior declaration made by `ffi.cdef` raises an error.
+- Looking up a declared name that does not exist in the library raises an error.
+'''
+example = '''
+import os, ffi
+
+assert(os.name == "windows")
+
+ffi.cdef(```
+typedef void* HWND;
+int MessageBoxA(HWND hWnd, const char* text, const char* caption, unsigned int type);
+```)
+
+const user32 = ffi.load("user32")
+
+const MB_OK = 0x00000000
+const MB_ICONINFORMATION = 0x00000040
+
+const res = user32.MessageBoxA(
+    nil,
+    "Hello from Teascript FFI!",
+    "Teascript Windows API Example",
+    MB_OK | MB_ICONINFORMATION
+)
+
+if res == 1
+{
+    print("User clicked OK")
+}
+'''

@@ -1,0 +1,250 @@
+title = "Collection Operations"
+slug = "collections"
+summary = "Length, iteration and list items"
+description = "Operations on lists and other collections: getting the length of an object, iterating over a map, and reading, writing, inserting and deleting list items. List positions are zero-based, so the first item is at position `0`.\n\nFor reading and writing maps by key, see the Field Access section; for the `obj[key]` operators that honour operator methods, see the Attribute Access section."
+
+[[entry]]
+name = "tea_len"
+kind = "function"
+since = "1.0"
+tags = ["object", "list", "map"]
+signature = "int tea_len(tea_State* T, int index);"
+summary = "Object length"
+description = "Returns the length of the object at `index`: the number of bytes of a string, the number of items of a list, the number of key-value pairs of a map, or the size in bytes of a userdata's data block. For any other type, `-1` is returned."
+returns = "The length of the object, or `-1` if its type has no length."
+stack = "[-0, +0, -]"
+example = '''
+tea_new_list(T, 0);
+tea_push_integer(T, 10);
+tea_add_item(T, -2);
+tea_push_integer(T, 20);
+tea_add_item(T, -2);          /* [list(10, 20)] */
+
+int n = tea_len(T, -1);       /* n = 2 */
+'''
+see_also = ["tea_get_item", "tea_add_item", "tea_get_lstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the object"
+
+###
+
+[[entry]]
+name = "tea_next"
+kind = "function"
+since = "1.0"
+tags = ["map", "object"]
+signature = "int tea_next(tea_State* T, int obj);"
+summary = "Iterate map"
+description = "Iterates over the map at `obj`. It pops a key from the stack and pushes the next key-value pair of the map, with the value on top. To start the traversal, push `nil` as the key. When there are no more pairs, nothing is pushed and `0` is returned; the key has been popped.\n\nThe order of the pairs is not specified. While traversing, do not call `tea_to_string` or `tea_to_lstring` directly on the key, since the conversion would change the value that `tea_next` needs; and do not add new keys to the map.\n\nBecause the stack changes at each step, pass an absolute index for `obj`."
+returns = "`1` if a pair was pushed; `0` if the traversal is finished."
+errors = "Raises a runtime error if the value at `obj` is not a map, or if the key is not a valid key of the map."
+stack = "[-1, +(2|0), e]"
+example = '''
+tea_new_map(T);                   /* [map] */
+tea_push_integer(T, 1);
+tea_set_key(T, -2, "a");          /* map.a = 1 */
+tea_push_integer(T, 2);
+tea_set_key(T, -2, "b");          /* map.b = 2 */
+
+int map = tea_absindex(T, -1);
+tea_push_nil(T);                  /* first key */
+while(tea_next(T, map))           /* [map, key, value] */
+{
+    const char* key = tea_get_string(T, -2);
+    tea_Integer val = tea_get_integer(T, -1);
+    printf("%s = %td\n", key, val);
+    tea_pop(T, 1);                /* pop the value, keep the key for the next step */
+}
+/* the key was popped by the last call: [map] */
+tea_pop(T, 1);
+'''
+see_also = ["tea_set_key", "tea_get_key", "tea_new_map", "tea_len"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "obj"
+desc = "Stack index of the map"
+
+###
+
+[[entry]]
+name = "tea_add_item"
+kind = "function"
+since = "1.0"
+tags = ["list"]
+signature = "void tea_add_item(tea_State* T, int list);"
+summary = "Append item"
+description = "Pops the value on top of the stack and appends it to the end of the list at `list`."
+errors = "May raise a memory error."
+stack = "[-1, +0, m]"
+example = '''
+tea_new_list(T, 0);          /* [] */
+tea_push_string(T, "a");
+tea_add_item(T, -2);         /* ["a"] */
+tea_push_string(T, "b");
+tea_add_item(T, -2);         /* ["a", "b"] */
+'''
+see_also = ["tea_insert_item", "tea_set_item", "tea_new_list"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "list"
+desc = "Stack index of the list"
+
+###
+
+[[entry]]
+name = "tea_get_item"
+kind = "function"
+since = "1.0"
+tags = ["list"]
+signature = "bool tea_get_item(tea_State* T, int list, int index);"
+summary = "Get item"
+description = "Pushes the item at position `index` (zero-based) of the list at `list`. Returns `true` if the item exists and was pushed. If `index` is out of range, returns `false` and pushes nothing."
+returns = "`true` if the item was pushed; `false` otherwise."
+stack = "[-0, +1, -]"
+example = '''
+tea_new_list(T, 0);
+tea_push_string(T, "x");
+tea_add_item(T, -2);
+tea_push_string(T, "y");
+tea_add_item(T, -2);                /* ["x", "y"] */
+
+bool ok = tea_get_item(T, -1, 1);   /* ok = true, pushes "y" */
+tea_pop(T, 1);
+ok = tea_get_item(T, -1, 5);        /* ok = false, nothing pushed */
+'''
+see_also = ["tea_set_item", "tea_len", "tea_get_index"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "list"
+desc = "Stack index of the list"
+
+[[entry.params]]
+name = "index"
+desc = "Zero-based position of the item"
+
+###
+
+[[entry]]
+name = "tea_set_item"
+kind = "function"
+since = "1.0"
+tags = ["list"]
+signature = "bool tea_set_item(tea_State* T, int list, int index);"
+summary = "Set item"
+description = "Pops the value on top of the stack and stores it at position `index` (zero-based) of the list at `list`. Returns `true` on success. If `index` is out of range, returns `false` and leaves the stack unchanged, so the value is not popped."
+returns = "`true` if the item was set; `false` otherwise."
+stack = "[-1, +0, m]"
+example = '''
+tea_new_list(T, 0);
+tea_push_string(T, "a");
+tea_add_item(T, -2);
+tea_push_string(T, "b");
+tea_add_item(T, -2);                  /* ["a", "b"] */
+
+tea_push_string(T, "B");
+bool ok = tea_set_item(T, -2, 1);     /* ok = true, list is ["a", "B"] */
+'''
+see_also = ["tea_get_item", "tea_insert_item", "tea_set_index"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "list"
+desc = "Stack index of the list"
+
+[[entry.params]]
+name = "index"
+desc = "Zero-based position of the item"
+
+###
+
+[[entry]]
+name = "tea_insert_item"
+kind = "function"
+since = "1.0"
+tags = ["list"]
+signature = "bool tea_insert_item(tea_State* T, int list, int index);"
+summary = "Insert item"
+description = "Pops the value on top of the stack and inserts it at position `index` (zero-based) of the list at `list`, shifting the items at and after `index` up by one. Returns `true` on success; if `index` is out of range, returns `false`."
+returns = "`true` if the item was inserted; `false` otherwise."
+stack = "[-1, +0, m]"
+example = '''
+tea_new_list(T, 0);
+tea_push_string(T, "a");
+tea_add_item(T, -2);
+tea_push_string(T, "c");
+tea_add_item(T, -2);                    /* ["a", "c"] */
+
+tea_push_string(T, "b");
+bool ok = tea_insert_item(T, -2, 1);    /* ok = true, list is ["a", "b", "c"] */
+'''
+see_also = ["tea_add_item", "tea_delete_item", "tea_set_item"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "list"
+desc = "Stack index of the list"
+
+[[entry.params]]
+name = "index"
+desc = "Zero-based position for the new item"
+
+###
+
+[[entry]]
+name = "tea_delete_item"
+kind = "function"
+since = "1.0"
+tags = ["list"]
+signature = "bool tea_delete_item(tea_State* T, int list, int index);"
+summary = "Delete item"
+description = "Removes the item at position `index` (zero-based) from the list at `list`, shifting the later items down by one. Returns `true` on success; if `index` is out of range, returns `false`. The stack is not changed."
+returns = "`true` if the item was deleted; `false` otherwise."
+stack = "[-0, +0, -]"
+example = '''
+tea_new_list(T, 0);
+tea_push_string(T, "a");
+tea_add_item(T, -2);
+tea_push_string(T, "b");
+tea_add_item(T, -2);
+tea_push_string(T, "c");
+tea_add_item(T, -2);                    /* ["a", "b", "c"] */
+
+bool ok = tea_delete_item(T, -1, 1);    /* ok = true, list is ["a", "c"] */
+'''
+see_also = ["tea_insert_item", "tea_add_item", "tea_len"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "list"
+desc = "Stack index of the list"
+
+[[entry.params]]
+name = "index"
+desc = "Zero-based position of the item to delete"

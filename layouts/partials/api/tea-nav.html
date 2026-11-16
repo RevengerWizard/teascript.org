@@ -1,0 +1,6 @@
+<strong>Builtins</strong>
+{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}{{ if and (eq $data.origin "builtin") (in (slice "class" "functions") $data.kind) }}<a class="{{ if eq $.Params.apiData $entity.data }}active{{ end }}" href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a>{{ end }}{{ end }}
+<strong>Modules</strong>
+{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}{{ if and (eq $data.kind "module") (ne $data.origin "bundled") }}<a class="{{ if eq $.Params.apiData $entity.data }}active{{ end }}" href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a>{{ end }}{{ end }}
+<strong>Bundled</strong>
+{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}{{ if eq $data.origin "bundled" }}<a class="{{ if eq $.Params.apiData $entity.data }}active{{ end }}" href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a>{{ end }}{{ end }}

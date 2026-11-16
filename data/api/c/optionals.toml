@@ -1,0 +1,311 @@
+title = "Optional Arguments"
+slug = "optionals"
+summary = "Read optional arguments with defaults"
+description = "Functions for reading optional arguments in a C function. Each `tea_opt_*` function returns the argument at `index` converted to a C value, exactly as the matching `tea_check_*` function would, or the default `def` if the argument is absent. If the argument is present but has the wrong type, a type error is raised.\n\nThe number of optional arguments a function accepts is declared when the function is pushed (the `nopts` parameter of `tea_push_cfunction`)."
+
+[[entry]]
+name = "tea_opt_nil"
+kind = "function"
+since = "1.0"
+tags = ["opt", "nil"]
+signature = "void tea_opt_nil(tea_State* T, int index);"
+summary = "Default to nil"
+description = "If the argument at `index` is absent, pushes `nil` in its place. Otherwise does nothing. This normalizes an optional argument slot so that later stack operations can count on a concrete value being there."
+stack = "[-0, +(1|0), -]"
+example = '''
+tea_opt_nil(T, 2);   /* argument 2 is now at least nil */
+'''
+see_also = ["tea_check_any", "tea_push_nil", "tea_is_nonenil"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+###
+
+[[entry]]
+name = "tea_opt_bool"
+kind = "function"
+since = "1.0"
+tags = ["opt", "bool"]
+signature = "bool tea_opt_bool(tea_State* T, int index, bool def);"
+summary = "Optional boolean"
+description = "Returns the boolean at `index`, or `def` if the argument is absent."
+returns = "The boolean at `index`, or `def`."
+errors = "Raises a type error if the argument is present but is not a boolean."
+stack = "[-0, +0, v]"
+example = '''
+static void greet(tea_State* T)
+{
+    const char* name = tea_check_string(T, 1);
+    bool loud = tea_opt_bool(T, 2, false);
+    if(loud)
+        tea_push_fstring(T, "HELLO, %s!", name);
+    else
+        tea_push_fstring(T, "Hello, %s.", name);
+}
+'''
+see_also = ["tea_check_bool", "tea_get_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Value returned if the argument is absent"
+
+###
+
+[[entry]]
+name = "tea_opt_number"
+kind = "function"
+since = "1.0"
+tags = ["opt", "number"]
+signature = "tea_Number tea_opt_number(tea_State* T, int index, tea_Number def);"
+summary = "Optional number"
+description = "Returns the number at `index`, or `def` if the argument is absent."
+returns = "The number at `index`, or `def`."
+errors = "Raises a type error if the argument is present but is not a number."
+stack = "[-0, +0, v]"
+example = '''
+static void scale(tea_State* T)
+{
+    tea_Number dx = tea_opt_number(T, 1, 1.0);
+    tea_Number dy = tea_opt_number(T, 2, 1.0);
+    tea_push_number(T, dx * dy);
+}
+'''
+see_also = ["tea_check_number", "tea_opt_integer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Value returned if the argument is absent"
+
+###
+
+[[entry]]
+name = "tea_opt_integer"
+kind = "function"
+since = "1.0"
+tags = ["opt", "integer"]
+signature = "tea_Integer tea_opt_integer(tea_State* T, int index, tea_Integer def);"
+summary = "Optional integer"
+description = "Returns the number at `index` truncated to a `tea_Integer`, or `def` if the argument is absent."
+returns = "The integer at `index`, or `def`."
+errors = "Raises a type error if the argument is present but is not a number."
+stack = "[-0, +0, v]"
+example = '''
+static void repeat(tea_State* T)
+{
+    const char* s = tea_check_string(T, 1);
+    tea_Integer n = tea_opt_integer(T, 2, 1);   /* once by default */
+    for(tea_Integer i = 0; i < n; i++)
+        tea_push_string(T, s);
+    tea_concat(T, (int)n);
+}
+'''
+see_also = ["tea_check_integer", "tea_opt_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Value returned if the argument is absent"
+
+###
+
+[[entry]]
+name = "tea_opt_pointer"
+kind = "function"
+since = "1.0"
+tags = ["opt", "pointer"]
+signature = "const void* tea_opt_pointer(tea_State* T, int index, void* def);"
+summary = "Optional pointer"
+description = "Returns the raw C pointer at `index`, or `def` if the argument is absent."
+returns = "The pointer at `index`, or `def`."
+errors = "Raises a type error if the argument is present but is not a pointer."
+stack = "[-0, +0, v]"
+example = '''
+static void open(tea_State* T)
+{
+    const char* path = tea_check_string(T, 1);
+    const void* ctx = tea_opt_pointer(T, 2, NULL);
+    /* ... open path, using ctx if one was given ... */
+}
+'''
+see_also = ["tea_check_pointer", "tea_get_pointer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Pointer returned if the argument is absent"
+
+###
+
+[[entry]]
+name = "tea_opt_lstring"
+kind = "function"
+since = "1.0"
+tags = ["opt", "string"]
+signature = "const char* tea_opt_lstring(tea_State* T, int index, const char* def, size_t* len);"
+summary = "Optional string and length"
+description = "Returns the string at `index`, with its length stored in `*len`, or `def` if the argument is absent. In that case the length is `strlen(def)`, or `0` if `def` is `NULL`.\n\nUse this variant when the string may contain embedded zero bytes."
+returns = "A pointer to the string data, or `def`."
+errors = "Raises a type error if the argument is present but is not a string."
+stack = "[-0, +0, v]"
+example = '''
+size_t len;
+const char* sep = tea_opt_lstring(T, 2, ", ", &len);
+/* sep is ", " and len is 2 if argument 2 is absent */
+'''
+see_also = ["tea_check_lstring", "tea_opt_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "String returned if the argument is absent; may be `NULL`"
+
+[[entry.params]]
+name = "len"
+desc = "Receives the string length, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_opt_string"
+kind = "function"
+since = "1.0"
+tags = ["opt", "string"]
+signature = "const char* tea_opt_string(tea_State* T, int index, const char* def);"
+summary = "Optional string"
+description = "Returns the string at `index`, or `def` if the argument is absent.\n\nUse `tea_opt_lstring` if the string may contain embedded zero bytes."
+returns = "A pointer to the string data, or `def`."
+errors = "Raises a type error if the argument is present but is not a string."
+stack = "[-0, +0, v]"
+example = '''
+static void log_message(tea_State* T)
+{
+    const char* msg = tea_check_string(T, 1);
+    const char* prefix = tea_opt_string(T, 2, "[info]");
+    tea_push_fstring(T, "%s %s", prefix, msg);
+}
+'''
+see_also = ["tea_check_string", "tea_opt_lstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "String returned if the argument is absent; may be `NULL`"
+
+###
+
+[[entry]]
+name = "tea_opt_userdata"
+kind = "function"
+since = "1.0"
+tags = ["opt", "userdata"]
+signature = "void* tea_opt_userdata(tea_State* T, int index, void* def);"
+summary = "Optional userdata"
+description = "Returns a pointer to the data block of the userdata at `index`, or `def` if the argument is absent or `nil`.\n\nThe userdata's class is not checked. When a particular class is required, use `tea_test_udata` or `tea_check_udata`."
+returns = "A pointer to the userdata's data block, or `def`."
+errors = "Raises a type error if the argument is present but is not a userdata."
+stack = "[-0, +0, v]"
+example = '''
+static void attach(tea_State* T)
+{
+    void* widget = tea_check_userdata(T, 1);
+    void* parent = tea_opt_userdata(T, 2, NULL);
+    attach_widget(widget, parent);   /* parent may be NULL */
+}
+'''
+see_also = ["tea_check_userdata", "tea_opt_pointer", "tea_test_udata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Pointer returned if the argument is absent or `nil`"
+
+###
+
+[[entry]]
+name = "tea_opt_cfunction"
+kind = "function"
+since = "1.0"
+tags = ["opt", "cfunction"]
+signature = "tea_CFunction tea_opt_cfunction(tea_State* T, int index, tea_CFunction def);"
+summary = "Optional C function"
+description = "Returns the C function at `index`, or `def` if the argument is absent."
+returns = "The `tea_CFunction` at `index`, or `def`."
+errors = "Raises a type error if the argument is present but is not a C function."
+stack = "[-0, +0, v]"
+example = '''
+static void walk(tea_State* T)
+{
+    tea_CFunction visit = tea_opt_cfunction(T, 1, NULL);
+    /* call visit on each element if it is not NULL */
+}
+'''
+see_also = ["tea_check_cfunction", "tea_to_cfunction"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the argument"
+
+[[entry.params]]
+name = "def"
+desc = "Function returned if the argument is absent"

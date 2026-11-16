@@ -51,7 +51,52 @@ skipped. To override this behavior, set $skipHome to false below.
 {{- $nodes := .nodes }}
 
 {{- /* Render. */}}
-{{- if in (slice "guide" "docs" "api") $currentPage.Section -}}
+{{- if .apiMode -}}
+<nav class="sidebar-nav" aria-label="{{ if eq .apiMode "c" }}C API{{ else }}Tea API{{ end }} contents">
+    <a class="sidebar-home" href="{{ if eq .apiMode "c" }}/api/c/{{ else }}/api/tea/{{ end }}">{{ if eq .apiMode "c" }}C API{{ else }}Tea API{{ end }}</a>
+    {{ if eq .apiMode "c" }}
+    <span class="sidebar-sections">Categories</span>
+    <ul class="sidebar-introduction">
+        {{ range site.Data.api.c._index.categories }}
+        {{ $active := eq $currentPage.Params.apiData .slug }}
+        <li class="{{ if $active }}active{{ end }}"><a {{ if $active }}aria-current="page"{{ end }} href="/api/c/{{ .slug }}/">{{ .title }}</a></li>
+        {{ end }}
+    </ul>
+    {{ else }}
+    <span class="sidebar-sections">Builtins</span>
+    <ul class="sidebar-introduction">
+        {{ range site.Data.api.tea._index.entities }}
+        {{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+        {{ if and (eq $data.origin "builtin") (eq $data.kind "functions") }}{{ $active := eq $currentPage.Params.apiData $entity.data }}
+        <li class="{{ if $active }}active{{ end }}"><a {{ if $active }}aria-current="page"{{ end }} href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a></li>{{ end }}
+        {{ end }}
+        {{ range site.Data.api.tea._index.entities }}
+        {{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+        {{ if and (eq $data.origin "builtin") (eq $data.kind "class") }}{{ $active := eq $currentPage.Params.apiData $entity.data }}
+        <li class="{{ if $active }}active{{ end }}"><a {{ if $active }}aria-current="page"{{ end }} href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a></li>{{ end }}
+        {{ end }}
+    </ul>
+    <span class="sidebar-sections">Modules</span>
+    <ul class="sidebar-introduction">
+        {{ range site.Data.api.tea._index.entities }}
+        {{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+        {{ if and (eq $data.kind "module") (ne $data.origin "bundled") }}{{ $active := eq $currentPage.Params.apiData $entity.data }}
+        <li class="{{ if $active }}active{{ end }}"><a {{ if $active }}aria-current="page"{{ end }} href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a></li>
+        {{ range $data.entry }}{{ if eq .kind "class" }}<li class="api-sidebar-nested"><a href="/api/tea/{{ $entity.slug }}/#{{ .name }}">{{ .name }}</a></li>{{ end }}{{ end }}{{ end }}
+        {{ end }}
+    </ul>
+    <span class="sidebar-sections">Bundled</span>
+    <ul class="sidebar-introduction">
+        {{ range site.Data.api.tea._index.entities }}
+        {{ $entity := . }}{{ $data := index site.Data.api.tea .data }}
+        {{ if eq $data.origin "bundled" }}{{ $active := eq $currentPage.Params.apiData $entity.data }}
+        <li class="{{ if $active }}active{{ end }}"><a {{ if $active }}aria-current="page"{{ end }} href="/api/tea/{{ $entity.slug }}/">{{ $entity.title }}</a></li>
+        {{ if eq $data.kind "module" }}{{ range $data.entry }}{{ if eq .kind "class" }}<li class="api-sidebar-nested"><a href="/api/tea/{{ $entity.slug }}/#{{ .name }}">{{ .name }}</a></li>{{ end }}{{ end }}{{ end }}{{ end }}
+        {{ end }}
+    </ul>
+    {{ end }}
+</nav>
+{{- else if in (slice "guide" "docs" "api") $currentPage.Section -}}
 {{- $section := site.GetPage "section" $currentPage.Section -}}
 <nav class="sidebar-nav" aria-label="{{ $section.Title }} contents">
     <a class="sidebar-home" href="{{ $section.RelPermalink }}">{{ $section.Title }}</a>

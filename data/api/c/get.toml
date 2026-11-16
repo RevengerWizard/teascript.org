@@ -1,0 +1,277 @@
+title = "Get Functions"
+slug = "get"
+summary = "Strict stack-to-C accessors"
+description = "Functions that read a value from the stack as a C value, when you already know its type. Unlike the `tea_to_*` functions, they do not convert, and unlike the `tea_check_*` functions, they do not produce friendly argument errors: using one on a value of the wrong type is a programming error and raises an internal API error. Test the type first with `tea_get_type` or the `tea_is_*` macros, or use the check functions to validate arguments."
+
+[[entry]]
+name = "tea_get_bool"
+kind = "function"
+since = "1.0"
+tags = ["get", "bool"]
+signature = "bool tea_get_bool(tea_State* T, int index);"
+summary = "Get boolean"
+description = "Returns the boolean value at `index`. The value must be a boolean. To apply Teascript truthiness rules to any value, use `tea_to_bool`."
+returns = "The boolean value at `index`."
+errors = "Raises an internal API error if the value is not a boolean."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_true(T);
+if(tea_get_bool(T, -1))
+    printf("value is true\n");
+'''
+see_also = ["tea_to_bool", "tea_check_bool", "tea_is_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_get_number"
+kind = "function"
+since = "1.0"
+tags = ["get", "number"]
+signature = "tea_Number tea_get_number(tea_State* T, int index);"
+summary = "Get number"
+description = "Returns the number at `index` as a `tea_Number` (a `double`). The value must be a number."
+returns = "The number at `index`."
+errors = "Raises an internal API error if the value is not a number."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_number(T, 3.14159);
+tea_Number pi = tea_get_number(T, -1);
+printf("value %f\n", pi);
+'''
+see_also = ["tea_get_integer", "tea_to_number", "tea_check_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_get_integer"
+kind = "function"
+since = "1.0"
+tags = ["get", "integer"]
+signature = "tea_Integer tea_get_integer(tea_State* T, int index);"
+summary = "Get integer"
+description = "Returns the number at `index` converted to a `tea_Integer`. The value must be a number; the fractional part is discarded (truncation toward zero)."
+returns = "The number at `index`, truncated to a `tea_Integer`."
+errors = "Raises an internal API error if the value is not a number."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_number(T, 42.9);
+tea_Integer n = tea_get_integer(T, -1);   /* n = 42 */
+printf("int value %td\n", n);
+'''
+see_also = ["tea_get_number", "tea_to_integer", "tea_check_integer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_get_pointer"
+kind = "function"
+since = "1.0"
+tags = ["get", "pointer"]
+signature = "const void* tea_get_pointer(tea_State* T, int index);"
+summary = "Get pointer"
+description = "Returns the raw C pointer at `index`. The value must be a pointer (see `tea_push_pointer`), not a userdata."
+returns = "The pointer stored at `index`."
+errors = "Raises an internal API error if the value is not a pointer."
+stack = "[-0, +0, e]"
+example = '''
+void* handle = get_some_handle();
+tea_push_pointer(T, handle);
+const void* ptr = tea_get_pointer(T, -1);
+printf("my pointer is %p\n", ptr);
+'''
+see_also = ["tea_to_pointer", "tea_check_pointer", "tea_push_pointer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_get_range"
+kind = "function"
+since = "1.0"
+tags = ["get", "range"]
+signature = "void tea_get_range(tea_State* T, int index, tea_Number* start, tea_Number* end, tea_Number* step);"
+summary = "Get range parts"
+description = "Retrieves the components of the range at `index`. The value must be a range. Any of the output pointers may be `NULL`, in which case that component is not written."
+errors = "Raises an internal API error if the value is not a range."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_range(T, 0, 10, 2);
+tea_Number start, end, step;
+tea_get_range(T, -1, &start, &end, &step);   /* 0, 10, 2 */
+'''
+see_also = ["tea_check_range", "tea_push_range", "tea_is_range"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the range"
+
+[[entry.params]]
+name = "start"
+desc = "Receives the range start, or `NULL`"
+
+[[entry.params]]
+name = "end"
+desc = "Receives the range end, or `NULL`"
+
+[[entry.params]]
+name = "step"
+desc = "Receives the range step, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_get_lstring"
+kind = "function"
+since = "1.0"
+tags = ["get", "string"]
+signature = "const char* tea_get_lstring(tea_State* T, int index, size_t* len);"
+summary = "Get string and length"
+description = "Returns the string at `index` as a C string. The value must be a string. The pointer refers to the interpreter's internal copy and stays valid as long as the string remains on the stack.\n\nIf `len` is not `NULL`, the string length is stored in `*len`. Teascript strings may contain embedded zero bytes, so use the length rather than relying on the terminator.\n\n> [!NOTE]\n> The result is never `NULL`, even for an empty string."
+returns = "A pointer to the string data."
+errors = "Raises an internal API error if the value is not a string."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_lstring(T, "hello\0world", 11);
+size_t len;
+const char* s = tea_get_lstring(T, -1, &len);   /* len = 11 */
+printf("%.*s\n", (int)len, s);
+'''
+see_also = ["tea_get_string", "tea_to_lstring", "tea_check_lstring"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the string"
+
+[[entry.params]]
+name = "len"
+desc = "Receives the string length, or `NULL`"
+
+###
+
+[[entry]]
+name = "tea_get_string"
+kind = "function"
+since = "1.0"
+tags = ["get", "string"]
+signature = "const char* tea_get_string(tea_State* T, int index);"
+summary = "Get string"
+description = "Returns the string at `index` as a C string. The value must be a string. Equivalent to `tea_get_lstring(T, index, NULL)`.\n\nBecause strings may contain embedded zero bytes, use `tea_get_lstring` when you need the real length."
+returns = "A pointer to the string data."
+errors = "Raises an internal API error if the value is not a string."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_string(T, "tea");
+const char* name = tea_get_string(T, -1);   /* "tea" */
+'''
+see_also = ["tea_get_lstring", "tea_to_string", "tea_check_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the string"
+
+###
+
+[[entry]]
+name = "tea_get_userdata"
+kind = "function"
+since = "1.0"
+tags = ["get", "userdata"]
+signature = "void* tea_get_userdata(tea_State* T, int index);"
+summary = "Get userdata block"
+description = "Returns a pointer to the data block of the userdata at `index`. The value must be a userdata. Unlike `tea_check_udata`, this does not verify the userdata's class."
+returns = "A pointer to the userdata's data block."
+errors = "Raises an internal API error if the value is not a userdata."
+stack = "[-0, +0, e]"
+example = '''
+MyBuffer* buf = (MyBuffer*)tea_new_userdata(T, sizeof(MyBuffer));
+/* ... */
+MyBuffer* same = (MyBuffer*)tea_get_userdata(T, -1);   /* same == buf */
+'''
+see_also = ["tea_to_userdata", "tea_check_userdata", "tea_test_udata", "tea_new_userdata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the userdata"
+
+###
+
+[[entry]]
+name = "tea_get_udvalue"
+kind = "function"
+since = "1.0"
+tags = ["get", "userdata"]
+signature = "bool tea_get_udvalue(tea_State* T, int ud, int n);"
+summary = "Get userdata uservalue"
+description = "Pushes the `n`-th user value of the userdata at `ud`, as created with `tea_new_userdatav` or `tea_new_udatav`. User values start out as `nil` and are set with `tea_set_udvalue`.\n\nReturns `true` if the user value exists and was pushed; returns `false` and pushes nothing if `n` is out of range."
+returns = "`true` if the value was pushed; `false` otherwise."
+stack = "[-0, +1, -]"
+example = '''
+tea_new_userdatav(T, sizeof(int), 2);   /* two user values */
+tea_push_string(T, "tag");
+tea_set_udvalue(T, -2, 0);              /* user value 0 = "tag" */
+
+if(tea_get_udvalue(T, -1, 0))
+    printf("%s\n", tea_get_string(T, -1));   /* tag */
+tea_pop(T, 1);
+'''
+see_also = ["tea_set_udvalue", "tea_new_userdatav", "tea_new_udatav"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "ud"
+desc = "Stack index of the userdata"
+
+[[entry.params]]
+name = "n"
+desc = "Zero-based number of the user value"

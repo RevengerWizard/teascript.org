@@ -1,0 +1,570 @@
+title = "SQLite3"
+kind = "module"
+origin = "bundled"
+since = "1.0"
+summary = "Embedded SQL database access through SQLite: open databases, run queries with bound parameters, use prepared statements and transactions."
+
+###
+
+[[entry]]
+name = "sqlite3.open"
+kind = "function"
+signature = "function sqlite3.open(path, opts)"
+summary = "Opens a SQLite database."
+description = """
+Open the SQLite database at `path` and return a `Database` object. Use `":memory:"` for a temporary in-memory database. By default the database is opened read-write and the file is created if it does not exist.
+
+The optional `opts` map currently recognizes a single key, `readonly`. When it is true, the database is opened read-only and is not created. Any other keys are ignored.
+"""
+returns = "A `Database` object."
+errors = '''
+- Raises an error if `path` is not a string.
+- Raises an error with SQLite's error message if the database cannot be opened, such as a missing file in read-only mode or a path that cannot be created.
+'''
+example = '''
+import sqlite3
+
+// Read-write database, created on demand
+const db = sqlite3.open("app.db")
+db.close()
+
+// Temporary database that lives in memory
+const memory = sqlite3.open(":memory:")
+memory.close()
+
+// Existing database, opened read-only
+const reader = sqlite3.open("existing.db", { readonly = true })
+reader.close()
+'''
+
+[[entry.params]]
+name = "path"
+desc = "The path of the database file, or `\":memory:\"` for an in-memory database."
+
+[[entry.params]]
+name = "opts"
+desc = "(Optional) A map of options. Currently only `readonly` is recognized; when `true`, the database is opened read-only."
+
+###
+
+[[entry]]
+name = "Database"
+kind = "class"
+signature = "class Database"
+summary = "An open SQLite database connection."
+description = """
+Represents an open SQLite database, returned by `sqlite3.open`. All operations are methods of the object, as in `db.query(...)`.
+
+Parameters for `run`, `query`, `row`, `value` and the `Statement` methods can be given as a list for positional placeholders or as a map for named placeholders. The supported placeholder forms are SQLite's `?`, `:name`, `@name` and `$name`. For named placeholders, the map keys omit the placeholder prefix: use `name` for `:name`, `@name` or `$name`. Positional values are matched to placeholders in order. Missing named values and omitted positional values are left unbound, which SQLite treats as `NULL`, and extra positional values are ignored.
+
+Values read from the database are converted as follows: `NULL` becomes `nil`; `INTEGER` and `REAL` become numbers (very large 64-bit integers may not be exactly representable); `TEXT` and `BLOB` become strings, preserving embedded NUL bytes. When binding, `nil`, booleans, numbers and strings are supported. Booleans bind as the integers `0` and `1`, numbers bind as floating-point values, and strings bind as `TEXT`. There is no way to bind a `BLOB`.
+
+The database is closed automatically when the object is collected. Call `close` to release it at a specific point.
+"""
+returns = "A `Database` object."
+errors = '''
+- Calling any method on a database that has been closed raises an error stating that the database is closed.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+
+db.exec("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)")
+
+// Positional parameters
+db.run("INSERT INTO users(name, age) VALUES (?, ?)", ["Ada", 37])
+
+// Named parameters
+db.run("INSERT INTO users(name, age) VALUES (:name, :age)", { name = "Grace", age = 85 })
+
+for const user in db.query("SELECT name, age FROM users ORDER BY name")
+{
+    print(user["name"], user["age"])
+}
+
+db.close()
+'''
+
+###
+
+[[entry]]
+name = "Database.exec"
+kind = "method"
+signature = "function Database.exec(sql)"
+summary = "Executes one or more SQL statements."
+description = "Execute one or more SQL statements separated by semicolons. Result rows are discarded and parameters cannot be bound. Use it for schema setup and scripts; use `run` or `query` when parameters or results are needed."
+returns = "Nothing."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `sql` is not a string.
+- Raises an error with SQLite's error message if a statement fails. Statements executed before the failing one are not undone.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+
+db.exec(```
+CREATE TABLE categories (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE);
+INSERT INTO categories(name) VALUES ('films'), ('series'), ('anime');```)
+
+print(db.value("SELECT count(*) FROM categories")) // 3
+'''
+
+[[entry.params]]
+name = "sql"
+desc = "A string with one or more SQL statements."
+
+###
+
+[[entry]]
+name = "Database.run"
+kind = "method"
+signature = "function Database.run(sql, params)"
+summary = "Executes a statement and reports its effect."
+description = "Prepare and execute the first statement in `sql`, consuming any rows it returns. Only the first statement of the string is executed; use `exec` for scripts with several statements. Intended for statements such as `INSERT`, `UPDATE` and `DELETE`."
+returns = "A map with two keys: `changes`, the number of rows modified by the most recent statement, and `last_id`, the row ID of the most recently inserted row."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `sql` is not a string.
+- Raises an error if `params` is neither a list nor a map.
+- Raises an error if a parameter has an unsupported type, such as a list, map or function.
+- Raises an error with SQLite's error message if the statement cannot be prepared or fails during execution, for example because of a syntax error or a violated constraint.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")
+
+const result = db.run("INSERT INTO users(name) VALUES (?)", ["Ada"])
+print(result["changes"]) // 1
+print(result["last_id"]) // 1
+
+db.run("UPDATE users SET name = :name WHERE id = :id", { name = "Ada Lovelace", id = 1 })
+'''
+
+[[entry.params]]
+name = "sql"
+desc = "A string with the SQL statement to execute."
+
+[[entry.params]]
+name = "params"
+desc = "(Optional) A list of positional values or a map of named values to bind to the placeholders."
+
+###
+
+[[entry]]
+name = "Database.query"
+kind = "method"
+signature = "function Database.query(sql, params)"
+summary = "Runs a query and returns all rows."
+description = "Prepare and execute the first statement in `sql` and collect every resulting row. Each row is a map from column name to value. Use column aliases in the query to control the keys."
+returns = "A list of maps, one per row, which is empty if the query returns no rows."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `sql` is not a string.
+- Raises an error if `params` is neither a list nor a map.
+- Raises an error if a parameter has an unsupported type, such as a list, map or function.
+- Raises an error with SQLite's error message if the statement cannot be prepared or fails during execution.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec(```
+CREATE TABLE users (name TEXT, age INTEGER);
+INSERT INTO users VALUES ('Ada', 37), ('Grace', 85), ('Tim', 12);```)
+
+const adults = db.query("SELECT name, age FROM users WHERE age >= ? ORDER BY age", [18])
+
+for const user in adults
+{
+    print(user["name"], user["age"])
+}
+'''
+
+[[entry.params]]
+name = "sql"
+desc = "A string with the SQL query to execute."
+
+[[entry.params]]
+name = "params"
+desc = "(Optional) A list of positional values or a map of named values to bind to the placeholders."
+
+###
+
+[[entry]]
+name = "Database.row"
+kind = "method"
+signature = "function Database.row(sql, params)"
+summary = "Returns the first row of a query."
+description = "Prepare and execute the first statement in `sql` and return only its first row as a map from column name to value. Remaining rows are ignored."
+returns = "A map with the first row, or `nil` if the query returns no rows."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `sql` is not a string.
+- Raises an error if `params` is neither a list nor a map.
+- Raises an error if a parameter has an unsupported type, such as a list, map or function.
+- Raises an error with SQLite's error message if the statement cannot be prepared or fails during execution.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec(```
+CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER);
+INSERT INTO users(name, age) VALUES ('Ada', 37);```)
+
+const user = db.row("SELECT * FROM users WHERE name = :name", { name = "Ada" })
+
+if user != nil
+{
+    print(user["id"], user["age"])
+}
+
+print(db.row("SELECT * FROM users WHERE name = ?", ["Nobody"])) // nil
+'''
+
+[[entry.params]]
+name = "sql"
+desc = "A string with the SQL query to execute."
+
+[[entry.params]]
+name = "params"
+desc = "(Optional) A list of positional values or a map of named values to bind to the placeholders."
+
+###
+
+[[entry]]
+name = "Database.value"
+kind = "method"
+signature = "function Database.value(sql, params)"
+summary = "Returns the first column of the first row."
+description = "Prepare and execute the first statement in `sql` and return the value of the first column of the first row. Useful for scalar queries such as `count(*)` or an ID lookup."
+returns = "The value of the first column of the first row, converted to a Teascript value, or `nil` if the query returns no rows or the value is `NULL`."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `sql` is not a string.
+- Raises an error if `params` is neither a list nor a map.
+- Raises an error if a parameter has an unsupported type, such as a list, map or function.
+- Raises an error with SQLite's error message if the statement cannot be prepared or fails during execution.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec(```
+CREATE TABLE categories (id INTEGER PRIMARY KEY, name TEXT);
+INSERT INTO categories(name) VALUES ('films'), ('anime');```)
+
+print(db.value("SELECT count(*) FROM categories"))                  // 2
+print(db.value("SELECT id FROM categories WHERE name = ?", ["anime"])) // 2
+print(db.value("SELECT id FROM categories WHERE name = ?", ["none"]))  // nil
+'''
+
+[[entry.params]]
+name = "sql"
+desc = "A string with the SQL query to execute."
+
+[[entry.params]]
+name = "params"
+desc = "(Optional) A list of positional values or a map of named values to bind to the placeholders."
+
+###
+
+[[entry]]
+name = "Database.prepare"
+kind = "method"
+signature = "function Database.prepare(sql)"
+summary = "Prepares a reusable statement."
+description = "Compile the first statement in `sql` into a reusable `Statement`. Preparing a statement once and running it many times with different parameters avoids parsing the SQL again. Only the first statement of the string is prepared."
+returns = "A `Statement` object."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `sql` is not a string.
+- Raises an error with SQLite's error message if the statement cannot be prepared, such as a syntax error or a reference to a table that does not exist.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE logs (message TEXT)")
+
+const insert = db.prepare("INSERT INTO logs(message) VALUES (?)")
+insert.run(["started"])
+insert.run(["finished"])
+insert.finalize()
+
+print(db.value("SELECT count(*) FROM logs")) // 2
+'''
+
+[[entry.params]]
+name = "sql"
+desc = "A string with the SQL statement to prepare."
+
+###
+
+[[entry]]
+name = "Database.transaction"
+kind = "method"
+signature = "function Database.transaction(fn)"
+summary = "Runs a function inside a transaction."
+description = "Begin a transaction, call `fn` with no arguments, and commit when it returns. If `fn` raises an error, the transaction is rolled back and the error is raised again. Transactions cannot be nested."
+returns = "Nothing."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error if `fn` is not a function.
+- Raises an error with SQLite's error message if the transaction cannot begin, for example because one is already active.
+- Re-raises any error raised by `fn`, after rolling back the transaction.
+- Raises an error with SQLite's error message if the commit fails, after rolling back the transaction.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE accounts (name TEXT)")
+
+db.transaction(function() {
+    db.run("INSERT INTO accounts(name) VALUES (?)", ["checking"])
+    db.run("INSERT INTO accounts(name) VALUES (?)", ["savings"])
+})
+
+print(db.value("SELECT count(*) FROM accounts")) // 2
+'''
+
+[[entry.params]]
+name = "fn"
+desc = "A function called with no arguments that performs the database operations of the transaction."
+
+###
+
+[[entry]]
+name = "Database.begin"
+kind = "method"
+signature = "function Database.begin()"
+summary = "Begins a transaction."
+description = "Begin a transaction using SQLite's default transaction behavior. The transaction stays open until `commit` or `rollback` is called. Prefer `transaction` when the work fits in a function, as it ends the transaction automatically."
+returns = "Nothing."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error with SQLite's error message if the transaction cannot begin, for example because one is already active.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE items (name TEXT)")
+
+db.begin()
+db.run("INSERT INTO items(name) VALUES (?)", ["first"])
+db.commit()
+'''
+
+###
+
+[[entry]]
+name = "Database.commit"
+kind = "method"
+signature = "function Database.commit()"
+summary = "Commits the current transaction."
+description = "Commit the transaction started with `begin`, making its changes permanent."
+returns = "Nothing."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error with SQLite's error message if there is no active transaction or the commit fails.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE items (name TEXT)")
+
+db.begin()
+db.run("INSERT INTO items(name) VALUES (?)", ["kept"])
+db.commit()
+
+print(db.value("SELECT count(*) FROM items")) // 1
+'''
+
+###
+
+[[entry]]
+name = "Database.rollback"
+kind = "method"
+signature = "function Database.rollback()"
+summary = "Rolls back the current transaction."
+description = "Roll back the transaction started with `begin`, discarding its changes."
+returns = "Nothing."
+errors = '''
+- Raises an error if the database is closed.
+- Raises an error with SQLite's error message if there is no active transaction or the rollback fails.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE items (name TEXT)")
+
+db.begin()
+db.run("INSERT INTO items(name) VALUES (?)", ["discarded"])
+db.rollback()
+
+print(db.value("SELECT count(*) FROM items")) // 0
+'''
+
+###
+
+[[entry]]
+name = "Database.close"
+kind = "method"
+signature = "function Database.close()"
+summary = "Closes the database."
+description = "Close the database and release its resources. Calling `close` on a database that is already closed does nothing. Any other operation on a closed database raises an error. All prepared statements should be finalized before closing."
+returns = "Nothing."
+errors = '''
+- Raises an error with SQLite's error message if the database cannot be closed, for example because of statements that have not been finalized. The database remains open in that case.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open("app.db")
+
+// ... use the database ...
+
+db.close()
+db.close() // safe, does nothing
+'''
+
+###
+
+[[entry]]
+name = "Statement"
+kind = "class"
+signature = "class Statement"
+summary = "A prepared SQL statement that can be run repeatedly."
+description = """
+Represents a compiled SQL statement, returned by `Database.prepare`. Each execution first resets the statement and clears its previous bindings, and then binds the parameters that were passed, so the same statement can be run any number of times with different values. Parameters follow the same rules as for `Database` methods.
+
+The statement is finalized automatically when the object is collected. Call `finalize` to release it at a specific point, in particular before closing the database.
+"""
+returns = "A `Statement` object."
+errors = '''
+- Calling any method other than `finalize` on a statement that has been finalized raises an error stating that the statement is finalized.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE users (name TEXT, age INTEGER)")
+
+const insert = db.prepare("INSERT INTO users(name, age) VALUES (:name, :age)")
+insert.run({ name = "Ada", age = 37 })
+insert.run({ name = "Grace", age = 85 })
+insert.finalize()
+
+const select = db.prepare("SELECT name FROM users WHERE age > ?")
+print(select.query([50]).len)
+select.finalize()
+'''
+
+###
+
+[[entry]]
+name = "Statement.run"
+kind = "method"
+signature = "function Statement.run(params)"
+summary = "Executes the prepared statement."
+description = "Reset the statement, bind `params`, and execute it, consuming any rows it returns."
+returns = "A map with two keys: `changes`, the number of rows modified by the most recent statement, and `last_id`, the row ID of the most recently inserted row."
+errors = '''
+- Raises an error if the statement has been finalized.
+- Raises an error if `params` is neither a list nor a map.
+- Raises an error if a parameter has an unsupported type, such as a list, map or function.
+- Raises an error with SQLite's error message if execution fails, for example because of a violated constraint.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE logs (message TEXT)")
+
+const insert = db.prepare("INSERT INTO logs(message) VALUES (?)")
+
+const first = insert.run(["started"])
+print(first["last_id"]) // 1
+
+const second = insert.run(["finished"])
+print(second["last_id"]) // 2
+
+insert.finalize()
+'''
+
+[[entry.params]]
+name = "params"
+desc = "(Optional) A list of positional values or a map of named values to bind to the placeholders."
+
+###
+
+[[entry]]
+name = "Statement.query"
+kind = "method"
+signature = "function Statement.query(params)"
+summary = "Executes the prepared statement and returns all rows."
+description = "Reset the statement, bind `params`, execute it, and collect every resulting row. Each row is a map from column name to value."
+returns = "A list of maps, one per row, which is empty if the statement returns no rows."
+errors = '''
+- Raises an error if the statement has been finalized.
+- Raises an error if `params` is neither a list nor a map.
+- Raises an error if a parameter has an unsupported type, such as a list, map or function.
+- Raises an error with SQLite's error message if execution fails.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec(```
+CREATE TABLE titles (name TEXT, year INTEGER);
+INSERT INTO titles VALUES ('Arrival', 2016), ('Severance', 2022), ('Spirited Away', 2001);```)
+
+const since = db.prepare("SELECT name FROM titles WHERE year >= ? ORDER BY year")
+
+for const title in since.query([2010])
+{
+    print(title["name"])
+}
+
+since.finalize()
+'''
+
+[[entry.params]]
+name = "params"
+desc = "(Optional) A list of positional values or a map of named values to bind to the placeholders."
+
+###
+
+[[entry]]
+name = "Statement.finalize"
+kind = "method"
+signature = "function Statement.finalize()"
+summary = "Releases the prepared statement."
+description = "Release the prepared statement. Calling `finalize` on a statement that is already finalized does nothing. Any other use of a finalized statement raises an error."
+returns = "Nothing."
+errors = '''
+- Does not raise errors when called again on a finalized statement.
+'''
+example = '''
+import sqlite3
+
+const db = sqlite3.open(":memory:")
+db.exec("CREATE TABLE logs (message TEXT)")
+
+const insert = db.prepare("INSERT INTO logs(message) VALUES (?)")
+insert.run(["started"])
+
+insert.finalize()
+insert.finalize() // safe, does nothing
+
+db.close()
+'''

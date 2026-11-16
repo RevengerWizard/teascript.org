@@ -1,0 +1,22 @@
+<section class="api-entry" id="{{ .name }}">
+    {{ $tags := .tags }}{{ if and (not $.isC) (not $tags) }}{{ with .teaCategory }}{{ $tags = slice . }}{{ end }}{{ end }}
+    <header class="api-entry-header">
+        <h2>{{ .name }}</h2>
+        <div class="api-badges">
+            {{ if not $.isC }}
+                {{ with .kind }}<span class="api-pill api-pill--kind api-pill--kind-{{ . | urlize }}">{{ . }}</span>{{ end }}
+            {{ end }}
+            {{ range $tags }}<a class="api-pill api-pill--tag" href="{{ if $.isC }}/api/c/tag/{{ . }}/{{ else }}/api/tea/tag/{{ . }}/{{ end }}">{{ . }}</a>{{ end }}
+            {{ with .since }}<a class="api-pill api-pill--since" href="{{ if $.isC }}/api/c/since/{{ . }}/{{ else }}/api/tea/since/{{ . }}/{{ end }}">{{ . }}</a>{{ end }}
+            {{ with .deprecated }}<span class="api-badge api-badge--deprecated">Deprecated {{ .version }}{{ with .replacement }}; use {{ . }}{{ end }}</span>{{ end }}
+        </div>
+    </header>
+    {{ with .signature }}<div class="api-entry-field"><h3>Signature</h3><div class="api-entry-signature">{{ if $.isC }}{{ highlight . "c" (dict "class" "api-code") }}{{ else }}{{ printf "```tea\n%s\n```" . | markdownify }}{{ end }}{{ if $.isC }}{{ with $.stack }}<small class="api-stack-effect">{{ . }}</small>{{ end }}{{ end }}</div></div>{{ end }}
+    {{ with .description }}<div class="api-entry-field"><h3>Description</h3><div class="api-entry-description">{{ . | markdownify }}</div></div>{{ else }}{{ if not $.isC }}{{ with .summary }}<div class="api-entry-field"><h3>Description</h3><p>{{ . }}</p></div>{{ end }}{{ end }}{{ end }}
+    {{ with .params }}<div class="api-entry-field"><h3>Parameters</h3><dl>{{ range . }}<dt><code>{{ .name }}</code></dt><dd>{{ .desc | markdownify }}</dd>{{ end }}</dl></div>{{ end }}
+    {{ with .value }}<div class="api-entry-field"><h3>Value</h3><p>{{ . | markdownify }}</p></div>{{ end }}
+    {{ with .returns }}<div class="api-entry-field"><h3>Returns</h3><p>{{ . | markdownify }}</p></div>{{ end }}
+    {{ with .errors }}<div class="api-entry-field"><h3>Errors</h3><div>{{ . | markdownify }}</div></div>{{ end }}
+    {{ with .example }}<div class="api-entry-field"><h3>Example</h3>{{ if $.isC }}{{ highlight . "c" (dict "class" "api-code") }}{{ else }}{{ printf "```tea\n%s\n```" . | markdownify }}{{ end }}</div>{{ end }}
+    {{ with .see_also }}<div class="api-entry-field"><h3>See also</h3><p>{{ range $i, $name := . }}{{ if $i }}, {{ end }}{{ $href := partial "api/resolve-see-also.html" (dict "name" $name "isC" $.isC "category" $.apiCategory "teaCategory" $.teaCategory) }}<a href="{{ $href }}">{{ $name }}</a>{{ end }}</p></div>{{ end }}
+</section>

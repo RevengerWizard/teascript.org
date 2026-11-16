@@ -1,0 +1,103 @@
+title = "Calls"
+slug = "calls"
+summary = "Call functions from C"
+description = "Functions for calling Teascript and C functions from C code, with or without error protection. To call a function, push it onto the stack, then push its arguments in order, then call. The function and its arguments are popped and replaced by the single value the function returns.\n\nAn unprotected call lets any error propagate to the caller. A protected call catches the error, leaves the error value on the stack and reports an error code instead; use it whenever the callee may fail and you need to recover."
+
+[[entry]]
+name = "tea_call"
+kind = "function"
+since = "1.0"
+tags = ["call"]
+signature = "void tea_call(tea_State* T, int n);"
+summary = "Call function"
+description = "Calls the function at position `top - n - 1` with the `n` arguments above it, in order. The function and its arguments are popped, and the result is pushed in their place.\n\nThis is an unprotected call: an error raised inside the callee propagates out of the C function that called `tea_call`. Use `tea_pcall` when you need to catch errors."
+errors = "Propagates any error raised by the called function."
+stack = "[-(n+1), +1, e]"
+example = '''
+/* assume a global function "greet" that takes one argument */
+if(tea_get_global(T, "greet"))
+{
+    tea_push_string(T, "world");
+    tea_call(T, 1);          /* the result replaces the function and argument */
+    tea_pop(T, 1);           /* drop the result */
+}
+'''
+see_also = ["tea_pcall", "tea_pccall", "tea_get_global"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Number of arguments"
+
+###
+
+[[entry]]
+name = "tea_pcall"
+kind = "function"
+since = "1.0"
+tags = ["call", "error"]
+signature = "int tea_pcall(tea_State* T, int n);"
+summary = "Protected call"
+description = "Calls the function at position `top - n - 1` with the `n` arguments above it, in protected mode. Whether the call succeeds or fails, the function and its arguments are popped and exactly one value is pushed in their place: the result on success, or the error value on failure. On failure, one of the `TEA_ERROR_*` codes is returned.\n\nIn both cases there is one value to pop afterwards."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-(n+1), +1, -]"
+example = '''
+if(tea_get_global(T, "risky"))
+{
+    tea_push_integer(T, 42);
+    int status = tea_pcall(T, 1);
+    if(status != TEA_OK)
+        fprintf(stderr, "call failed: %s\n", tea_get_string(T, -1));
+    tea_pop(T, 1);           /* the result, or the error value */
+}
+'''
+see_also = ["tea_call", "tea_pccall", "TEA_OK"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Number of arguments"
+
+###
+
+[[entry]]
+name = "tea_pccall"
+kind = "function"
+since = "1.0"
+tags = ["call", "error", "cfunction"]
+signature = "int tea_pccall(tea_State* T, tea_CFunction func, void* ud);"
+summary = "Protected C function call"
+description = "Calls the C function `func` in protected mode, passing it the pointer `ud` as its only argument. It saves you from pushing a C function and a pointer by hand before calling `tea_pcall`, and is the usual way to run C code that may raise errors from code that must not be interrupted.\n\nInside `func`, `ud` is available as a pointer value, readable with `tea_get_pointer`. If `func` raises an error, it is caught and the error value is left on the stack."
+returns = "`TEA_OK` on success; otherwise an error code."
+stack = "[-0, +(0|1), -]"
+example = '''
+typedef struct Point { int x, y; } Point;
+
+static void process_point(tea_State* T)
+{
+    Point* p = (Point*)tea_get_pointer(T, 1);
+    printf("(%d, %d)\n", p->x, p->y);
+}
+
+Point pt = { 3, 4 };
+int status = tea_pccall(T, process_point, &pt);
+'''
+see_also = ["tea_pcall", "tea_call", "tea_get_pointer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "func"
+desc = "C function to call"
+
+[[entry.params]]
+name = "ud"
+desc = "Pointer passed to `func` as its argument"

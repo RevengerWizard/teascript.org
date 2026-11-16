@@ -1,0 +1,418 @@
+title = "Stack Manipulation"
+slug = "stack"
+summary = "Manipulate the value stack"
+description = "Functions for manipulating the Teascript value stack from C: pushing, popping, inserting, removing and rearranging values, and making sure there is room for more. Together they form the basis for receiving arguments and returning results when interfacing with Teascript code.\n\nStack indices are zero-based: `0` is the first value. A negative index counts back from the top, so `-1` is the top value. Pseudo-indices (such as the registry and upvalues) are special negative values that do not refer to real stack slots."
+
+[[entry]]
+name = "TEA_MIN_STACK"
+kind = "const"
+since = "1.0"
+tags = ["stack", "const"]
+signature = "#define TEA_MIN_STACK 20"
+summary = "Guaranteed C stack slots"
+description = "The number of free stack slots guaranteed to a C function when it starts running. A function that pushes more values than this must reserve the extra space first with `tea_check_stack` or `tea_test_stack`."
+example = '''
+static void many(tea_State* T)
+{
+    /* needs more than TEA_MIN_STACK slots: reserve them */
+    tea_check_stack(T, 100, "too many values");
+    for(int i = 0; i < 100; i++)
+        tea_push_integer(T, i);
+}
+'''
+see_also = ["tea_check_stack", "tea_test_stack"]
+
+###
+
+[[entry]]
+name = "TEA_REGISTRY_INDEX"
+kind = "const"
+since = "1.0"
+tags = ["stack", "index", "const"]
+signature = "#define TEA_REGISTRY_INDEX (-10000)"
+summary = "Registry pseudo-index"
+description = "Pseudo-index that refers to the registry, a table reserved for use by C code. It is not a real stack slot, but it is accepted by functions that take an index."
+see_also = ["TEA_UPVALUES_INDEX", "tea_absindex"]
+
+###
+
+[[entry]]
+name = "TEA_UPVALUES_INDEX"
+kind = "const"
+since = "1.0"
+tags = ["stack", "index", "const"]
+signature = "#define TEA_UPVALUES_INDEX (-11000)"
+summary = "Upvalues pseudo-index base"
+description = "Base of the pseudo-indices that refer to the upvalues of the running C closure. Use `tea_upvalue_index` rather than this value directly."
+see_also = ["tea_upvalue_index", "tea_push_cclosure"]
+
+###
+
+[[entry]]
+name = "tea_upvalue_index"
+kind = "macro"
+since = "1.0"
+tags = ["stack", "index", "macro"]
+signature = "#define tea_upvalue_index(i) (TEA_UPVALUES_INDEX - (i))"
+summary = "Upvalue pseudo-index"
+description = "Produces the pseudo-index of upvalue `i` of the running C closure. The upvalues are the values that were popped when the closure was created with `tea_push_cclosure`."
+example = '''
+static void counter(tea_State* T)
+{
+    /* read the first upvalue, bump it and store it back */
+    tea_push_value(T, tea_upvalue_index(1));
+    tea_Integer n = tea_get_integer(T, -1) + 1;
+    tea_pop(T, 1);
+    tea_push_integer(T, n);
+    tea_replace(T, tea_upvalue_index(1));
+}
+'''
+see_also = ["tea_push_cclosure", "TEA_UPVALUES_INDEX"]
+
+[[entry.params]]
+name = "i"
+desc = "Upvalue number"
+
+###
+
+[[entry]]
+name = "tea_absindex"
+kind = "function"
+since = "1.0"
+tags = ["stack", "index"]
+signature = "int tea_absindex(tea_State* T, int index);"
+summary = "Absolute index"
+description = "Converts the acceptable index `index` into an equivalent absolute index, one that does not depend on the current top of the stack. An index that is already absolute, or a pseudo-index, is returned unchanged."
+returns = "The absolute index corresponding to `index`."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_integer(T, 123);
+tea_push_integer(T, 456);
+tea_push_integer(T, 789);       /* [123, 456, 789] */
+
+int abs = tea_absindex(T, -2);  /* abs = 1 */
+tea_push_integer(T, 101);       /* -2 would now mean 789, abs still means 456 */
+tea_push_value(T, abs);         /* [123, 456, 789, 101, 456] */
+'''
+see_also = ["tea_get_top", "tea_set_top"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index to convert"
+
+###
+
+[[entry]]
+name = "tea_get_top"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "int tea_get_top(tea_State* T);"
+summary = "Stack size"
+description = "Returns the number of elements in the current frame. Because indices are zero-based, the top element is at index `n - 1` (also reachable as `-1`). A result of `0` means the stack is empty."
+returns = "The number of elements on the stack."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_integer(T, 42);
+tea_push_integer(T, 43);
+int n = tea_get_top(T);   /* n = 2 */
+'''
+see_also = ["tea_set_top", "tea_absindex"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_set_top"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_set_top(tea_State* T, int index);"
+summary = "Set stack top"
+description = "Sets the stack top to `index`. If the new top is larger than the old one, the new slots are filled with `nil`. If it is smaller, the values above the new top are discarded.\n\n{{< stack before=\"...,a,b,c\" after=\"...,a\" >}}\n\n`tea_set_top(T, 0)` empties the stack."
+stack = "[-?, +?, -]"
+example = '''
+/* assume the stack is empty */
+tea_push_integer(T, 123);   /* top = 1, [123] */
+tea_set_top(T, 3);          /* top = 3, [123, nil, nil] */
+tea_set_top(T, 1);          /* top = 1, [123] */
+tea_set_top(T, 0);          /* top = 0, [] */
+'''
+see_also = ["tea_pop", "tea_get_top"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "New stack top"
+
+###
+
+[[entry]]
+name = "tea_pop"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_pop(tea_State* T, int n);"
+summary = "Pop values"
+description = "Removes `n` elements from the top of the stack.\n\n{{< stack before=\"...,val1,...,valN\" after=\"...\" >}}"
+stack = "[-n, +0, -]"
+example = '''
+tea_push_integer(T, 1);
+tea_push_integer(T, 2);
+tea_push_integer(T, 3);   /* [1, 2, 3] */
+tea_pop(T, 2);            /* [1] */
+'''
+see_also = ["tea_set_top", "tea_remove"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Number of elements to pop"
+
+###
+
+[[entry]]
+name = "tea_push_value"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_push_value(tea_State* T, int index);"
+summary = "Duplicate value"
+description = "Pushes a copy of the value at `index` onto the top of the stack.\n\n{{< stack before=\"...,val,...\" after=\"...,val,...,val\" >}}"
+stack = "[-0, +1, -]"
+example = '''
+tea_push_string(T, "tea");      /* ["tea"] */
+tea_push_value(T, -1);          /* ["tea", "tea"] */
+'''
+see_also = ["tea_copy", "tea_replace"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to duplicate"
+
+###
+
+[[entry]]
+name = "tea_remove"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_remove(tea_State* T, int index);"
+summary = "Remove value"
+description = "Removes the value at `index`. The elements above `index` are shifted down to fill the gap.\n\n{{< stack before=\"...,val(index),...\" after=\"...,...\" >}}"
+stack = "[-1, +0, -]"
+example = '''
+tea_push_integer(T, 123);
+tea_push_integer(T, 453);
+tea_push_integer(T, 987);   /* [123, 453, 987] */
+tea_remove(T, -2);          /* [123, 987] */
+'''
+see_also = ["tea_insert", "tea_pop"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to remove"
+
+###
+
+[[entry]]
+name = "tea_insert"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_insert(tea_State* T, int index);"
+summary = "Insert top value"
+description = "Moves the top value into position `index`, shifting up the elements at and above `index`.\n\n{{< stack before=\"...,old(index),...,val\" after=\"...,val(index),old,...\" >}}\n\n> [!NOTE]\n> A negative `index` is evaluated before the top value is popped."
+stack = "[-1, +1, -]"
+example = '''
+tea_push_string(T, "foo");
+tea_push_string(T, "tea");
+tea_push_integer(T, 698);
+tea_push_string(T, "bar");  /* ["foo", "tea", 698, "bar"] */
+tea_insert(T, -3);          /* ["foo", "bar", "tea", 698] */
+'''
+see_also = ["tea_remove", "tea_replace"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index where the top value is inserted"
+
+###
+
+[[entry]]
+name = "tea_replace"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_replace(tea_State* T, int index);"
+summary = "Replace with top"
+description = "Pops the top value and uses it to overwrite the value at `index`.\n\n{{< stack before=\"...,old(index),...,val\" after=\"...,val(index),...\" >}}\n\n> [!NOTE]\n> A negative `index` is evaluated before the top value is popped."
+stack = "[-1, +0, -]"
+example = '''
+tea_push_integer(T, 123);
+tea_push_integer(T, 897);
+tea_push_integer(T, 769);
+tea_push_string(T, "bar");  /* [123, 897, 769, "bar"] */
+tea_replace(T, -3);         /* [123, "bar", 769] */
+'''
+see_also = ["tea_copy", "tea_insert"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value to overwrite"
+
+###
+
+[[entry]]
+name = "tea_copy"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_copy(tea_State* T, int from_index, int to_index);"
+summary = "Copy between slots"
+description = "Copies the value at `from_index` into `to_index`, overwriting the previous value there. The stack size does not change.\n\n{{< stack before=\"...,old(to_index),...,val(from_index),...\" after=\"...,val(to_index),...,val(from_index),...\" >}}\n\nThis is shorthand for:\n\n```c\nto_index = tea_absindex(T, to_index);\ntea_push_value(T, from_index);\ntea_replace(T, to_index);\n```"
+stack = "[-0, +0, -]"
+example = '''
+tea_push_integer(T, 10);
+tea_push_integer(T, 20);
+tea_push_integer(T, 30);
+tea_copy(T, -1, 0);         /* [30, 20, 30] */
+'''
+see_also = ["tea_push_value", "tea_replace"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "from_index"
+desc = "Stack index of the source value"
+
+[[entry.params]]
+name = "to_index"
+desc = "Stack index of the destination slot"
+
+###
+
+[[entry]]
+name = "tea_swap"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "void tea_swap(tea_State* T, int index1, int index2);"
+summary = "Swap two slots"
+description = "Swaps the values at `index1` and `index2`. If both indices are the same, nothing happens.\n\n{{< stack before=\"...,val1,...,val2,...\" after=\"...,val2,...,val1,...\" >}}"
+stack = "[-0, +0, -]"
+example = '''
+tea_push_integer(T, 569);
+tea_push_string(T, "foo");
+tea_push_integer(T, 437);
+tea_push_string(T, "bar");
+tea_push_string(T, "tea");  /* [569, "foo", 437, "bar", "tea"] */
+tea_swap(T, -3, -1);        /* [569, "foo", "tea", "bar", 437] */
+'''
+see_also = ["tea_copy", "tea_replace"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index1"
+desc = "First stack index"
+
+[[entry.params]]
+name = "index2"
+desc = "Second stack index"
+
+###
+
+[[entry]]
+name = "tea_test_stack"
+kind = "function"
+since = "1.0"
+tags = ["stack"]
+signature = "bool tea_test_stack(tea_State* T, int size);"
+summary = "Try to grow stack"
+description = "Checks whether the stack has room for at least `size` more elements, growing it if necessary. Returns `true` if the space is available and `false` otherwise; on failure the stack is left unchanged.\n\nUnlike `tea_check_stack`, this function never raises an error, so it can be used to handle a potential stack overflow gracefully."
+returns = "`true` if the stack can hold `size` more elements; `false` otherwise."
+stack = "[-0, +0, m]"
+example = '''
+if(!tea_test_stack(T, 4))
+{
+    tea_error(T, "not enough stack space");
+}
+'''
+see_also = ["tea_check_stack", "tea_get_top", "TEA_MIN_STACK"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Number of additional slots required"
+
+###
+
+[[entry]]
+name = "tea_check_stack"
+kind = "function"
+since = "1.0"
+tags = ["stack", "error"]
+signature = "void tea_check_stack(tea_State* T, int size, const char* msg);"
+summary = "Grow stack or raise"
+description = "Ensures the stack has room for at least `size` more elements, growing it if necessary. If the stack cannot grow enough, a stack overflow error is raised, using `msg` as part of its message.\n\nUse `tea_test_stack` if you need to handle the failure yourself."
+errors = "Raises a runtime error (stack overflow) if the requested space is not available."
+stack = "[-0, +0, v]"
+example = '''
+static void push_range(tea_State* T)
+{
+    tea_Integer n = tea_check_integer(T, 1);
+    tea_check_stack(T, (int)n, "range too large");
+    for(tea_Integer i = 0; i < n; i++)
+        tea_push_integer(T, i);
+}
+'''
+see_also = ["tea_test_stack", "tea_get_top", "TEA_MIN_STACK"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Number of additional slots required"
+
+[[entry.params]]
+name = "msg"
+desc = "Message included in the error if the check fails"

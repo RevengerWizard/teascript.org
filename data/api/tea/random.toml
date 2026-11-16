@@ -1,0 +1,131 @@
+title = "Random"
+slug = "random"
+kind = "module"
+origin = "modules"
+since = "1.0"
+summary = "Pseudo-random number generation"
+description = "The random module provides a pseudo-random number generator and helpers for producing random booleans, integers, numbers, ranges, and selections. Seed the generator when repeatable sequences are needed."
+
+[[entry]]
+name = "random.seed"
+kind = "function"
+signature = "function random.seed(x)"
+summary = "Init random number generator"
+description = "The function `seed` initializes the random number generator with a starting value. Using the same seed will produce the same sequence of random numbers."
+example = "import random\n\n// Seed with a specific value for reproducible results\nrandom.seed(42)\nvar a = random.random()\nvar b = random.random()\n\n// Reset to the same seed\nrandom.seed(42)\nvar c = random.random()\nvar d = random.random()\n\nprint(a == c)  // true\nprint(b == d)  // true\n\n// Seed with current time for different results each run\nrandom.seed(12345)\nprint(\"Random value:\", random.random())"
+
+[[entry.params]]
+name = "x"
+desc = "A number used as the seed value"
+
+###
+
+[[entry]]
+name = "random.random"
+kind = "function"
+signature = "function random.random()"
+summary = "Random number 0 to <1"
+description = "The function `random` provides a random floating-point number between 0 (inclusive) and 1 (exclusive)."
+example = "import random\n\n// Generate a random decimal\nvar value = random.random()\nprint(\"Random value:\", value)  // e.g. 0.723456789\n\n// Generate multiple random values\nfor const i in 0..5\n{\n    print(random.random())\n}\n\n// Scale to a custom range\nvar percentage = random.random() * 100\nprint(\"Random percentage:\", percentage)"
+
+###
+
+[[entry]]
+name = "random.bool"
+kind = "function"
+signature = "function random.bool()"
+summary = "Random bool"
+description = "The function `bool` provides a random boolean value, either `true` or `false`, with equal probability."
+example = "import random\n\n// Flip a coin\nvar coin = random.bool()\nprint(\"Heads or tails:\", coin)\n\n// Simulate a series of coin flips\nvar heads = 0\nvar tails = 0\nfor const i in 0..100\n{\n    if random.bool()\n    {\n        heads += 1\n    }\n    else\n    {\n        tails += 1\n    }\n}\nprint(\"Heads: \" + heads + \", Tails: \" + tails)\n\n// Random decision\nif random.bool()\n{\n    print(\"Taking the left path\")\n}\nelse\n{\n    print(\"Taking the right path\")\n}"
+
+###
+
+[[entry]]
+name = "random.int"
+kind = "function"
+signature = "function random.int(a, b)"
+summary = "Random ranged int number"
+description = "The function `int` provides a random integer between `a` and `b`, inclusive."
+returns = "A random integer in the range `[a, b]`"
+example = "import random\n\n// Roll a six-sided die\nvar roll = random.int(1, 6)\nprint(\"You rolled:\", roll)\n\n// Generate a random index\nvar items = [\"apple\", \"banana\", \"cherry\", \"date\"]\nvar idx = random.int(0, len(items) - 1)\nprint(\"Selected:\", items[idx])\n\n// Random level generation\nvar level = random.int(1, 100)\nprint(\"Generated level:\", level)\n\n// Simulate dice rolls\nfor const i in 0..5\n{\n    print(\"Roll \" + (i + 1) + \": \" + random.int(1, 6))\n}"
+
+[[entry.params]]
+name = "a"
+desc = "The lower bound (inclusive)"
+
+[[entry.params]]
+name = "b"
+desc = "The upper bound (inclusive)"
+
+###
+
+[[entry]]
+name = "random.number"
+kind = "function"
+signature = "function random.number(a, b)"
+summary = "Random ranged number"
+description = "The function `number` provides a random floating-point number between `a` and `b`."
+returns = "A random number in the range `[a, b)`"
+example = "import random\n\n// Random temperature between 20.0 and 30.0\nvar temp = random.number(20.0, 30.0)\nprint(\"Temperature:\", temp)\n\n// Random position in a game world\nvar x = random.number(-100.0, 100.0)\nvar y = random.number(-100.0, 100.0)\nprint(\"Spawn position: \" + x + \" \" + y)\n\n// Random probability\nvar chance = random.number(0.0, 1.0)\nif chance < 0.25\n{\n    print(\"Rare event triggered!\")\n}\n\n// Random damage calculation\nvar damage = random.number(10.0, 20.0)\nprint(\"Damage dealt:\", damage)"
+
+[[entry.params]]
+name = "a"
+desc = "The lower bound"
+
+[[entry.params]]
+name = "b"
+desc = "The upper bound"
+
+###
+
+[[entry]]
+name = "random.range"
+kind = "function"
+signature = "function random.range(iter)\nfunction random.range(start, end)\nfunction random.range(start, end, step)"
+summary = "Random number from range"
+description = "The function `range` provides a random number from a specified range, honoring the range's step value."
+example = "import random\n\n// Random value from a range\nprint(random.range(0..10))\n\n// Random value from a range with a step\nprint(random.range(0..100..10))\n\n// Single numeric argument\nprint(random.range(50))\n\n// Two numeric arguments\nprint(random.range(10, 20))\n\n// Three numeric arguments\nprint(random.range(0, 100, 5))\n\n// Random even number between 0 and 20\nprint(random.range(0, 20, 2))\n\n// Random multiple of 25 between 0 and 200\nprint(random.range(0, 200, 25))"
+
+[[entry.params]]
+name = "iter"
+desc = "A range, or the upper bound when used with a single numeric argument"
+
+[[entry.params]]
+name = "start"
+desc = "The start of the range (inclusive)"
+
+[[entry.params]]
+name = "end"
+desc = "The end of the range (exclusive)"
+
+[[entry.params]]
+name = "step"
+desc = "The step between values (default 1)"
+
+###
+
+[[entry]]
+name = "random.choice"
+kind = "function"
+signature = "function random.choice(list)"
+summary = "Random list element"
+description = "The function `choice` provides a random element from a given list."
+returns = "A randomly selected element from the list"
+example = "import random\n\n// Pick a random color\nvar colors = [\"red\", \"green\", \"blue\", \"yellow\"]\nprint(\"Selected color:\", random.choice(colors))\n\n// Pick a random card\nvar deck = [\"Ace\", \"King\", \"Queen\", \"Jack\", \"10\", \"9\", \"8\"]\nprint(\"Drawn card:\", random.choice(deck))\n\n// Random reward from a loot table\nvar loot = [\"gold\", \"silver\", \"gem\", \"potion\", \"scroll\"]\nprint(\"You found:\", random.choice(loot))\n\n// Random enemy encounter\nvar enemies = [\"goblin\", \"orc\", \"troll\", \"dragon\"]\nvar enemy = random.choice(enemies)\nprint(\"A wild \" + enemy + \" appears!\")"
+
+[[entry.params]]
+name = "list"
+desc = "The list from which to choose an element"
+
+###
+
+[[entry]]
+name = "random.shuffle"
+kind = "function"
+signature = "function random.shuffle(list)"
+summary = "Randomly re-order list elements"
+description = "The function `shuffle` randomly reorders the elements of a list in place."
+
+[[entry.params]]
+name = "list"
+desc = "The list to shuffle"

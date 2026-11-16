@@ -1,0 +1,7 @@
+{{ if eq .Params.apiTagAPI "tea" }}
+    {{ partial "api/tea-tag.html" . }}
+{{ else }}
+    {{ $tagType := .Params.apiTagType }}{{ $tag := .Params.apiTag }}{{ $entries := slice }}
+    {{ range site.Data.api.c._index.categories }}{{ $category := . }}{{ $data := index site.Data.api.c $category.slug }}{{ range $data.entry }}{{ if or (and (eq $tagType "since") (eq .since $tag)) (and (eq $tagType "tag") (in .tags $tag)) }}{{ $entries = $entries | append (dict "entry" . "category" $category) }}{{ end }}{{ end }}{{ end }}
+    <div class="page-layout page-api page-api-index-page"><main class="page-main api-main"><article class="post-single"><header class="post-header"><div class="post-title-row"><h1 class="post-title">{{ .Title }}</h1></div></header><div class="post-content"><div class="api-index-table-wrap"><table class="api-index-table"><thead><tr><th>Name</th><th>Category</th><th>Kind</th><th>Summary</th></tr></thead><tbody>{{ range $entries }}{{ $item := .entry }}{{ $cat := .category }}<tr><td><a href="/api/c/{{ $cat.slug }}/#{{ $item.name }}">{{ $item.name }}</a></td><td><a href="/api/c/{{ $cat.slug }}/">{{ $cat.title }}</a></td><td><span class="api-pill api-pill--kind api-pill--kind-{{ $item.kind | urlize }}">{{ $item.kind }}</span></td><td>{{ $item.summary }}</td></tr>{{ end }}</tbody></table></div></div></article></main></div>
+{{ end }}

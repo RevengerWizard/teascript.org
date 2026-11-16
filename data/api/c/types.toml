@@ -1,0 +1,705 @@
+title = "Types"
+slug = "types"
+summary = "Type codes and type queries"
+description = "The type codes and masks used by the C API, and the functions and macros that inspect the type of a value on the stack or compare two values. None of them raise errors on a type mismatch: they only report. To validate arguments and raise an error instead, see the Argument Checking section.\n\nAn index that holds no value (past the top of the stack) has type `TEA_TYPE_NONE`, which is different from the Teascript value `nil` (`TEA_TYPE_NIL`)."
+
+[[entry]]
+name = "TEA_TYPE_NONE"
+kind = "enum"
+since = "1.0"
+tags = ["type", "enum"]
+signature = '''
+enum
+{
+    TEA_TYPE_NONE,
+    TEA_TYPE_NIL,
+    TEA_TYPE_BOOL,
+    TEA_TYPE_NUMBER,
+    TEA_TYPE_POINTER,
+    TEA_TYPE_STRING,
+    TEA_TYPE_RANGE,
+    TEA_TYPE_FUNCTION,
+    TEA_TYPE_MODULE,
+    TEA_TYPE_CLASS,
+    TEA_TYPE_INSTANCE,
+    TEA_TYPE_LIST,
+    TEA_TYPE_MAP,
+    TEA_TYPE_USERDATA,
+};
+'''
+summary = "Basic type codes"
+description = '''
+The codes returned by `tea_get_type` and accepted by `tea_check_type`. The values are consecutive, starting at `0`.
+
+| Code | Value |
+|---|---|
+| `TEA_TYPE_NONE` | No value (empty or invalid index) |
+| `TEA_TYPE_NIL` | `nil` |
+| `TEA_TYPE_BOOL` | Boolean |
+| `TEA_TYPE_NUMBER` | Number |
+| `TEA_TYPE_POINTER` | Raw C pointer |
+| `TEA_TYPE_STRING` | String |
+| `TEA_TYPE_RANGE` | Range |
+| `TEA_TYPE_FUNCTION` | Function |
+| `TEA_TYPE_MODULE` | Module |
+| `TEA_TYPE_CLASS` | Class |
+| `TEA_TYPE_INSTANCE` | Class instance |
+| `TEA_TYPE_LIST` | List |
+| `TEA_TYPE_MAP` | Map |
+| `TEA_TYPE_USERDATA` | Userdata |
+'''
+example = '''
+switch(tea_get_type(T, 1))
+{
+    case TEA_TYPE_NUMBER: /* ... */ break;
+    case TEA_TYPE_STRING: /* ... */ break;
+    default:              /* ... */ break;
+}
+'''
+see_also = ["tea_get_type", "tea_check_type", "TEA_MASK_NONE"]
+
+###
+
+[[entry]]
+name = "TEA_MASK_NONE"
+kind = "const"
+since = "1.0"
+tags = ["type", "mask", "const"]
+signature = "#define TEA_MASK_<TYPE> (1 << TEA_TYPE_<TYPE>)"
+summary = "Type bit masks"
+description = "One bit mask per basic type, each defined as `1 << TEA_TYPE_x`: `TEA_MASK_NONE`, `TEA_MASK_NIL`, `TEA_MASK_BOOL`, `TEA_MASK_NUMBER`, `TEA_MASK_POINTER`, `TEA_MASK_STRING`, `TEA_MASK_RANGE`, `TEA_MASK_FUNCTION`, `TEA_MASK_MODULE`, `TEA_MASK_CLASS`, `TEA_MASK_INSTANCE`, `TEA_MASK_LIST`, `TEA_MASK_MAP` and `TEA_MASK_USERDATA`.\n\nMasks can be combined with `|` and tested against a value with `tea_is_mask`, which makes it easy to accept several types at once."
+example = '''
+/* accept a list or a map */
+if(!tea_is_mask(T, 1, TEA_MASK_LIST | TEA_MASK_MAP))
+    tea_type_error(T, 1, "list or map");
+'''
+see_also = ["tea_get_mask", "tea_is_mask", "TEA_TYPE_NONE"]
+
+###
+
+[[entry]]
+name = "tea_typeof"
+kind = "function"
+since = "1.0"
+tags = ["type", "string"]
+signature = "const char* tea_typeof(tea_State* T, int index);"
+summary = "Type name"
+description = "Returns the name of the type of the value at `index` as a NUL-terminated C string (for example `\"number\"`, `\"string\"` or `\"list\"`). If the index holds no value, the string `\"no value\"` is returned.\n\nThe string belongs to the interpreter and must not be modified. It is meant for diagnostics, error messages and debugging output."
+returns = "The type name of the value at `index`."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_number(T, 1);
+printf("%s\n", tea_typeof(T, -1));   /* number */
+'''
+see_also = ["tea_get_type", "tea_type_error"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_get_type"
+kind = "function"
+since = "1.0"
+tags = ["type"]
+signature = "int tea_get_type(tea_State* T, int index);"
+summary = "Type code"
+description = "Returns the type of the value at `index` as one of the `TEA_TYPE_*` constants. If the index holds no value, `TEA_TYPE_NONE` is returned."
+returns = "One of the `TEA_TYPE_*` constants."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_nil(T);
+int t = tea_get_type(T, -1);   /* TEA_TYPE_NIL */
+t = tea_get_type(T, 5);        /* TEA_TYPE_NONE: no value at index 5 */
+'''
+see_also = ["tea_get_mask", "tea_typeof", "TEA_TYPE_NONE"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_get_mask"
+kind = "function"
+since = "1.0"
+tags = ["type", "mask"]
+signature = "int tea_get_mask(tea_State* T, int index);"
+summary = "Type mask"
+description = "Returns the type mask of the value at `index`, the `TEA_MASK_*` constant that corresponds to its type. This is `1 << tea_get_type(T, index)`."
+returns = "One of the `TEA_MASK_*` constants."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_string(T, "tea");
+if(tea_get_mask(T, -1) & (TEA_MASK_STRING | TEA_MASK_NUMBER))
+{
+    /* a string or a number */
+}
+'''
+see_also = ["tea_is_mask", "tea_get_type", "TEA_MASK_NONE"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_object"
+kind = "function"
+since = "1.0"
+tags = ["type", "object"]
+signature = "bool tea_is_object(tea_State* T, int index);"
+summary = "Is heap object"
+description = "Returns `true` if the value at `index` is a garbage-collected object, as opposed to a plain value such as `nil`, a boolean, a number or a raw pointer."
+returns = "`true` if the value is an object; `false` otherwise, including for an invalid index."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_string(T, "tea");
+tea_push_number(T, 1);
+bool a = tea_is_object(T, -2);   /* true */
+bool b = tea_is_object(T, -1);   /* false */
+'''
+see_also = ["tea_get_type", "tea_gc"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_cfunction"
+kind = "function"
+since = "1.0"
+tags = ["type", "cfunction"]
+signature = "bool tea_is_cfunction(tea_State* T, int index);"
+summary = "Is C function"
+description = "Returns `true` if the value at `index` is a C function, that is, one created with `tea_push_cfunction`, `tea_push_cclosure` or one of the registration helpers. Functions written in Teascript are not C functions."
+returns = "`true` if the value is a C function; `false` otherwise."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_cfunction(T, my_func, 0, 0);
+bool c = tea_is_cfunction(T, -1);   /* true */
+'''
+see_also = ["tea_to_cfunction", "tea_check_cfunction", "tea_push_cfunction"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_equal"
+kind = "function"
+since = "1.0"
+tags = ["type", "compare"]
+signature = "bool tea_equal(tea_State* T, int index1, int index2);"
+summary = "Compare values"
+description = "Returns `true` if the values at `index1` and `index2` are equal according to the `==` operator of Teascript, which may call an equality method. Use `tea_rawequal` to compare without calling any method."
+returns = "`true` if the values are equal; `false` otherwise."
+stack = "[-0, +0, e]"
+example = '''
+tea_push_integer(T, 3);
+tea_push_number(T, 3.0);
+bool eq = tea_equal(T, -2, -1);   /* true */
+'''
+see_also = ["tea_rawequal"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index1"
+desc = "Stack index of the first value"
+
+[[entry.params]]
+name = "index2"
+desc = "Stack index of the second value"
+
+###
+
+[[entry]]
+name = "tea_rawequal"
+kind = "function"
+since = "1.0"
+tags = ["type", "compare"]
+signature = "bool tea_rawequal(tea_State* T, int index1, int index2);"
+summary = "Compare without methods"
+description = "Returns `true` if the values at `index1` and `index2` are primitively equal, without calling any equality method. Returns `false` if either index is invalid."
+returns = "`true` if the values are raw-equal; `false` otherwise."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_string(T, "tea");
+tea_push_string(T, "tea");
+bool eq = tea_rawequal(T, -2, -1);   /* true */
+'''
+see_also = ["tea_equal"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "index1"
+desc = "Stack index of the first value"
+
+[[entry.params]]
+name = "index2"
+desc = "Stack index of the second value"
+
+###
+
+[[entry]]
+name = "tea_is_mask"
+kind = "macro"
+since = "1.0"
+tags = ["type", "mask", "macro"]
+signature = "#define tea_is_mask(T, n, m) (tea_get_mask(T, (n)) & (m))"
+summary = "Test against mask"
+description = "Tests whether the type of the value at `n` is one of the types in the mask `m`. The result is the masked value, so it is non-zero when the test passes; it is not necessarily `1`."
+returns = "Non-zero if the value's type is in the mask; `0` otherwise."
+stack = "[-0, +0, -]"
+example = '''
+if(tea_is_mask(T, 1, TEA_MASK_LIST | TEA_MASK_MAP))
+{
+    /* argument 1 is a list or a map */
+}
+'''
+see_also = ["tea_get_mask", "TEA_MASK_NONE"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+[[entry.params]]
+name = "m"
+desc = "Mask of accepted types (`TEA_MASK_*`, combined with `|`)"
+
+###
+
+[[entry]]
+name = "tea_is_nonenil"
+kind = "macro"
+since = "1.0"
+tags = ["type", "nil", "macro"]
+signature = "#define tea_is_nonenil(T, n) (tea_get_type(T, (n)) <= TEA_TYPE_NIL)"
+summary = "Is none or nil"
+description = "Tests whether the value at `n` is absent or `nil`. This is handy for optional arguments, where both mean \"not given\"."
+returns = "`true` if the index holds no value or `nil`."
+stack = "[-0, +0, -]"
+example = '''
+if(tea_is_nonenil(T, 2))
+{
+    /* optional argument 2 was not given */
+}
+'''
+see_also = ["tea_is_none", "tea_is_nil", "tea_opt_nil"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_none"
+kind = "macro"
+since = "1.0"
+tags = ["type", "macro"]
+signature = "#define tea_is_none(T, n) (tea_get_type(T, (n)) == TEA_TYPE_NONE)"
+summary = "Is none"
+description = "Tests whether the index `n` holds no value, as opposed to holding `nil`."
+returns = "`true` if the index holds no value."
+stack = "[-0, +0, -]"
+example = '''
+if(tea_is_none(T, 3))
+{
+    /* fewer than four values on the stack */
+}
+'''
+see_also = ["tea_is_nil", "tea_is_nonenil"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index to test"
+
+###
+
+[[entry]]
+name = "tea_is_nil"
+kind = "macro"
+since = "1.0"
+tags = ["type", "nil", "macro"]
+signature = "#define tea_is_nil(T, n) (tea_get_type(T, (n)) == TEA_TYPE_NIL)"
+summary = "Is nil"
+description = "Tests whether the value at `n` is `nil`. An index that holds no value is not `nil`; use `tea_is_nonenil` to test for both."
+returns = "`true` if the value is `nil`."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_nil(T);
+bool n = tea_is_nil(T, -1);   /* true */
+'''
+see_also = ["tea_is_none", "tea_is_nonenil", "tea_push_nil"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_bool"
+kind = "macro"
+since = "1.0"
+tags = ["type", "bool", "macro"]
+signature = "#define tea_is_bool(T, n) (tea_get_type(T, (n)) == TEA_TYPE_BOOL)"
+summary = "Is boolean"
+description = "Tests whether the value at `n` is a boolean."
+returns = "`true` if the value is a boolean."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_true(T);
+bool b = tea_is_bool(T, -1);   /* true */
+'''
+see_also = ["tea_get_bool", "tea_to_bool", "tea_check_bool"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_number"
+kind = "macro"
+since = "1.0"
+tags = ["type", "number", "macro"]
+signature = "#define tea_is_number(T, n) (tea_get_type(T, (n)) == TEA_TYPE_NUMBER)"
+summary = "Is number"
+description = "Tests whether the value at `n` is a number. Strings that look like numbers do not count; use `tea_to_numberx` to convert them."
+returns = "`true` if the value is a number."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_number(T, 3.5);
+bool b = tea_is_number(T, -1);   /* true */
+'''
+see_also = ["tea_get_number", "tea_to_numberx", "tea_check_number"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_pointer"
+kind = "macro"
+since = "1.0"
+tags = ["type", "pointer", "macro"]
+signature = "#define tea_is_pointer(T, n) (tea_get_type(T, (n)) == TEA_TYPE_POINTER)"
+summary = "Is pointer"
+description = "Tests whether the value at `n` is a raw C pointer, as pushed with `tea_push_pointer`. A userdata is not a pointer."
+returns = "`true` if the value is a raw pointer."
+stack = "[-0, +0, -]"
+example = '''
+int x;
+tea_push_pointer(T, &x);
+bool b = tea_is_pointer(T, -1);   /* true */
+'''
+see_also = ["tea_get_pointer", "tea_push_pointer", "tea_check_pointer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_range"
+kind = "macro"
+since = "1.0"
+tags = ["type", "range", "macro"]
+signature = "#define tea_is_range(T, n) (tea_get_type(T, (n)) == TEA_TYPE_RANGE)"
+summary = "Is range"
+description = "Tests whether the value at `n` is a range."
+returns = "`true` if the value is a range."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_range(T, 0, 10, 1);
+bool b = tea_is_range(T, -1);   /* true */
+'''
+see_also = ["tea_get_range", "tea_push_range", "tea_check_range"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_string"
+kind = "macro"
+since = "1.0"
+tags = ["type", "string", "macro"]
+signature = "#define tea_is_string(T, n) (tea_get_type(T, (n)) == TEA_TYPE_STRING)"
+summary = "Is string"
+description = "Tests whether the value at `n` is a string. Numbers are not strings; use `tea_to_string` to convert them."
+returns = "`true` if the value is a string."
+stack = "[-0, +0, -]"
+example = '''
+tea_push_string(T, "tea");
+bool b = tea_is_string(T, -1);   /* true */
+'''
+see_also = ["tea_get_string", "tea_to_string", "tea_check_string"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_list"
+kind = "macro"
+since = "1.0"
+tags = ["type", "list", "macro"]
+signature = "#define tea_is_list(T, n) (tea_get_type(T, (n)) == TEA_TYPE_LIST)"
+summary = "Is list"
+description = "Tests whether the value at `n` is a list."
+returns = "`true` if the value is a list."
+stack = "[-0, +0, -]"
+example = '''
+tea_new_list(T, 0);
+bool b = tea_is_list(T, -1);   /* true */
+'''
+see_also = ["tea_new_list", "tea_check_list"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_map"
+kind = "macro"
+since = "1.0"
+tags = ["type", "map", "macro"]
+signature = "#define tea_is_map(T, n) (tea_get_type(T, (n)) == TEA_TYPE_MAP)"
+summary = "Is map"
+description = "Tests whether the value at `n` is a map."
+returns = "`true` if the value is a map."
+stack = "[-0, +0, -]"
+example = '''
+tea_new_map(T);
+bool b = tea_is_map(T, -1);   /* true */
+'''
+see_also = ["tea_new_map", "tea_check_map"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_function"
+kind = "macro"
+since = "1.0"
+tags = ["type", "macro"]
+signature = "#define tea_is_function(T, n) (tea_get_type(T, (n)) == TEA_TYPE_FUNCTION)"
+summary = "Is function"
+description = "Tests whether the value at `n` is a function. Use `tea_is_cfunction` to tell C functions apart."
+returns = "`true` if the value is a function."
+stack = "[-0, +0, -]"
+example = '''
+if(tea_get_global(T, "print") && tea_is_function(T, -1))
+{
+    /* print is callable */
+}
+'''
+see_also = ["tea_is_cfunction", "tea_check_function"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_module"
+kind = "macro"
+since = "1.0"
+tags = ["type", "module", "macro"]
+signature = "#define tea_is_module(T, n) (tea_get_type(T, (n)) == TEA_TYPE_MODULE)"
+summary = "Is module"
+description = "Tests whether the value at `n` is a module."
+returns = "`true` if the value is a module."
+stack = "[-0, +0, -]"
+example = '''
+tea_import(T, "math");
+bool b = tea_is_module(T, -1);   /* true */
+'''
+see_also = ["tea_new_module", "tea_check_module"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_class"
+kind = "macro"
+since = "1.0"
+tags = ["type", "class", "macro"]
+signature = "#define tea_is_class(T, n) (tea_get_type(T, (n)) == TEA_TYPE_CLASS)"
+summary = "Is class"
+description = "Tests whether the value at `n` is a class. An instance of a class is not a class; see `tea_is_instance`."
+returns = "`true` if the value is a class."
+stack = "[-0, +0, -]"
+example = '''
+tea_new_class(T, "Point");
+bool b = tea_is_class(T, -1);   /* true */
+'''
+see_also = ["tea_is_instance", "tea_new_class", "tea_check_class"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_instance"
+kind = "macro"
+since = "1.0"
+tags = ["type", "class", "macro"]
+signature = "#define tea_is_instance(T, n) (tea_get_type(T, (n)) == TEA_TYPE_INSTANCE)"
+summary = "Is instance"
+description = "Tests whether the value at `n` is an instance of a class."
+returns = "`true` if the value is a class instance."
+stack = "[-0, +0, -]"
+example = '''
+if(tea_is_instance(T, 0))
+{
+    /* argument 0 is a class instance */
+}
+'''
+see_also = ["tea_is_class", "tea_check_instance"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"
+
+###
+
+[[entry]]
+name = "tea_is_userdata"
+kind = "macro"
+since = "1.0"
+tags = ["type", "userdata", "macro"]
+signature = "#define tea_is_userdata(T, n) (tea_get_type(T, (n)) == TEA_TYPE_USERDATA)"
+summary = "Is userdata"
+description = "Tests whether the value at `n` is a userdata. To also check its class, use `tea_test_udata`."
+returns = "`true` if the value is a userdata."
+stack = "[-0, +0, -]"
+example = '''
+tea_new_userdata(T, 16);
+bool b = tea_is_userdata(T, -1);   /* true */
+'''
+see_also = ["tea_get_userdata", "tea_test_udata", "tea_check_userdata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Stack index of the value"

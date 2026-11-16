@@ -1,0 +1,197 @@
+title = "IO"
+kind = "module"
+origin = "modules"
+since = "1.0"
+summary = "Input/output functionality"
+description = "The io module provides standard input, output, and error streams, along with functions for opening files and pipes. File handles support reading, writing, seeking, flushing, and closing."
+
+[[entry]]
+name = "io.stdin"
+kind = "attribute"
+signature = "io.stdin"
+summary = "Input file"
+description = "The `io.stdin` file represents the standard input stream. It can be used to read input from the user."
+example = "import io\n\n// Read a line of input from the user\nvar str = io.stdin.readline()\nprint(str)"
+
+###
+
+[[entry]]
+name = "io.stdout"
+kind = "attribute"
+signature = "io.stdout"
+summary = "Output file"
+description = "The `io.stdout` file represents the standard output stream. It can be used to write output text to the console."
+example = "import io\n\n// Print a string to the console\nio.stdout.write(\"Hello, world!\")    // Hello, world!"
+
+###
+
+[[entry]]
+name = "io.stderr"
+kind = "attribute"
+signature = "io.stderr"
+summary = "Output error file"
+description = "The `io.stderr` file represents the standard error stream. It can be used to write error messages to the console."
+example = "import io\n\n// Print an error message to the console\nio.stderr.write(\"An error occurred!\")  // An error occurred!"
+
+###
+
+[[entry]]
+name = "io.open"
+kind = "function"
+signature = "function io.open(path, mode='r')"
+summary = "Open a file"
+description = "The `open` function opens a file at the specified path with the given mode."
+example = "import io\n\n// Open a file for reading\nvar file = io.open(\"data.txt\", \"r\")\n\n// Open a file for writing\nvar output = io.open(\"output.txt\", \"w\")\n\n// Open a file for appending\nvar log = io.open(\"log.txt\", \"a\")"
+
+[[entry.params]]
+name = "path"
+desc = "The path to the file to open."
+
+[[entry.params]]
+name = "mode"
+desc = "An optional string specifying the mode in which to open the file. Defaults to `\"r\"`."
+
+###
+
+[[entry]]
+name = "io.popen"
+kind = "function"
+signature = "function io.popen(path, mode='r')"
+summary = "Open a pipe"
+description = "The `popen` function opens a pipe to a subprocess command."
+example = "import io\n\n// Open a pipe to read from a command\nvar pipe = io.popen(\"ls -la\", \"r\")\nvar content = pipe.read()\nprint(content)"
+
+[[entry.params]]
+name = "path"
+desc = "The command to execute."
+
+[[entry.params]]
+name = "mode"
+desc = "An optional string specifying the mode in which to open the pipe. Defaults to `\"r\"`."
+
+###
+
+[[entry]]
+name = "File"
+kind = "class"
+signature = "File"
+summary = "An open file handle"
+description = '''
+The `File` class represents an open file handle returned by `io.open`, `io.popen`, or the standard streams:
+- `io.stdout`
+- `io.stdin`
+- `io.stderr`
+'''
+
+###
+
+[[entry]]
+name = "File.write"
+kind = "method"
+signature = "function File:write(...)"
+summary = "Write values to file"
+description = "The `write` method writes one or more values to the file."
+example = "import io\n\nvar file = io.open(\"output.txt\", \"w\")\nfile.write(\"Hello, world!\\n\")\nfile.write(\"Line 2\\n\")\nfile.write(\"Value: \", 42, \"\\n\")\nfile.close()"
+
+[[entry.params]]
+name = "..."
+desc = "One or more values to write to the file."
+
+###
+
+[[entry]]
+name = "File.read"
+kind = "method"
+signature = "function File:read(count=nil)"
+summary = "Read from file"
+description = "The `read` method reads data from the file. When called with no arguments, it reads the entire file content. When called with a `count` argument, it reads up to `count` bytes."
+example = "import io\n\nvar file = io.open(\"data.txt\", \"r\")\n\n// Read the entire file\nvar content = file.read()\nprint(content)\n\n// Read a specific number of bytes\nfile.seek(\"set\", 0)\nvar first_10 = file.read(10)\nprint(first_10)\n\nfile.close()"
+
+[[entry.params]]
+name = "count"
+desc = "An optional number of bytes to read. If not specified, the entire file is read."
+
+###
+
+[[entry]]
+name = "File.readline"
+kind = "method"
+signature = "function File:readline()"
+summary = "Read line from file"
+description = "The `readline` method reads a single line from the file."
+example = "import io\n\nvar file = io.open(\"data.txt\", \"r\")\nvar line = file.readline()\nwhile line != nil\n{\n    print(line)\n    line = file.readline()\n}\nfile.close()"
+
+###
+
+[[entry]]
+name = "File.seek"
+kind = "method"
+signature = "function File:seek(whence='cur', offset=0)"
+summary = "Move file position indicator"
+description = "The `seek` method moves the file position indicator to a new location."
+example = "import io\n\nvar file = io.open(\"data.txt\", \"r\")\n\n// Move to the beginning of the file\nvar pos = file.seek(\"set\", 0)\nprint(\"Position:\", pos)\n\n// Move forward 10 bytes from current position\npos = file.seek(\"cur\", 10)\nprint(\"Position:\", pos)\n\n// Move to 5 bytes before the end of the file\npos = file.seek(\"end\", -5)\nprint(\"Position:\", pos)\n\nfile.close()"
+
+[[entry.params]]
+name = "whence"
+desc = "An optional string specifying the reference point for the offset. Can be `\"set\"`, `\"cur\"`, or `\"end\"`. Defaults to `\"cur\"`."
+
+[[entry.params]]
+name = "offset"
+desc = "An optional number specifying the number of bytes to move from the reference point. Defaults to `0`."
+
+###
+
+[[entry]]
+name = "File.flush"
+kind = "method"
+signature = "function File:flush()"
+summary = "Flush file buffered data"
+description = "The `flush` method flushes any buffered data to the file."
+example = "import io\n\nvar file = io.open(\"output.txt\", \"w\")\nfile.write(\"Important data\")\nfile.flush()  // Ensure data is written to disk immediately"
+
+###
+
+[[entry]]
+name = "File.setvbuf"
+kind = "method"
+signature = "function File:setvbuf(mode, size=8192)"
+summary = "Set file buffering mode"
+description = "The `setvbuf` method sets the buffering mode for the file."
+example = "import io\n\nvar file = io.open(\"output.txt\", \"w\")\n\n// Set line buffering\nfile.setvbuf(\"line\")\n\n// Set no buffering\nfile.setvbuf(\"no\")\n\n// Set full buffering with a custom size\nfile.setvbuf(\"full\", 4096)"
+
+[[entry.params]]
+name = "mode"
+desc = "A string specifying the buffering mode. Can be `\"full\"`, `\"line\"`, or `\"no\"`."
+
+[[entry.params]]
+name = "size"
+desc = "An optional number specifying the buffer size in bytes. Defaults to `8192`."
+
+###
+
+[[entry]]
+name = "File.close"
+kind = "method"
+signature = "function File:close()"
+summary = "Close an open file"
+description = "The `close` method closes the file. Standard streams cannot be closed."
+example = "import io\n\nvar file = io.open(\"data.txt\", \"r\")\nvar content = file.read()\nfile.close()"
+
+###
+
+[[entry]]
+name = "File.tostring"
+kind = "method"
+signature = "function File:tostring()"
+summary = "File tostring"
+description = "The `tostring` method provides a string representation of the file object."
+example = "import io\n\nvar file = io.open(\"data.txt\", \"r\")\nprint(file.tostring())  // <file>\nfile.close()\nprint(file.tostring())  // <file (closed)>"
+
+###
+
+[[entry]]
+name = "File.iter"
+kind = "method"
+signature = "function File:iter()"
+summary = "File iterator"
+description = "The `iter` method provides an iterator that reads lines from the file one at a time."

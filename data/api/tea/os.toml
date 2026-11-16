@@ -1,0 +1,228 @@
+title = "OS"
+slug = "os"
+kind = "module"
+origin = "modules"
+since = "1.0"
+summary = "OS functions"
+description = "The os module provides operating-system information and services, including environment access, process execution, and filesystem operations."
+
+[[entry]]
+name = "os.name"
+kind = "attribute"
+signature = "os.name"
+summary = "Simple OS name"
+description = """
+The basic name of the operating system Teascript is being ran on.
+
+The currently available name strings are:
+- `windows`
+- `linux`
+- `osx`
+- `bsd`
+- `posix`
+- `browser`
+- `other`
+"""
+example = '''
+import os
+
+print("Operating system:", os.name)
+'''
+
+###
+
+[[entry]]
+name = "os.arch"
+kind = "attribute"
+signature = "os.arch"
+summary = "Simple architecture name"
+description = """
+The architecture of the operating system Teascript is being ran on.
+
+The currently available name strings are:
+- `x86`
+- `x64`
+- `arm`
+- `arm64`
+- `wasm`
+"""
+example = '''
+import os
+
+print("Architecture:", os.arch)
+'''
+
+###
+
+[[entry]]
+name = "os.env"
+kind = "attribute"
+signature = "os.env"
+summary = "Environments map"
+description = "A map containing all environment variables and their values."
+example = '''
+import os
+
+// Access a specific environment variable
+print("Home directory:", os.env["HOME"])
+
+// Iterate over all environment variables
+for const key, value in os.env
+{
+    print(key + " = " + value)
+}
+'''
+
+###
+
+[[entry]]
+name = "os.getenv"
+kind = "function"
+signature = "function os.getenv(name, def=nil)"
+summary = "Get env variable"
+description = "The function `getenv` retrieves the value of an environment variable."
+example = '''
+import os
+
+// Get an environment variable
+var path = os.getenv("PATH")
+print("PATH:", path)
+
+// Get with a default value
+var config = os.getenv("APP_CONFIG", "default.json")
+print("Config:", config)
+'''
+
+[[entry.params]]
+name = "name"
+desc = "The name of the environment variable"
+
+[[entry.params]]
+name = "def"
+desc = "(Optional) The value to use if the environment variable does not exist"
+
+###
+
+[[entry]]
+name = "os.setenv"
+kind = "function"
+signature = "function os.setenv(name, value)"
+summary = "Set env variable"
+description = "The function `setenv` sets or unsets an environment variable."
+example = '''
+import os
+
+// Set an environment variable
+os.setenv("MY_VAR", "hello")
+print(os.getenv("MY_VAR"))  // hello
+
+// Unset an environment variable
+os.setenv("MY_VAR", nil)
+print(os.getenv("MY_VAR"))  // nil
+'''
+
+[[entry.params]]
+name = "name"
+desc = "The name of the environment variable"
+
+[[entry.params]]
+name = "value"
+desc = "The value to set, or `nil` to unset the variable"
+
+###
+
+[[entry]]
+name = "os.execute"
+kind = "function"
+signature = "function os.execute(command)"
+summary = "Simple command execution"
+description = "The function `execute` runs a shell command."
+example = '''
+import os
+
+// Execute a shell command
+var status = os.execute("ls -la")
+print("Command exited with status:", status)
+'''
+
+[[entry.params]]
+name = "command"
+desc = "The command to execute"
+
+###
+
+[[entry]]
+name = "os.remove"
+kind = "function"
+signature = "function os.remove(filename)"
+summary = "Remove file"
+description = "The function `remove` deletes a file."
+example = '''
+import os
+
+// Remove a file
+var success = os.remove("temp.txt")
+if success
+{
+    print("File deleted successfully")
+}
+else
+{
+    print("Failed to delete file")
+}
+'''
+
+[[entry.params]]
+name = "filename"
+desc = "The path to the file to delete"
+
+###
+
+[[entry]]
+name = "os.rename"
+kind = "function"
+signature = "function os.rename(fromname, toname)"
+summary = "Rename file"
+description = "The function `rename` renames or moves a file."
+example = '''
+import os
+
+// Rename a file
+var success = os.rename("old.txt", "new.txt")
+if success
+{
+    print("File renamed successfully")
+}
+else
+{
+    print("Failed to rename file")
+}
+'''
+
+[[entry.params]]
+name = "fromname"
+desc = "The current path of the file"
+
+[[entry.params]]
+name = "toname"
+desc = "The new path of the file"
+
+###
+
+[[entry]]
+name = "os.mkdir"
+kind = "function"
+signature = "function os.mkdir(dir)"
+summary = "Create new directory"
+description = "The function `mkdir` creates a new directory."
+example = '''
+import os
+
+// Create a new directory
+os.mkdir("new_folder")
+print("Directory created")
+'''
+
+[[entry.params]]
+name = "dir"
+desc = "The path of the directory to create"

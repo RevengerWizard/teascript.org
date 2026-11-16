@@ -1,0 +1,417 @@
+title = "Core"
+kind = "functions"
+origin = "builtin"
+since = "1.0"
+summary = "Base/core functions"
+description = "Core functions are available globally without importing a module. They cover common operations such as output, type inspection, protected calls, loading code, and working with object attributes."
+
+[[entry]]
+name = "print"
+kind = "function"
+signature = "function print(...)"
+summary = "Print values"
+description = '''
+The `print` function is a global function in Teascript that is used to output values to the console. If no arguments are provided, it prints a new line `\n`. If arguments are provided, it prints each value separated by a tab `\t`.
+'''
+returns = "Always `nil`."
+example = '''
+print()
+print(1, 2, 3);                 // 1    2   3
+print(true, 789.98, "hello");   // true 789.98  "hello"
+
+print("Hello, world!")          // "Hello, world!"
+
+var x = 5
+var y = 10
+print(x, y)                     // "5   10"
+'''
+
+[[entry.params]]
+name = "..."
+desc = "the values to be printed. These can be of any Tea type."
+
+###
+
+[[entry]]
+name = "input"
+kind = "function"
+signature = "function input(prompt='')"
+summary = "Ask for user input"
+description = "The `input` function reads a line of text from the standard input stream of the console, and returns it as a string."
+returns = "The text entered by the user as a Tea string."
+example = '''
+var name = input("Enter your name: ")
+print("Hello, " + name + "!")
+'''
+
+[[entry.params]]
+name = "prompt"
+desc = 'an optional string value, defaults as an empty string `""`.'
+
+###
+
+[[entry]]
+name = "assert"
+kind = "function"
+signature = "function assert(condition, message=nil)"
+summary = "Simple assertion"
+description = "The `assert` function is used to check whether a given condition is `true`, and if is not, it raises an error with an optional error message."
+returns = "`nil` when the condition results `true`. It does not return if the condition is `false`, raising an error instead."
+example = '''
+assert(5 > 3, "5 is not greater than 3")
+assert([1, 2, 3].len == 3, "The list does not have 3 elements")
+'''
+
+[[entry.params]]
+name = "condition"
+desc = "a boolean value or an expression to be evaluated based on its truthyness."
+
+[[entry.params]]
+name = "message"
+desc = "an optional string to be printed as the error message if the `condition` arguments results `false`."
+
+###
+
+[[entry]]
+name = "error"
+kind = "function"
+signature = "function error(message)"
+summary = "Cause runtime error"
+description = "The `error` function is used to raise an error with a specified string message. It is similar to the `assert` function, but `error` always raises an error."
+errors = "Raises an error using the specified string message."
+example = '''
+function divide(x, y)
+{
+    if(y == 0)
+        error("Cannot divide by zero")
+    return x / y
+}
+
+divide(5, 0)  // Raises an error with message "Cannot divide by zero"
+'''
+
+[[entry.params]]
+name = "message"
+desc = "A string to be used as the error message."
+
+###
+
+[[entry]]
+name = "typeof"
+kind = "function"
+signature = "function typeof(value)"
+summary = "Name of value types"
+description = "The `typeof` function is used to determine the type of a given value."
+returns = "A string containing the name of the value type."
+example = '''
+print(typeof(5))  // "number"
+print(typeof("hello"))  // "string"
+print(typeof([1, 2, 3]))  // "list"
+print(typeof({a = 1, b = 2}))  // "map"
+print(type(1..10))  // "range"
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The Tea value whose type is to be determined."
+
+###
+
+[[entry]]
+name = "tostring"
+kind = "function"
+signature = "function tostring(value)"
+summary = "Convert value to string"
+description = "The `tostring` function converts any value into its string representation. It respects an instance or userdata `tostring()` special method if one is defined, allowing custom formatting for these objects."
+returns = "A string representation of `value`. For plain values, the result is a readable form suitable for display or concatenation."
+example = '''
+print(tostring(123))          // "123"
+print(tostring(true))         // "true"
+print(tostring([1, 2, 3]))    // "[1, 2, 3]"
+print(tostring({a = 1}))      // "{a = 1}"
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The Tea value to convert to a string"
+
+###
+
+[[entry]]
+name = "tonumber"
+kind = "function"
+signature = "function tonumber(value, base=10)"
+summary = "Convert value to number"
+description = "The function `tonumber` converts a given Tea value into a number, or returns `nil` if is unable to convert it. When `base` is 10 (default), any value that can be coerced into a number is converted directly. For other bases (between `2` and `36`), the input must be a string, which is interpreted as a number in that base."
+returns = "The parsed number, or `nil` if the conversion fails."
+example = '''
+print(tonumber("123"))      // 123
+print(tonumber("123.45"))   // 123.45
+print(tonumber(42))         // 42
+print(tonumber("ff", 16))   // 255
+print(tonumber("101", 2))   // 5
+print(tonumber("xyz"))      // nil
+'''
+
+[[entry.params]]
+name = "value"
+desc = "The Tea value to coerce into a number."
+
+[[entry.params]]
+name = "base"
+desc = "An optional number specifying the base for string parsing. Defaults to `10`"
+
+###
+
+[[entry]]
+name = "gc"
+kind = "function"
+signature = "function gc()"
+summary = "Garbage collect"
+description = "The `gc` function is used to invoke the Teascript garbage collector, which is responsible for freeing up memory that is no longer being used by the Tea program."
+returns = "The number of Kbytes being collected. This is expressed as: number of bytes / 2 ** 10"
+example = '''
+const collected = gc()
+print('Collected ', collected, 'Kib')
+'''
+
+###
+
+[[entry]]
+name = "eval"
+kind = "function"
+signature = "function eval(source)"
+summary = "Evaluate Tea source"
+description = "The `eval` function compiles and executes then given source string as Tea code in the current environment, returning any result produced by the evaluated chunk."
+returns = "The value produced by the evaluated code (if any). If code raises an error, the error is propagated to the caller and can be caught with `pcall`."
+example = '''
+print(eval("1 + 2 * 3"))     // 7
+eval("var greeting = 'hi'")
+print(greeting)              // "hi"
+'''
+
+[[entry.params]]
+name = "source"
+desc = "A string containing Tea source code to compile and run"
+
+###
+
+[[entry]]
+name = "dump"
+kind = "function"
+signature = "function dump(func, strip=false)"
+summary = "Tea function to bytecode"
+description = "The `dump` function serializes a Tea function into bytecode, returning the compiled representation as a string. The result can later be loaded with `loadstring` to reconstruct the function."
+returns = "A Tea string containing the serialized bytecode."
+example = '''
+function greet(name)
+{
+    return "Hello, " + name
+}
+
+var bytecode = dump(greet)
+print(typeof(bytecode))          // "string"
+
+var reloaded = loadstring(bytecode)
+print(reloaded("world"))         // "Hello, world"
+'''
+
+[[entry.params]]
+name = "func"
+desc = "The function to serialize. Must be a Tea function (not a C function)"
+
+[[entry.params]]
+name = "strip"
+desc = 'An optional boolean (or string containing the `"s"`). When truthy, debug information is stripped from the output, producing smaller bytecode.'
+
+###
+
+[[entry]]
+name = "loadfile"
+kind = "function"
+signature = "function loadfile(filename, mode='t')"
+summary = "Load and parse file"
+description = "The `loadfile` function loads a Tea chunk from the specified file and returns it as a callable function, without executing it."
+returns = "A Tea function representing the compiled chunk. If the file cannot be read or compiled, an error is raised."
+example = '''
+var chunk = loadfile("script.tea")
+chunk()
+'''
+
+[[entry.params]]
+name = "filename"
+desc = "The path of the file to load"
+
+[[entry.params]]
+name = "mode"
+desc = 'An optional string specifying the accepted input modes: `"t"` for text source, `"b"` for binary bytecode, or `"bt"` for both. Defaults to `"t"`.'
+
+###
+
+[[entry]]
+name = "loadstring"
+kind = "function"
+signature = "function loadstring(source, name='?<load>')"
+summary = "Load and parse string"
+description = "The `loadstring` function compiles the given Tea source string into a callable Tea function without executing it. The optional `name` argument is used as the chunk name in error messages and stack traces."
+returns = "A Tea function representing the compiled chunk. If compilation fails, an error is raised."
+example = '''
+var chunk = loadstring("print(6 * 7)")
+print(chunk())               // 42
+'''
+
+[[entry.params]]
+name = "source"
+desc = "A string containing Tea source code"
+
+[[entry.params]]
+name = "name"
+desc = 'An optional module environment name. Defaults to `"?<load>"`.'
+
+###
+
+[[entry]]
+name = "pcall"
+kind = "function"
+signature = "function pcall(func, ...)"
+summary = "Run function in protected mode"
+description = "The `pcall` function calls `func` in protected mode, catching any error that occurs during execution. This is the primary mechanism for handling runtime errors in Tea code."
+returns = "The function returns a two-element list. The first element is a boolean indicating whether the call succeeded. The second element is the function's return value on success, or the error message on failure."
+example = '''
+var result = pcall(function() error("something went wrong") end)
+print(result[0])             // false
+print(result[1])             // "something went wrong"
+
+var ok, res = pcall(function(a, b) return a + b end, 2, 3)
+print(ok, res)          // true 5
+'''
+
+[[entry.params]]
+name = "func"
+desc = "The Tea function to call."
+
+[[entry.params]]
+name = "..."
+desc = "Any arguments to be passed to `func`"
+
+###
+
+[[entry]]
+name = "rawequal"
+kind = "function"
+signature = "function rawequal(a, b)"
+summary = "Raw equality"
+description = "The `rawequal` function compares two Tea values for equality without invoking any special method. Unlike the `==` operator, which may call `operator ==` if defined, this performs a direct, primitive comparison."
+returns = "`true` if the two values are primitively equal; `false` otherwise."
+example = '''
+print(rawequal(1, 1))        // true
+print(rawequal("a", "a"))    // true
+print(rawequal([1], [1]))    // false (distinct list objects)
+'''
+
+[[entry.params]]
+name = "a"
+desc = "The first (left) value to compare"
+
+[[entry.params]]
+name = "b"
+desc = "The second (right) value to compare"
+
+###
+
+[[entry]]
+name = "hasattr"
+kind = "function"
+signature = "function hasattr(obj, name)"
+summary = "Check attribute presence"
+description = "The `hasattr` function checks whether the given object has an attribute with the specified name, consulting the object's attributes and any applicable method."
+returns = "`true` if the attribute exists; `false` otherwise."
+example = '''
+var point = {x = 10, y = 20}
+print(hasattr(point, "x"))       // true
+print(hasattr(point, "z"))       // false
+'''
+
+[[entry.params]]
+name = "obj"
+desc = "The object to inspect."
+
+[[entry.params]]
+name = "name"
+desc = "A string containing the attribute name to look up."
+
+###
+
+[[entry]]
+name = "getattr"
+kind = "function"
+signature = "function getattr(obj, name)"
+summary = "Get an attribute name"
+description = "The `getattr` function retrieves the value of the named attribute from the given object, honoring special methods such as getters and `getattr()`."
+returns = "The value of the attribute. If the attribute does not exist, an error is raised."
+example = '''
+var point = {x = 10, y = 20}
+print(getattr(point, "x"))       // 10
+print(getattr(point, "z"))       // error: attribute "z" not found
+'''
+
+[[entry.params]]
+name = "obj"
+desc = "The object to read from."
+
+[[entry.params]]
+name = "name"
+desc = "A string containing the attribute name to retrieve."
+
+###
+
+[[entry]]
+name = "setattr"
+kind = "function"
+signature = "function setattr(obj, name, value)"
+summary = "Set an attribute name"
+description = "The `setattr` function assigns a value to the named attribute of the given object, honoring special methods such as setters and `setattr()`."
+returns = "nil"
+example = '''
+var point = {x = 10, y = 20}
+setattr(point, "x", 99)
+print(point.x)                   // 99
+
+setattr(point, "z", 5)
+print(point.z)                   // 5
+'''
+
+[[entry.params]]
+name = "obj"
+desc = "The object to modify."
+
+[[entry.params]]
+name = "name"
+desc = "A string containing the attribute name to set."
+
+[[entry.params]]
+name = "value"
+desc = "The value to assign"
+
+###
+
+[[entry]]
+name = "delattr"
+kind = "function"
+signature = "function delattr(obj, name)"
+summary = "Delete an attribute name"
+description = "The `delattr` function removes the named attribute from the given object."
+returns = "nil"
+example = '''
+var point = {x = 10, y = 20}
+delattr(point, "y")
+print(hasattr(point, "y"))       // false
+'''
+
+[[entry.params]]
+name = "obj"
+desc = "The object from which to remove the attribute."
+
+[[entry.params]]
+name = "name"
+desc = "A string containing the attribute name to delete."

@@ -1,6 +1,42 @@
 {{ define "main" }}
 
-<div class="page-layout{{ if eq .Section "guide" }} page-guide{{ else if in (slice "docs" "api") .Section }} page-reference{{ end }}">
+{{ if .Params.apiLanding }}
+<div class="page-layout page-api page-api-landing"><main class="page-main api-main"><article class="post-single"><header class="post-header"><h1 class="post-title">{{ .Title }}</h1></header><div class="post-content">{{ .Content }}</div></article></main></div>
+{{ else if .Params.apiIndex }}
+<div class="page-layout page-api page-api-index-page {{ if eq .Params.apiIndex "c" }}page-api-c-index{{ else }}page-api-tea-index{{ end }}">
+    <main class="page-main api-main"><article class="post-single"><header class="post-header"><div class="post-title-row"><h1 class="post-title">{{ .Title }}</h1></div></header><div class="post-content">{{ partial "api/index.html" . }}</div></article></main>
+</div>
+{{ else if .Params.apiData }}
+    {{ if eq .Type "api-c" }}{{ partial "api/category.html" . }}{{ else if eq .Type "api-tea" }}{{ partial "api/entity.html" . }}{{ else }}{{ partial "anchor.html" .Content }}{{ end }}
+{{ else if eq .Type "api-tag" }}
+{{ partial "api/tag.html" . }}
+{{ else if and .IsSection (in (slice "guide" "docs") .Section) }}
+<div class="page-layout{{ if eq .Section "guide" }} page-guide{{ else }} page-reference{{ end }}">
+    <aside class="sidebar">{{ partial "sidebar.html" (dict "currentPage" . "nodes" .Pages) }}</aside>
+    <main class="page-main">
+        <article class="post-single section-landing">
+            <header class="post-header"><h1 class="post-title">{{ .Title }}</h1></header>
+            <div class="post-content">
+                {{ .Content }}
+                <div class="section-landing-cards">
+                    {{ range .Sections.ByWeight }}
+                    {{ $part := . }}
+                    {{ with index .RegularPages.ByWeight 0 }}
+                    <a class="section-landing-card" href="{{ .RelPermalink }}">
+                        {{ with $part.Params.number }}<span class="section-landing-card__eyebrow">{{ . }}</span>{{ end }}
+                        <strong>{{ $part.LinkTitle }}</strong>
+                        {{ with $part.Description }}<span class="section-landing-card__description">{{ . | plainify | truncate 180 }}</span>{{ end }}
+                        <span class="section-landing-card__link">Start this part →</span>
+                    </a>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+        </article>
+    </main>
+</div>
+{{ else }}
+<div class="page-layout{{ if eq .Section "guide" }} page-guide{{ else if eq .Section "docs" }} page-reference{{ end }}">
     <div class="sidebar">
         {{ if in (slice "guide" "docs" "api") .Section }}
         <button class="sidebar-close" type="button" aria-label="Close navigation">
@@ -29,11 +65,11 @@
             </div>
         </header>
         {{ if in (slice "guide" "docs" "api") .Section }}
-        <div class="page-content-layout">
+        <div class="page-content-layout{{ if eq .Section "api" }} api-content-layout{{ else if and (in (slice "guide" "docs") .Section) (eq .Params.toc false) }} no-reference-toc{{ end }}">
             <div class="post-content">
                 {{- partial "anchor.html" .Content -}}
             </div>
-            {{ if ne .Params.toc false }}
+            {{ if and (ne .Section "api") (ne .Params.toc false) }}
             <aside class="reference-toc">
                 <details open>
                     <summary><span>On this page</span>{{ (resources.Get "svg/menu.svg").Content | safeHTML }}</summary>
@@ -59,7 +95,7 @@
             {{ end }}
         </div>
         {{ else }}
-            {{ if ne .Params.toc false -}}
+            {{ if and (ne .Type "api-tea") (ne .Params.toc false) -}}
                 {{- partial "toc.html" . }}
             {{ end -}}
             <div class="post-content">
@@ -72,6 +108,7 @@
     </article>
     </div>
 </div>
+{{ end }}
 
 {{ if in (slice "guide" "docs" "api") .Section }}
 <script>

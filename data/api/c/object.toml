@@ -1,0 +1,404 @@
+title = "Object Creation"
+slug = "object"
+summary = "Create lists, maps, classes, modules, userdata"
+description = "Functions that create new objects and push them onto the stack: lists, maps, classes, modules and userdata. The `tea_create_*` variants also fill in the new class or module from a registration array in one call. Creating an object allocates memory, so every function here can raise a memory error."
+
+[[entry]]
+name = "tea_new_list"
+kind = "function"
+since = "1.0"
+tags = ["object", "list"]
+signature = "void tea_new_list(tea_State* T, size_t n);"
+summary = "New list"
+description = "Creates a new, empty list and pushes it onto the stack. `n` is the capacity to prepare, a hint that avoids reallocations during later `tea_add_item` calls; it does not set the list's length."
+stack = "[-0, +1, m]"
+example = '''
+tea_new_list(T, 4);          /* [] with room for 4 items */
+
+for(int i = 0; i < 3; i++)
+{
+    tea_push_integer(T, i * 10);
+    tea_add_item(T, -2);
+}
+/* the list is now [0, 10, 20] */
+'''
+see_also = ["tea_new_map", "tea_add_item", "tea_insert_item"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "n"
+desc = "Initial capacity hint"
+
+###
+
+[[entry]]
+name = "tea_new_map"
+kind = "function"
+since = "1.0"
+tags = ["object", "map"]
+signature = "void tea_new_map(tea_State* T);"
+summary = "New map"
+description = "Creates a new, empty map and pushes it onto the stack."
+stack = "[-0, +1, m]"
+example = '''
+tea_new_map(T);                    /* {} */
+tea_push_string(T, "hello");
+tea_set_key(T, -2, "greeting");    /* {greeting = "hello"} */
+'''
+see_also = ["tea_new_list", "tea_set_key", "tea_set_field"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+###
+
+[[entry]]
+name = "tea_new_class"
+kind = "function"
+since = "1.0"
+tags = ["object", "class"]
+signature = "void tea_new_class(tea_State* T, const char* name);"
+summary = "New class"
+description = "Creates a new, empty class called `name` and pushes it onto the stack. Add methods with `tea_set_methods` or one at a time with `tea_set_attr`."
+stack = "[-0, +1, m]"
+example = '''
+tea_new_class(T, "Point");
+
+tea_push_cfunction(T, point_new, 2, 0);
+tea_set_attr(T, -2, "new");
+'''
+see_also = ["tea_create_class", "tea_set_methods", "tea_new_udata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the class"
+
+###
+
+[[entry]]
+name = "tea_new_module"
+kind = "function"
+since = "1.0"
+tags = ["object", "module"]
+signature = "void tea_new_module(tea_State* T, const char* name);"
+summary = "New module"
+description = "Creates a new, empty module called `name` and pushes it onto the stack. The module's path is set to its name. Add members with `tea_set_attr` or `tea_set_funcs`."
+stack = "[-0, +1, m]"
+example = '''
+tea_new_module(T, "mathx");
+
+tea_push_cfunction(T, mathx_sqrt, 1, 0);
+tea_set_attr(T, -2, "sqrt");
+'''
+see_also = ["tea_create_module", "tea_new_submodule", "tea_set_funcs"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the module"
+
+###
+
+[[entry]]
+name = "tea_new_submodule"
+kind = "function"
+since = "1.0"
+tags = ["object", "module"]
+signature = "void tea_new_submodule(tea_State* T, const char* name);"
+summary = "New submodule"
+description = "Creates a new, empty submodule called `name` and pushes it onto the stack. A submodule is a module meant to be nested inside another module: assign it to the parent with `tea_set_attr`."
+stack = "[-0, +1, m]"
+example = '''
+tea_new_submodule(T, "path");
+
+tea_push_cfunction(T, path_join, TEA_VARG, 0);
+tea_set_attr(T, -2, "join");
+'''
+see_also = ["tea_new_module", "tea_create_submodule"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the submodule"
+
+###
+
+[[entry]]
+name = "tea_create_class"
+kind = "function"
+since = "1.0"
+tags = ["object", "class"]
+signature = "void tea_create_class(tea_State* T, const char* name, const tea_Methods* klass);"
+summary = "New class with methods"
+description = "Creates a new class called `name`, registers every method described by the `tea_Methods` array `klass`, and pushes the class onto the stack. Each entry gives a method name, its type (`\"method\"`, `\"static\"`, `\"getter\"` or `\"setter\"`), the C function and the argument counts. The array ends with an entry whose name is `NULL`."
+stack = "[-0, +1, m]"
+example = '''
+static const tea_Methods point_methods[] =
+{
+    {"new",    "method", point_new,    2, 0},
+    {"length", "method", point_length, 0, 0},
+    {"x",      "getter", point_getx,   0, 0},
+    {NULL, NULL, NULL, 0, 0}
+};
+
+tea_create_class(T, "Point", point_methods);
+tea_set_global(T, "Point");
+'''
+see_also = ["tea_new_class", "tea_set_methods", "tea_Methods"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the class"
+
+[[entry.params]]
+name = "klass"
+desc = "`NULL`-terminated array of method descriptors; may be `NULL` for an empty class"
+
+###
+
+[[entry]]
+name = "tea_create_module"
+kind = "function"
+since = "1.0"
+tags = ["object", "module"]
+signature = "void tea_create_module(tea_State* T, const char* name, const tea_Reg* module);"
+summary = "New module with functions"
+description = "Creates a new module called `name`, fills it with the functions described by the `tea_Reg` array `module`, and pushes it onto the stack. Each entry gives a name, a C function and the argument counts. An entry with a `NULL` function stores `nil` under its name, which is useful as a placeholder to fill in afterwards. The array ends with an entry whose name is `NULL`."
+stack = "[-0, +1, m]"
+example = '''
+static const tea_Reg mathx_lib[] =
+{
+    {"sqrt", mathx_sqrt, 1, 0},
+    {"pi",   NULL,       0, 0},      /* placeholder */
+    {NULL, NULL, 0, 0}
+};
+
+tea_create_module(T, "mathx", mathx_lib);
+tea_push_number(T, 3.14159);
+tea_set_attr(T, -2, "pi");           /* fill in the placeholder */
+tea_set_global(T, "mathx");
+'''
+see_also = ["tea_new_module", "tea_create_submodule", "tea_set_funcs", "tea_Reg"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the module"
+
+[[entry.params]]
+name = "module"
+desc = "`NULL`-terminated array of function descriptors; may be `NULL` for an empty module"
+
+###
+
+[[entry]]
+name = "tea_create_submodule"
+kind = "function"
+since = "1.0"
+tags = ["object", "module"]
+signature = "void tea_create_submodule(tea_State* T, const char* name, const tea_Reg* module);"
+summary = "New submodule with functions"
+description = "Like `tea_create_module`, but creates a submodule meant to be nested inside another module. Assign it to the parent with `tea_set_attr`."
+stack = "[-0, +1, m]"
+example = '''
+static const tea_Reg path_lib[] =
+{
+    {"join",  path_join,  TEA_VARG, 0},
+    {"split", path_split, 1,        0},
+    {NULL, NULL, 0, 0}
+};
+
+tea_create_submodule(T, "path", path_lib);   /* [path] */
+tea_get_global(T, "os");                     /* [path, os] */
+tea_insert(T, -2);                           /* [os, path] */
+tea_set_attr(T, -2, "path");                 /* os.path = path; [os] */
+tea_pop(T, 1);
+'''
+see_also = ["tea_new_submodule", "tea_create_module"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the submodule"
+
+[[entry.params]]
+name = "module"
+desc = "`NULL`-terminated array of function descriptors; may be `NULL` for an empty submodule"
+
+###
+
+[[entry]]
+name = "tea_new_userdata"
+kind = "function"
+since = "1.0"
+tags = ["object", "userdata"]
+signature = "void* tea_new_userdata(tea_State* T, size_t size);"
+summary = "New userdata"
+description = "Creates a new anonymous userdata with a data block of `size` bytes and no user values, and pushes it onto the stack. Equivalent to `tea_new_userdatav(T, size, 0)`.\n\nThe block is managed by the garbage collector. Use `tea_set_finalizer` to release any native resources it refers to."
+returns = "A pointer to the data block, valid for as long as the userdata is alive."
+stack = "[-0, +1, m]"
+example = '''
+void* buf = tea_new_userdata(T, 256);
+memset(buf, 0, 256);
+'''
+see_also = ["tea_new_userdatav", "tea_new_udata", "tea_set_finalizer"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Size of the data block in bytes"
+
+###
+
+[[entry]]
+name = "tea_new_userdatav"
+kind = "function"
+since = "1.0"
+tags = ["object", "userdata"]
+signature = "void* tea_new_userdatav(tea_State* T, size_t size, int nuvs);"
+summary = "New userdata with uservalues"
+description = "Creates a new anonymous userdata with a data block of `size` bytes and `nuvs` user values, all initially `nil`, and pushes it onto the stack. The user values hold Teascript values that live and die with the userdata; access them with `tea_get_udvalue` and `tea_set_udvalue`. Unlike `tea_new_udatav`, the userdata has no class."
+returns = "A pointer to the data block, valid for as long as the userdata is alive."
+stack = "[-0, +1, m]"
+example = '''
+/* a userdata holding one int and one user value */
+int* p = (int*)tea_new_userdatav(T, sizeof(int), 1);
+*p = 42;
+'''
+see_also = ["tea_new_userdata", "tea_new_udatav", "tea_set_udvalue"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Size of the data block in bytes"
+
+[[entry.params]]
+name = "nuvs"
+desc = "Number of user values"
+
+###
+
+[[entry]]
+name = "tea_new_udata"
+kind = "function"
+since = "1.0"
+tags = ["object", "userdata", "class"]
+signature = "void* tea_new_udata(tea_State* T, size_t size, const char* name);"
+summary = "New typed userdata"
+description = "Creates a new userdata with a data block of `size` bytes and no user values, associated with the class registered under `name`, and pushes it onto the stack. Equivalent to `tea_new_udatav(T, size, 0, name)`. The class association is what lets `tea_check_udata` and `tea_test_udata` verify the type later."
+returns = "A pointer to the data block, valid for as long as the userdata is alive."
+stack = "[-0, +1, m]"
+example = '''
+FILE** f = (FILE**)tea_new_udata(T, sizeof(FILE*), "File");
+*f = fopen("data.txt", "r");
+'''
+see_also = ["tea_new_udatav", "tea_new_userdata", "tea_check_udata"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Size of the data block in bytes"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the registered class to associate"
+
+###
+
+[[entry]]
+name = "tea_new_udatav"
+kind = "function"
+since = "1.0"
+tags = ["object", "userdata", "class"]
+signature = "void* tea_new_udatav(tea_State* T, size_t size, int nuvs, const char* name);"
+summary = "New typed userdata with uservalues"
+description = "Creates a new userdata with a data block of `size` bytes and `nuvs` user values, associated with the class registered under `name` (typically created with `tea_new_class` or `tea_create_class`), and pushes it onto the stack. The class association enables type checking with `tea_check_udata` and `tea_test_udata`."
+returns = "A pointer to the data block, valid for as long as the userdata is alive."
+stack = "[-0, +1, m]"
+example = '''
+/* a "RingBuffer" userdata with two user values */
+RingBuffer* rb = (RingBuffer*)tea_new_udatav(T, sizeof(RingBuffer), 2, "RingBuffer");
+rb->capacity = 16;
+'''
+see_also = ["tea_new_userdatav", "tea_new_udata", "tea_check_udata", "tea_create_class"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "size"
+desc = "Size of the data block in bytes"
+
+[[entry.params]]
+name = "nuvs"
+desc = "Number of user values"
+
+[[entry.params]]
+name = "name"
+desc = "Name of the registered class to associate"
+
+###
+
+[[entry]]
+name = "tea_set_udvalue"
+kind = "function"
+since = "1.0"
+tags = ["object", "userdata"]
+signature = "void tea_set_udvalue(tea_State* T, int ud, int n);"
+summary = "Set userdata uservalue"
+description = "Pops the value on top of the stack and stores it as the `n`-th user value of the userdata at `ud`. The userdata must have been created with at least `n + 1` user values (see `tea_new_userdatav`)."
+stack = "[-1, +0, -]"
+example = '''
+tea_new_userdatav(T, sizeof(int), 2);   /* [ud] */
+tea_push_string(T, "tag");
+tea_set_udvalue(T, -2, 0);              /* user value 0 = "tag" */
+tea_push_integer(T, 7);
+tea_set_udvalue(T, -2, 1);              /* user value 1 = 7 */
+'''
+see_also = ["tea_get_udvalue", "tea_new_userdatav", "tea_new_udatav"]
+
+[[entry.params]]
+name = "T"
+desc = "Teascript state"
+
+[[entry.params]]
+name = "ud"
+desc = "Stack index of the userdata"
+
+[[entry.params]]
+name = "n"
+desc = "Zero-based number of the user value"

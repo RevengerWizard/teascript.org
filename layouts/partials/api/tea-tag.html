@@ -1,0 +1,9 @@
+{{ $tagType := .Params.apiTagType }}{{ $tag := .Params.apiTag }}
+<div class="page-layout page-api page-api-index-page"><main class="page-main api-main"><article class="post-single"><header class="post-header"><div class="post-title-row"><h1 class="post-title">{{ .Title }}</h1></div></header><div class="post-content"><div class="api-index-table-wrap"><table class="api-index-table"><thead><tr><th>Name</th><th>Category</th><th>Kind</th><th>Origin</th><th>Summary</th></tr></thead><tbody>
+{{ range site.Data.api.tea._index.entities }}{{ $entity := . }}{{ $data := index site.Data.api.tea .data }}{{ $entityTags := $data.tags | default (slice $entity.slug) }}{{ $entitySince := $data.since }}
+    {{ if or (and (eq $tagType "tag") (in $entityTags $tag)) (and (eq $tagType "since") (eq $entitySince $tag)) }}<tr><td><a href="/api/tea/{{ $entity.slug }}/">{{ $data.title }}</a></td><td>—</td><td><span class="api-pill api-pill--kind api-pill--kind-{{ $data.kind | urlize }}">{{ $data.kind }}</span></td><td>{{ $data.origin }}</td><td>{{ $data.summary | markdownify }}</td></tr>{{ end }}
+    {{ range $data.entry }}{{ if ne .kind "section" }}{{ $entry := . }}{{ $entryTags := $entry.tags | default (slice $entity.slug) }}{{ $entrySince := $entry.since | default $data.since }}
+        {{ if or (and (eq $tagType "tag") (in $entryTags $tag)) (and (eq $tagType "since") (eq $entrySince $tag)) }}<tr><td><a href="/api/tea/{{ $entity.slug }}/#{{ $entry.name }}">{{ $entry.name }}</a></td><td><a href="/api/tea/{{ $entity.slug }}/">{{ $data.title }}</a></td><td><span class="api-pill api-pill--kind api-pill--kind-{{ $entry.kind | urlize }}">{{ $entry.kind }}</span></td><td>{{ $data.origin }}</td><td>{{ $entry.summary | markdownify }}</td></tr>{{ end }}
+    {{ end }}{{ end }}
+{{ end }}
+</tbody></table></div></div></article></main></div>
