@@ -20,7 +20,7 @@
 {{- $playTheme := "" }}
 {{- if .Params.play }}
 {{- $playIndex = resources.Get "js/play/index.js" }}
-{{- $playWorker := resources.Get "js/play/worker.js" }}
+{{- $playWorker := resources.Get "js/play/worker.js" | resources.Copy "play/worker.js" }}
 {{- $playMode := resources.Get "js/play/mode-tea.js" }}
 {{- $playTheme = resources.Get "js/play/theme-tea.js" }}
 {{- $playWasm := resources.Get "js/play/demo.wasm" }}
