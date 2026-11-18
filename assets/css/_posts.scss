@@ -472,6 +472,15 @@ h6:hover .anchor {
     border: 1px solid var(--border);
 }
 
+.paginav a:hover {
+    border-color: var(--accent);
+}
+
+.paginav a:hover .title,
+.paginav a:hover span:not(.title) {
+    color: var(--accent);
+}
+
 .paginav .title {
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -482,11 +491,6 @@ h6:hover .anchor {
 .paginav .prev,
 .paginav .next {
     width: auto;
-}
-
-.paginav span:not(.title):hover {
-    color: var(--accent);
-    box-shadow: 0 1px 0;
 }
 
 .paginav .next {
