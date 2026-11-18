@@ -1,0 +1,18 @@
+{{ define "main" }}
+<main class="play" aria-label="Teascript playground">
+    <div class="play__panes">
+        <section class="play__pane play__editor-pane" aria-labelledby="play-editor-title">
+            <div class="play__toolbar" role="toolbar" aria-label="Playground controls">
+                <button id="run" type="button">Run</button>
+                <button id="clear" type="button">Clear</button>
+                <button id="share" type="button">Share code</button>
+            </div>
+            <div id="editor" class="play__editor" aria-label="Teascript code editor">print("Hello, world!")</div>
+        </section>
+        <div class="play__splitter" role="separator" aria-label="Resize editor and terminal" aria-orientation="vertical" aria-valuemin="20" aria-valuemax="80" aria-valuenow="50" tabindex="0"></div>
+        <section class="play__pane play__terminal-pane" aria-labelledby="play-terminal-title">
+            <div id="terminal" class="play__terminal" aria-label="Program terminal"></div>
+        </section>
+    </div>
+</main>
+{{ end }}

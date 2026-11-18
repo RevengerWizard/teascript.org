@@ -1,0 +1,131 @@
+.play {
+    width: 100%;
+    height: calc(100vh - var(--header-height) - 16px);
+    min-height: 520px;
+    padding: 0;
+    display: flex;
+}
+
+.play__toolbar {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--border);
+    flex: 0 0 42px;
+}
+
+.play__toolbar button {
+    min-width: 72px;
+    padding: 5px 11px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--primary);
+    font-size: 13px;
+}
+
+.play__toolbar button:hover {
+    border-color: var(--accent);
+}
+
+.play__panes {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.play__pane {
+    display: flex;
+    height: 100%;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--theme);
+}
+
+.play__editor-pane,
+.play__terminal-pane {
+    flex: 1 1 50%;
+}
+
+.play__splitter {
+    z-index: 1;
+    flex: 0 0 8px;
+    cursor: col-resize;
+    touch-action: none;
+    background: var(--border);
+    transition: background-color 120ms ease;
+}
+
+.play__splitter:hover,
+.play__splitter:focus-visible,
+.play__splitter.is-dragging {
+    background: var(--accent);
+    outline: none;
+}
+
+#run {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: #171717;
+}
+
+.play__editor,
+.play__terminal {
+    width: 100%;
+    min-height: 0;
+    flex: 1;
+}
+
+.play__editor {
+    font-size: 14px;
+}
+
+.play__terminal {
+    overflow: hidden;
+    background: #000000;
+}
+
+.play__terminal .xterm {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+
+@media (max-width: 760px) {
+    .play {
+        height: auto;
+        min-height: 0;
+        padding: 0;
+    }
+
+    .play__panes {
+        flex-direction: column;
+        flex: none;
+        overflow: visible;
+    }
+
+    .play__pane {
+        height: 50vh;
+        min-height: 320px;
+    }
+
+    .play__editor,
+    .play__terminal {
+        min-height: 50vh;
+        flex: none;
+    }
+
+    .play__editor-pane,
+    .play__terminal-pane {
+        flex: none;
+    }
+
+    .play__splitter {
+        flex: 0 0 8px;
+        cursor: row-resize;
+    }
+}
