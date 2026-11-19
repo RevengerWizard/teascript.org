@@ -198,6 +198,38 @@
     background: var(--code-block-bg) !important;
 }
 
+.homepage-snippet {
+    position: relative;
+}
+
+.homepage-snippet__play {
+    position: absolute;
+    z-index: 1;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    color: var(--code-primary);
+}
+
+.homepage-snippet__play svg {
+    width: 18px;
+    height: 18px;
+}
+
+.homepage-snippet__play svg path {
+    stroke: currentColor;
+}
+
+.homepage-snippet__play:hover,
+.homepage-snippet__play:focus-visible {
+    color: var(--accent);
+    border-color: var(--accent);
+    outline: none;
+}
+
 .snippet-select {
     display: block;
     margin: 0 0 0.6rem;

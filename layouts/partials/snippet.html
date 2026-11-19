@@ -7,10 +7,28 @@
     {{ end }}
 </select>
 <div class="highlight homepage-snippet">
+<a class="homepage-snippet__play" href="/play/" aria-label="Open this example in Teascript Play" title="Open in Play">
+    {{ (resources.Get "svg/play.svg").Content | safeHTML }}
+</a>
 <pre class="chroma external"><code class="language-js external" id="external-code">loading...</code></pre>
 </div>
 <script>
 const codeBlock = document.getElementById('external-code');
+const playLink = document.querySelector('.homepage-snippet__play');
+
+playLink.addEventListener('click', async event => {
+    event.preventDefault();
+    const code = codeBlock.textContent;
+    try {
+        const value = window.encodePlayCodeParam ? await window.encodePlayCodeParam(code) : encodeURIComponent(code);
+        window.location.href = `/play/?code=${value}`;
+        return;
+    } catch (err) {
+        console.error('Could not compress example for Play:', err);
+    }
+    window.location.href = `/play/?code=${encodeURIComponent(code)}`;
+});
+
 
 async function snippet(file)
 {

@@ -45,10 +45,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.24.1/ace.js" crossorigin="anonymous" defer></script>
 {{- $playTheme = resources.Get "js/play/theme-tea.js" | resources.Fingerprint }}
 <script src="{{ $playTheme.RelPermalink }}" integrity="{{ $playTheme.Data.Integrity }}" crossorigin="anonymous" defer></script>
+{{- $playShareCode := resources.Get "js/play/share-code.js" | resources.Fingerprint }}
+<script src="{{ $playShareCode.RelPermalink }}" integrity="{{ $playShareCode.Data.Integrity }}" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.js" crossorigin="anonymous" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.js" defer></script>
 {{- $playIndex = resources.Get "js/play/index.js" | resources.Fingerprint }}
 <script src="{{ $playIndex.RelPermalink }}" integrity="{{ $playIndex.Data.Integrity }}" crossorigin="anonymous" defer></script>
+{{- end }}
+
+{{- if .IsHome }}
+{{- $playShareCode := resources.Get "js/play/share-code.js" | resources.Fingerprint }}
+<script src="{{ $playShareCode.RelPermalink }}" integrity="{{ $playShareCode.Data.Integrity }}" crossorigin="anonymous" defer></script>
 {{- end }}
 
 {{- /* Favicons */}}

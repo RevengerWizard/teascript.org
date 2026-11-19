@@ -4,6 +4,7 @@
     min-height: 520px;
     padding: 0;
     display: flex;
+    flex-direction: column;
 }
 
 .play__toolbar {
@@ -41,6 +42,7 @@
     display: flex;
     height: 100%;
     min-width: 0;
+    min-height: 0;
     flex-direction: column;
     overflow: hidden;
     background: var(--theme);
@@ -52,12 +54,19 @@
 }
 
 .play__splitter {
+    position: relative;
     z-index: 1;
-    flex: 0 0 8px;
+    flex: 0 0 5px;
     cursor: col-resize;
     touch-action: none;
     background: var(--border);
     transition: background-color 120ms ease;
+}
+
+.play__splitter::before {
+    position: absolute;
+    inset: 0 -9px;
+    content: "";
 }
 
 .play__splitter:hover,
@@ -81,12 +90,14 @@
 }
 
 .play__editor {
+    height: 100%;
     font-size: 14px;
 }
 
 .play__terminal {
     overflow: hidden;
     background: #000000;
+    padding-right: 8px;
 }
 
 .play__terminal .xterm {
@@ -97,35 +108,37 @@
 
 @media (max-width: 760px) {
     .play {
-        height: auto;
-        min-height: 0;
+        height: calc(100vh - var(--header-height) - 16px);
+        min-height: 400px;
         padding: 0;
     }
 
     .play__panes {
         flex-direction: column;
-        flex: none;
-        overflow: visible;
+        overflow: hidden;
     }
 
     .play__pane {
-        height: 50vh;
-        min-height: 320px;
+        height: auto;
+        min-height: 0;
     }
 
     .play__editor,
     .play__terminal {
-        min-height: 50vh;
-        flex: none;
+        min-height: 0;
     }
 
     .play__editor-pane,
     .play__terminal-pane {
-        flex: none;
+        flex: 1 1 50%;
     }
 
     .play__splitter {
-        flex: 0 0 8px;
+        flex: 0 0 5px;
         cursor: row-resize;
+    }
+
+    .play__splitter::before {
+        inset: -10px 0;
     }
 }

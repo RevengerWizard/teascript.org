@@ -36,8 +36,6 @@ ace.config.setModuleUrl("ace/mode/tea", modeUrl);
 
 const editor = ace.edit("editor", {
 	theme: "ace/theme/tea",
-	maxLines: 30,
-	minLines: 10,
 	fontSize: "12px",
 	wrap: true,
 	tabSize: 4,
@@ -63,7 +61,15 @@ if(githubPath != null)
 }
 else if(initialCode != null)
 {
-	set_editor_text(initialCode);
+	if(initialCode.startsWith("~"))
+	{
+		window.decodePlayCode(initialCode.slice(1))
+			.then(set_editor_text)
+			.catch(function (error) {
+				write_output("Could not decode shared code: " + (error.message || String(error)) + "\n", true);
+			});
+	}
+	else set_editor_text(initialCode);
 }
 
 // Terminal
@@ -304,13 +310,24 @@ async function run_input()
 
 function share()
 {
-	const arg = `?code=${encodeURIComponent(editor.getValue())}`;
-	const link = `${location.protocol}//${location.host}${location.pathname}${arg}`;
-	navigator.clipboard.writeText(link).then(function () {
+	const code = editor.getValue();
+	const encoded = window.encodePlayCodeParam ? window.encodePlayCodeParam(code) : Promise.resolve(encodeURIComponent(code));
+	encoded.then(function (value) {
+		const arg = `?code=${value}`;
+		const link = `${location.protocol}//${location.host}${location.pathname}${arg}`;
+		return navigator.clipboard.writeText(link).then(function () {
 		alert("Link to the snippet is in your clipboard now");
 		window.history.pushState("", "", arg);
-	}, function () {
+		}, function () {
 		alert("Failed to copy the link to the clipboard");
+		});
+	}).catch(function () {
+		const arg = `?code=${encodeURIComponent(code)}`;
+		const link = `${location.protocol}//${location.host}${location.pathname}${arg}`;
+		navigator.clipboard.writeText(link).then(function () {
+			alert("Link to the snippet is in your clipboard now");
+			window.history.pushState("", "", arg);
+		}, function () { alert("Failed to copy the link to the clipboard"); });
 	});
 }
 
@@ -323,26 +340,37 @@ const editorPane = document.querySelector(".play__editor-pane");
 const terminalPane = document.querySelector(".play__terminal-pane");
 const splitter = document.querySelector(".play__splitter");
 let paneRatio = 0.5;
+let resizeFrame = 0;
 
 function set_pane_ratio(ratio)
 {
 	paneRatio = Math.min(0.8, Math.max(0.2, ratio));
-	const available = panes.clientWidth - splitter.offsetWidth;
+	const vertical = window.matchMedia("(max-width: 760px)").matches;
+	const available = (vertical ? panes.clientHeight - splitter.offsetHeight : panes.clientWidth - splitter.offsetWidth);
 	editorPane.style.flex = `0 0 ${(available * paneRatio)}px`;
 	terminalPane.style.flex = `1 1 ${(available * (1 - paneRatio))}px`;
 	splitter.setAttribute("aria-valuenow", String(Math.round(paneRatio * 100)));
-	fit_terminal();
-	editor.resize();
+	splitter.setAttribute("aria-orientation", vertical ? "horizontal" : "vertical");
+	if(!resizeFrame)
+	{
+		resizeFrame = requestAnimationFrame(function () {
+			resizeFrame = 0;
+			fit_terminal();
+			editor.resize();
+		});
+	}
 }
 
 function move_splitter(event)
 {
 	const bounds = panes.getBoundingClientRect();
-	set_pane_ratio((event.clientX - bounds.left) / bounds.width);
+	if(window.matchMedia("(max-width: 760px)").matches)
+		set_pane_ratio((event.clientY - bounds.top - splitter.offsetHeight / 2) / (bounds.height - splitter.offsetHeight));
+	else
+		set_pane_ratio((event.clientX - bounds.left - splitter.offsetWidth / 2) / (bounds.width - splitter.offsetWidth));
 }
 
 splitter.addEventListener("pointerdown", function (event) {
-	if(window.matchMedia("(max-width: 760px)").matches) return;
 	event.preventDefault();
 	splitter.classList.add("is-dragging");
 	splitter.setPointerCapture(event.pointerId);
@@ -359,11 +387,16 @@ function stop_splitter_drag(event)
 splitter.addEventListener("pointerup", stop_splitter_drag);
 splitter.addEventListener("pointercancel", stop_splitter_drag);
 splitter.addEventListener("keydown", function (event) {
-	if(event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+	const vertical = window.matchMedia("(max-width: 760px)").matches;
+	const decrease = vertical ? "ArrowUp" : "ArrowLeft";
+	const increase = vertical ? "ArrowDown" : "ArrowRight";
+	if(event.key !== decrease && event.key !== increase) return;
 	event.preventDefault();
-	set_pane_ratio(paneRatio + (event.key === "ArrowRight" ? 0.02 : -0.02));
+	set_pane_ratio(paneRatio + (event.key === increase ? 0.02 : -0.02));
 });
 
 window.addEventListener("resize", function () {
-	if(!window.matchMedia("(max-width: 760px)").matches) set_pane_ratio(paneRatio);
+	set_pane_ratio(paneRatio);
 });
+
+set_pane_ratio(paneRatio);
