@@ -3,7 +3,10 @@
     <div class="play__panes">
         <section class="play__pane play__editor-pane" aria-labelledby="play-editor-title">
             <div class="play__toolbar" role="toolbar" aria-label="Playground controls">
-                <button id="run" type="button">Run</button>
+                <button id="run" type="button" aria-label="Run program" title="Run program">
+                    <span class="play__run-icon">{{ (resources.Get "svg/play.svg").Content | safeHTML }}</span>
+                    <span class="play__stop-icon">{{ (resources.Get "svg/stop.svg").Content | safeHTML }}</span>
+                </button>
                 <button id="share" type="button">Share code</button>
             </div>
             <div id="editor" class="play__editor" aria-label="Teascript code editor">print("Hello, world!")</div>

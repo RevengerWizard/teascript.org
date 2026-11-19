@@ -10,6 +10,9 @@
 {{- if eq site.Params.defaultTheme `dark` -}}
 {{- print " dark" }}
 {{- end -}}
+{{- if eq .Params.stickyHeader false -}}
+{{- print " no-sticky-header" }}
+{{- end -}}
 ">
     {{ partialCached "header.html" . .Section }}
     {{ block "main" . }}{{ end }}

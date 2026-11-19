@@ -7,6 +7,10 @@
     -webkit-backdrop-filter: blur(8px);
 }
 
+.no-sticky-header .header {
+    position: static;
+}
+
 .nav {
     display: flex;
     flex-wrap: wrap;

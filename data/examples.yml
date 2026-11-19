@@ -1,24 +1,119 @@
-- title: "Hello world"
-  file: "hello.tea"
-- title: "Fibonacci"
-  file: "fib.tea"
 - title: 99 Bottles
   file: "99bottles.tea"
-- title: Fizzbuzz
-  file: "fizzbuzz.tea"
-- title: Mandelbrot fractal
-  file: "fractal.tea"
-- title: "Roman numerals"
-  file: "roman.tea"
-- title: "2D Vector"
-  file: "vector.tea"
+
+- title: "Acronyms"
+  file: "acronyms.tea"
+
+- title: "Arrow functions"
+  file: "arrow.tea"
+
+- title: "Birds"
+  file: "birds.tea"
+
 - title: "Closure"
   file: "closure.tea"
+
 - title: "Coffee Maker"
   file: "coffee_maker.tea"
-- title: "π"
-  file: "pi.tea"
-- title: "Functional Linked List"
-  file: "link.tea"
+
+- title: "Counter"
+  file: "counter.tea"
+
+- title: "Throw a dice"
+  file: "dice.tea"
+
+- title: "Employee"
+  file: "employee.tea"
+
+#- title: "Extension methods"
+#  file: "extension.tea"
+
+- title: "Factorial"
+  file: "factorial.tea"
+
+- title: "Fibonacci"
+  file: "fib.tea"
+
+- title: Fizzbuzz
+  file: "fizzbuzz.tea"
+
+- title: Mandelbrot fractal
+  file: "fractal.tea"
+
+- title: "Guess the number"
+  file: "guess.tea"
+
+- title: "Hello world"
+  file: "hello.tea"
+
+- title: "HEX to RGB"
+  file: "hex2rgb.tea"
+
 - title: "Histogram"
   file: "histogram.tea"
+
+- title: "Iterator"
+  file: "iter.tea"
+
+- title: "Functional Linked List"
+  file: "link.tea"
+
+- title: "Monte Carlo"
+  file: "monte_carlo.tea"
+
+- title: "Palindrome words"
+  file: "palindrome.tea"
+
+- title: "Pascal Triangle"
+  file: "pascal_triangle.tea"
+
+- title: "Persons"
+  file: "person_list.tea"
+
+- title: "π"
+  file: "pi.tea"
+
+- title: "Point"
+  file: "point.tea"
+
+- title: "Rock, paper, scissors"
+  file: "rock_paper_scissors.tea"
+
+- title: "Roman numerals"
+  file: "roman.tea"
+
+- title: "Block scopes"
+  file: "scope.tea"
+
+#- title: "Scramble"
+#  file: "scramble.tea"
+
+- title: "Sieve primes"
+  file: "sieve.tea"
+
+- title: "Sine wave"
+  file: "sine.tea"
+
+- title: "Custom sort"
+  file: "sort.tea"
+
+- title: "Stalin sort"
+  file: "stalin_sort.tea"
+
+- title: "Sudoku table"
+  file: "sudoku_table.tea"
+
+- title: "Temperature"
+  file: "temperature.tea"
+
+- title: "Timer"
+  file: "timer.tea"
+
+- title: "Tree"
+  file: "tree.tea"
+
+- title: "2D Vector"
+  file: "vector.tea"
+
+- title: "Generate words"
+  file: "words.tea"

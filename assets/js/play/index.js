@@ -36,7 +36,7 @@ ace.config.setModuleUrl("ace/mode/tea", modeUrl);
 
 const editor = ace.edit("editor", {
 	theme: "ace/theme/tea",
-	fontSize: "12px",
+	fontSize: "14px",
 	wrap: true,
 	tabSize: 4,
 	useSoftTabs: false,
@@ -121,6 +121,15 @@ let inputControl = null;
 let waitingForInput = false;
 let running = false;
 let inputLine = "";
+let runGeneration = 0;
+const runButton = document.getElementById("run");
+
+function set_run_button_state(isRunning)
+{
+	runButton.classList.toggle("is-running", isRunning);
+	runButton.setAttribute("aria-label", isRunning ? "Stop program" : "Run program");
+	runButton.title = isRunning ? "Stop program" : "Run program";
+}
 
 // Bytes available for one stdin delivery (buffer minus the 8-byte header).
 function input_capacity()
@@ -194,6 +203,7 @@ function reset_run_state()
 	waitingForInput = false;
 	running = false;
 	inputLine = "";
+	set_run_button_state(false);
 }
 
 function kill_worker()
@@ -233,7 +243,7 @@ async function start_worker()
 
     try
     {
-		worker = new Worker(workerScriptUrl, { type: "classic", name: "teascript-playground" });
+		worker = new Worker(workerScriptUrl, { type: "module", name: "teascript-playground" });
     }
     catch (error)
     {
@@ -293,19 +303,34 @@ function clear_output()
 
 async function run_input()
 {
-	if(running) return;
+	if(running)
+	{
+		stop_input();
+		return;
+	}
 	clear_output();
 
 	running = true;
+	set_run_button_state(true);
+	const generation = ++runGeneration;
     if(!worker && !await start_worker())
     {
-		running = false;
+		if(generation === runGeneration) reset_run_state();
 		return;
 	}
+	if(generation !== runGeneration || !running) return;
 
 	inputBuffer = new SharedArrayBuffer(8 + 65528);
 	inputControl = new Int32Array(inputBuffer, 0, 2);
 	worker.postMessage({ code: editor.getValue(), sab: inputBuffer, wasm: wasmUrl });
+}
+
+function stop_input()
+{
+	if(!running) return;
+	++runGeneration;
+	kill_worker();
+	reset_run_state();
 }
 
 function share()
@@ -331,7 +356,7 @@ function share()
 	});
 }
 
-document.getElementById("run").addEventListener("click", run_input);
+runButton.addEventListener("click", run_input);
 document.getElementById("clear").addEventListener("click", clear_output);
 document.getElementById("share").addEventListener("click", share);
 

@@ -82,6 +82,9 @@ export class WasiPreview1 {
     this.env = options?.env || {}
     this.fs = options?.fs || new FSDummy()
     this.debug = !!options?.debug
+    this.sleepMs = options?.sleepMs || (() => {})
+    this.stdinPosition = 0
+    this.stdinBuffer = new Uint8Array()
 
     // Initialize file descriptors with stdin(0), stdout(1), stderr(2), /
     // fd is first number
@@ -436,7 +439,13 @@ export class WasiPreview1 {
     try {
       let content
       if (fd === 0) {
-        content = this.stdin()
+        if (this.stdinPosition >= this.stdinBuffer.length) {
+          // Flush prompts and other pending C output before waiting for user input.
+          if (this.wasm.fflush) this.wasm.fflush(0)
+          this.stdinBuffer = this.stdin()
+          this.stdinPosition = 0
+        }
+        content = this.stdinBuffer
       } else {
         content = this.fs.readFileSync(fileDesc.handle.path)
       }
@@ -446,7 +455,7 @@ export class WasiPreview1 {
         const buf = view.getUint32(ptr, true)
         const bufLen = view.getUint32(ptr + 4, true)
 
-        const start = fileDesc.handle.position
+        const start = fd === 0 ? this.stdinPosition : fileDesc.handle.position
         const end = Math.min(start + bufLen, content.length)
         const bytesToRead = end - start
 
@@ -454,7 +463,8 @@ export class WasiPreview1 {
 
         mem.set(new Uint8Array(content.slice(start, end)), buf)
         totalRead += bytesToRead
-        fileDesc.handle.position += bytesToRead
+        if (fd === 0) this.stdinPosition += bytesToRead
+        else fileDesc.handle.position += bytesToRead
 
         if (bytesToRead < bufLen) break
       }
@@ -1207,25 +1217,42 @@ export class WasiPreview1 {
 
   // Poll Operations
   poll_oneoff(in_, out, nsubscriptions, nevents) {
-    // Basic implementation that just processes all subscriptions immediately
     const view = new DataView(this.wasm.memory.buffer)
-    let numEvents = 0
-
+    const timers = []
+    let shortest = Infinity
     for (let i = 0; i < nsubscriptions; i++) {
-      const subPtr = in_ + i * 48 // size of subscription struct
-      const userdata = view.getBigUint64(subPtr, true)
+      const subPtr = in_ + i * 48
       const type = view.getUint8(subPtr + 8)
+      if (type !== defs.EVENTTYPE_CLOCK) continue
 
-      // Write event
-      const eventPtr = out + numEvents * 32 // size of event struct
-      view.setBigUint64(eventPtr, userdata, true)
-      view.setUint8(eventPtr + 8, type)
-      view.setUint8(eventPtr + 9, defs.EVENTRWFLAGS_FD_READWRITE_HANGUP)
-      view.setUint16(eventPtr + 10, 0, true) // error
+      const clockId = view.getUint32(subPtr + 16, true)
+      let timeoutNs = view.getBigUint64(subPtr + 24, true)
+      if (view.getUint16(subPtr + 40, true) & 1) {
+        let nowNs
+        if (clockId === defs.CLOCKID_REALTIME) nowNs = BigInt(Date.now()) * 1_000_000n
+        else if (clockId === defs.CLOCKID_MONOTONIC) nowNs = BigInt(Math.floor(performance.now() * 1e6))
+        else continue
+        timeoutNs = timeoutNs > nowNs ? timeoutNs - nowNs : 0n
+      }
 
-      numEvents++
+      const timeoutMs = Number(timeoutNs) / 1e6
+      timers.push({ userdata: view.getBigUint64(subPtr, true), timeoutMs })
+      shortest = Math.min(shortest, timeoutMs)
     }
 
+    if (!timers.length) return defs.ERRNO_NOSYS
+    if (this.wasm.fflush) this.wasm.fflush(0)
+    this.sleepMs(shortest)
+
+    let numEvents = 0
+    for (const timer of timers) {
+      if (timer.timeoutMs > shortest + 1) continue
+      const eventPtr = out + numEvents * 32
+      view.setBigUint64(eventPtr, timer.userdata, true)
+      view.setUint16(eventPtr + 8, defs.ERRNO_SUCCESS, true)
+      view.setUint8(eventPtr + 10, defs.EVENTTYPE_CLOCK)
+      numEvents++
+    }
     view.setUint32(nevents, numEvents, true)
     return defs.ERRNO_SUCCESS
   }

@@ -26,8 +26,11 @@
     font-size: 13px;
 }
 
-.play__toolbar button:hover {
+.play__toolbar button:hover,
+.play__toolbar button:focus-visible {
     border-color: var(--accent);
+    color: var(--accent);
+    outline: none;
 }
 
 .play__panes {
@@ -77,9 +80,36 @@
 }
 
 #run {
-    border-color: var(--accent);
-    background: var(--accent);
-    color: #171717;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+}
+
+#run svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+
+#run svg path {
+    stroke: currentColor;
+}
+
+#run svg rect {
+    fill: currentColor;
+}
+
+.play__stop-icon {
+    display: none;
+}
+
+#run.is-running .play__run-icon {
+    display: none;
+}
+
+#run.is-running .play__stop-icon {
+    display: block;
 }
 
 .play__editor,
