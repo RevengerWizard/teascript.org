@@ -9,6 +9,43 @@ branch = "master"
 sections = ["guide", "docs", "api"]
 defaultTheme = "dark"
 
+[[params.home]]
+version = "v0.0.0"
+tagline = '''
+A <span class="tagline-accent">small</span>, <span class="tagline-accent">fast</span> scripting language you can <span class="tagline-accent">embed</span>
+'''
+content = """
+<br/>
+
+Teascript is a lightweight, embeddable scripting language designed for simplicity and speed.
+
+<br/>
+
+With a minimal footprint, a fast single-pass compiler, and a flexible class system, it’s ideal for game development, scripting, and lightweight applications.
+
+<br/>
+
+<span class="homepage-features-title">Main features</span>
+
+<br/>
+
+* Single-pass compiler, tight bytecode
+* Few built-in types
+* Lexical scoping
+* Dynamic typing
+* Operator overloading
+* High order functions and classes
+* Closures
+* Garbage collected
+"""
+after = """
+"""
+buttons = [
+  { label = "Download", url = "/download/" },
+  { label = "Read the Guide", url = "/guide/getting-started/" },
+  { label = "C API", url = "/api/c" }
+]
+
 [taxonomies]
 
 [[menu.main]]

@@ -1,9 +1,38 @@
 {{ define "main" }}
 
 <main class="main">
+    {{ $home := index site.Params.home 0 }}
+    {{ with $home.tagline }}
+    <div class="homepage-tagline">
+        <div class="homepage-tagline__logo" aria-hidden="true">
+            {{ (resources.Get "svg/logo.svg").Content | safeHTML }}
+        </div>
+        <div class="homepage-content homepage-content--before">
+            {{ . | markdownify }}
+        </div>
+        <div class="homepage-actions">
+            {{ range $home.buttons }}
+            <a href="{{ .url }}">{{ .label }}</a>
+            {{ end }}
+        </div>
+        <small class="homepage-meta">
+            <span>{{ $home.version }}</span>
+            <span class="homepage-meta__separator" aria-hidden="true">·</span>
+            <span>MIT</span>
+            <span class="homepage-meta__separator" aria-hidden="true">·</span>
+            <span>written in C</span>
+        </small>
+    </div>
+    {{ end }}
     {{ partial "snippet" . }}
-    
-    {{ .Content }}
+    <div class="homepage-content">
+        {{ $home.content | markdownify }}
+    </div>
+    {{ with $home.after }}
+    <div class="homepage-content homepage-content--after">
+        {{ . | markdownify }}
+    </div>
+    {{ end }}
 </main>
 
 {{ end }}
