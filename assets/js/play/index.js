@@ -19,6 +19,28 @@ const workerUrl = document.querySelector('meta[name="play-worker-url"]')?.conten
 const modeUrl = document.querySelector('meta[name="play-mode-url"]')?.content;
 const serviceWorkerUrl = document.querySelector('meta[name="play-sw-url"]')?.content;
 const wasmUrl = document.querySelector('meta[name="play-wasm-url"]')?.content;
+let wasmBytesPromise;
+
+function get_wasm_bytes()
+{
+	if(!wasmBytesPromise)
+	{
+		wasmBytesPromise = (async function () {
+			const cache = "caches" in window ? await caches.open("teascript-play-wasm-v2") : null;
+			const absoluteWasmUrl = new URL(wasmUrl, location.href).href;
+			let response = cache ? await cache.match(absoluteWasmUrl) : null;
+			if(!response)
+			{
+				response = await fetch(absoluteWasmUrl);
+				if(!response.ok) throw new Error("HTTP " + response.status + " while loading the Teascript WASM module");
+				if(cache) await cache.put(absoluteWasmUrl, response.clone());
+			}
+			return response.arrayBuffer();
+		})();
+		wasmBytesPromise.catch(function () { wasmBytesPromise = null; });
+	}
+	return wasmBytesPromise;
+}
 
 if ("serviceWorker" in navigator && window.isSecureContext && serviceWorkerUrl)
 {
@@ -50,6 +72,32 @@ editor.renderer.setScrollMargin(10, 10);
 const params = new URLSearchParams(window.location.search);
 const githubPath = params.get("github");
 const initialCode = params.get("code");
+const initialSnippet = params.get("snippet");
+const playSnippetSelect = document.getElementById("play-snippet");
+
+function load_example(file)
+{
+	return get_contents(`https://raw.githubusercontent.com/RevengerWizard/teascript/master/example/${encodeURIComponent(file)}`)
+		.then(function (code) {
+			set_editor_text(code.trim());
+		})
+		.catch(function (error) {
+			write_output("Could not load example: " + (error.message || String(error)) + "\n", true);
+		});
+}
+
+playSnippetSelect.addEventListener("change", function () {
+	const url = new URL(window.location.href);
+	if(playSnippetSelect.value)
+	{
+		url.searchParams.set("snippet", playSnippetSelect.value);
+		url.searchParams.delete("code");
+		url.searchParams.delete("github");
+		load_example(playSnippetSelect.value);
+	}
+	else url.searchParams.delete("snippet");
+	history.replaceState(null, "", url.pathname + url.search + url.hash);
+});
 
 if(githubPath != null)
 {
@@ -58,6 +106,11 @@ if(githubPath != null)
 		.catch(function (error) {
 			console.error("Could not load snippet from GitHub:", error);
 		});
+}
+else if(initialSnippet != null && Array.from(playSnippetSelect.options).some(option => option.value === initialSnippet))
+{
+	playSnippetSelect.value = initialSnippet;
+	load_example(initialSnippet);
 }
 else if(initialCode != null)
 {
@@ -86,6 +139,7 @@ const terminal = new Terminal({
 const fitAddon = new FitAddon.FitAddon();
 terminal.loadAddon(fitAddon);
 terminal.open(terminalElement);
+terminal.write('Type "tea" to start the Teascript REPL.\r\n$ ');
 
 function fit_terminal()
 {
@@ -121,6 +175,8 @@ let inputControl = null;
 let waitingForInput = false;
 let running = false;
 let inputLine = "";
+let commandLine = "";
+let runningRepl = false;
 let runGeneration = 0;
 const runButton = document.getElementById("run");
 
@@ -184,19 +240,50 @@ function append_char(char)
 }
 
 terminal.onData(function(input) {
-	if(!waitingForInput) return;
+	if(!waitingForInput && (running || input.includes("\u001b"))) return;
 	// Ignore escape sequences (arrows, delete, ...); this is a simple line editor.
 	if(input.includes("\u001b")) return;
 
     for(const char of input)
     {
-		if(!waitingForInput) break; // input was submitted mid-paste
-
-		if(char === "\r" || char === "\n") submit_input();
-		else if(char === "\x7f" || char === "\b") erase_last_char();
-		else if(char >= " ") append_char(char);
+		if(waitingForInput)
+		{
+			if(char === "\r" || char === "\n") submit_input();
+			else if(char === "\x7f" || char === "\b") erase_last_char();
+			else if(char >= " ") append_char(char);
+		}
+		else if(!running)
+		{
+			if(char === "\r" || char === "\n") submit_command();
+			else if(char === "\x7f" || char === "\b") erase_command_char();
+			else if(char >= " ") append_command_char(char);
+		}
 	}
 });
+
+function append_command_char(char)
+{
+	commandLine += char;
+	terminal.write(char);
+}
+
+function erase_command_char()
+{
+	if(!commandLine.length) return;
+	commandLine = Array.from(commandLine).slice(0, -1).join("");
+	terminal.write("\b \b");
+}
+
+function submit_command()
+{
+	const command = commandLine.trim();
+	commandLine = "";
+	terminal.write("\r\n");
+	const teaCommand = command.match(/^tea(?:\s+(.*))?$/);
+	if(teaCommand) start_execution("", "tea", teaCommand[1] || "");
+	else if(command) { write_output("command not found: " + command + "\r\n", true); terminal.write("$ "); }
+	else terminal.write("$ ");
+}
 
 function reset_run_state()
 {
@@ -264,9 +351,11 @@ async function start_worker()
 				terminal.focus();
 				break;
 			case "done":
+				const wasRepl = runningRepl;
+				runningRepl = false;
 				reset_run_state();
 				if(message.status !== 0) write_output("Teascript returned error status " + message.status + "\n", true);
-				else write_output("\n");
+				write_output(wasRepl ? "\r\n$ " : "\n$ ");
 				break;
 			case "trap":
 				reset_run_state();
@@ -299,20 +388,24 @@ function clear_output()
 {
 	if(running) return;
 	terminal.reset();
+	terminal.write("$ ");
 }
 
-async function run_input()
+async function start_execution(code, mode, args = "")
 {
-	if(running)
-	{
-		stop_input();
-		return;
-	}
-	clear_output();
-
 	running = true;
+	runningRepl = mode === "repl";
 	set_run_button_state(true);
 	const generation = ++runGeneration;
+	let wasmBytes;
+	try { wasmBytes = await get_wasm_bytes(); }
+	catch(error)
+	{
+		reset_run_state();
+		write_output("Could not load Teascript WASM: " + (error.message || String(error)) + "\n", true);
+		return;
+	}
+	if(generation !== runGeneration || !running) return;
     if(!worker && !await start_worker())
     {
 		if(generation === runGeneration) reset_run_state();
@@ -322,7 +415,15 @@ async function run_input()
 
 	inputBuffer = new SharedArrayBuffer(8 + 65528);
 	inputControl = new Int32Array(inputBuffer, 0, 2);
-	worker.postMessage({ code: editor.getValue(), sab: inputBuffer, wasm: wasmUrl });
+	const workerWasmBytes = wasmBytes.slice(0);
+	worker.postMessage({ code, mode, args, sab: inputBuffer, wasm: wasmUrl, wasmBytes: workerWasmBytes }, [workerWasmBytes]);
+}
+
+async function run_input()
+{
+	if(running) { stop_input(); return; }
+	terminal.reset();
+	start_execution(editor.getValue(), "program");
 }
 
 function stop_input()
@@ -331,6 +432,8 @@ function stop_input()
 	++runGeneration;
 	kill_worker();
 	reset_run_state();
+	runningRepl = false;
+	terminal.write("\r\n$ ");
 }
 
 function share()

@@ -7,6 +7,12 @@
                     <span class="play__run-icon">{{ (resources.Get "svg/play.svg").Content | safeHTML }}</span>
                     <span class="play__stop-icon">{{ (resources.Get "svg/stop.svg").Content | safeHTML }}</span>
                 </button>
+                <select id="play-snippet" class="play__snippet-select" aria-label="Load an example">
+                    <option value="">Load example…</option>
+                    {{ range .Site.Data.examples }}
+                    <option value="{{ .file }}">{{ .title }}</option>
+                    {{ end }}
+                </select>
                 <button id="share" type="button">Share code</button>
             </div>
             <div id="editor" class="play__editor" aria-label="Teascript code editor">print("Hello, world!")</div>

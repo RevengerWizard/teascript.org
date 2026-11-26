@@ -23,14 +23,24 @@
 {{- $playWorker := resources.Get "js/play/worker.js" | resources.Copy "play/worker.js" }}
 {{- $playWasi := resources.Get "js/play/wasi.js" | resources.Copy "play/wasi.js" }}
 {{- $playWasiDefs := resources.Get "js/play/defs.js" | resources.Copy "play/defs.js" }}
+{{- $playDir := resources.Get "js/play/dir.js" | resources.Copy "play/dir.js" }}
+{{- $fsIndex := resources.Get "js/play/fs/index.json" | resources.Copy "play/fs/index.json" }}
+{{- $fsIndexRelPermalink := $fsIndex.RelPermalink }}
+{{- $fsBytecode := resources.Get "js/play/fs/script/bc.tea" | resources.Copy "play/fs/script/bc.tea" }}
+{{- $fsBytecodeRelPermalink := $fsBytecode.RelPermalink }}
+{{- $fsBytecodeSave := resources.Get "js/play/fs/script/bcsave.tea" | resources.Copy "play/fs/script/bcsave.tea" }}
+{{- $fsBytecodeSaveRelPermalink := $fsBytecodeSave.RelPermalink }}
+{{- $fsVmdef := resources.Get "js/play/fs/script/vmdef.tea" | resources.Copy "play/fs/script/vmdef.tea" }}
+{{- $fsVmdefRelPermalink := $fsVmdef.RelPermalink }}
 {{- $playMode := resources.Get "js/play/mode-tea.js" }}
 {{- $playTheme = resources.Get "js/play/theme-tea.js" }}
-{{- $playWasm := resources.Get "js/play/demo.wasm" }}
+{{- $playWasm := resources.Get "js/play/demo.wasm" | resources.Fingerprint }}
 {{- $playSw := resources.Get "js/play/sw.js" | resources.Copy "sw.js" }}
 <meta name="play-script-url" content="{{ $playIndex.RelPermalink }}">
 <meta name="play-worker-url" content="{{ $playWorker.RelPermalink }}">
 <meta name="play-wasi-url" content="{{ $playWasi.RelPermalink }}">
 <meta name="play-wasi-defs-url" content="{{ $playWasiDefs.RelPermalink }}">
+<meta name="play-dir-url" content="{{ $playDir.RelPermalink }}">
 <meta name="play-mode-url" content="{{ $playMode.RelPermalink }}">
 <meta name="play-theme-url" content="{{ $playTheme.RelPermalink }}">
 <meta name="play-wasm-url" content="{{ $playWasm.RelPermalink }}">

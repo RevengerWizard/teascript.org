@@ -1,0 +1,190 @@
+/*
+** Teascript bytecode listing module
+**
+** This module lists the bytecode of a Teascript function
+**
+*/
+
+from debug import funcinfo, funck, funcbc, funcuv, funcline
+from vmdef import bcnames
+
+function ctlsub(c)
+{
+    const b = c.byte(0)
+    if c == "\n" { return "n" }
+    else if c == "\r" { return "r" }
+    else if c == "\t" { return "t" }
+    else if b < 32 or b == 127
+    {
+        return "\\%03d".format(b)
+    }
+    return c
+}
+
+function escapestr(val)
+{
+    if typeof(val) == "string"
+    {
+        var res = ""
+        const fmt = "%q".format(val)
+        for const c in fmt
+        {
+            res += ctlsub(c)
+        }
+        return res
+    }
+    return tostring(val)
+}
+
+function bcline(func, ofs, out)
+{
+    out.write("%04d ".format(ofs))
+    const line = funcline(func, ofs)
+    if ofs > 0 and line == funcline(func, ofs - 1)
+    {
+        out.write("   | ")
+    }
+    else
+    {
+        out.write("%4d ".format(line))
+    }
+
+    const pc = funcbc(func, ofs)
+    const bcname = bcnames[pc]
+    out.write("%-16s ".format(bcname))
+
+    switch bcname
+    case "CONSTANT", "PUSHATTR",
+        "GETATTR", "SETATTR",
+        "DEFMODULE", "GETGLOBAL",
+        "GETSUPER",
+        "CLASS",
+        "IMPORTFMT",
+        "IMPORTSTR",
+        "IMPORTNAME",
+        "IMPORTVAR"
+    {
+        const k = funcbc(func, ofs + 1)
+        out.write("%4d %s\n".format(k, escapestr(funck(func, k))))
+        return ofs + 2
+    }
+    case "DEFOPT",
+        "UNPACKREST",
+        "FORITER", "GETITER"
+    {
+        const slot1 = funcbc(func, ofs + 1)
+        const slot2 = funcbc(func, ofs + 2)
+        out.write("%4d     %4d\n".format(slot1, slot2))
+        return ofs + 3
+    }
+    case "METHOD"
+    {
+        const k = funcbc(func, ofs + 1)
+        const slot1 = funcbc(func, ofs + 2)
+        out.write("%4d %4d %s\n".format(k, slot1, escapestr(funck(func, k))))
+        return ofs + 3
+    }
+    case "KNIL", "KTRUE", "KFALSE",
+        "POP", "RANGE",
+        "LIST", "MAP",
+        "GETIDX", "SETIDX", "PUSHIDX",
+        "LISTEXTEND", "LISTITEM",
+        "MAPFIELD",
+        "ISEQ", "IS", "IN",
+        "ISGT", "ISGE",
+        "ISLT", "ISLE",
+        "ADD", "SUB",
+        "MUL", "DIV",
+        "MOD", "POW",
+        "BAND", "BOR", "BNOT", "BXOR",
+        "LSHIFT", "RSHIFT",
+        "NOT", "NEG",
+        "CLOSEUPVAL", "RETURN",
+        "INHERIT",
+        "ISTYPE",
+        "IMPORTALIAS",
+        "IMPORTEND",
+        "END"
+    {
+        out.write('\n')
+        return ofs + 1
+    }
+    case "GETLOCAL", "SETLOCAL",
+        "GETUPVAL", "SETUPVAL",
+        "GETMODULE", "SETMODULE",
+        "MULTICASE", "UNPACK",
+        "CALL", "NEW"
+    {
+        const slot = funcbc(func, ofs + 1)
+        out.write("%4d\n".format(slot))
+        return ofs + 2
+    }
+    case "SPREAD"
+    {
+        const sign = bcname == "LOOP" ? -1 : 1
+        var pos = funcbc(func, ofs + 1) << 8
+        pos |= funcbc(func, ofs + 2)
+        const nargs = funcbc(func, ofs + 3)
+        out.write("%4d -> %d (%d args)\n".format(ofs, ofs + 4 + pos, nargs))
+        return ofs + 4
+    }
+    case "JMPCMP", "JMP",
+        "JMPFALSE", "JMPNIL",
+        "LOOP"
+    {
+        const sign = bcname == "LOOP" ? -1 : 1
+        var jump = funcbc(func, ofs + 1) << 8
+        jump |= funcbc(func, ofs + 2)
+        out.write("%4d -> %d\n".format(ofs, ofs + 3 + sign * jump))
+        return ofs + 3
+    }
+    case "INVOKE", "SUPER"
+    {
+        const k = funcbc(func, ofs + 1)
+        const nargs = funcbc(func, ofs + 2)
+        out.write("   (%d args) %4d %s\n".format(nargs, k, escapestr(funck(func, k))))
+        return ofs + 3;
+    }
+    case "CLOSURE"
+    {
+        const k = funcbc(func, ofs + 1)
+        const proto = funck(func, k)
+        out.write("%4d %s\n".format(k, escapestr(proto)))
+
+        const upvalues = funcinfo(proto)['upvalues']
+        for var j = 0; j < upvalues; j += 1
+        {
+            const uv = funcuv(proto, j)
+            const islocal = (uv & 0x0100) != 0
+            const idx = uv & 0xff
+            out.write("        |                     %s %d\n".format(islocal ? "local" : "upvalue", idx))
+        }
+        return ofs + 2
+    }
+    default
+    {
+        return ofs + 1
+    }
+}
+
+export function bcdump(func, out)
+{
+    const fi = funcinfo(func)
+    if fi['children']
+    {
+        for var i = 0; i < fi['kconsts']; i += 1
+        {
+            const k = funck(fi['proto'], i)
+            if typeof(k) == 'proto'
+            {
+                bcdump(k, out)
+            }
+        }
+    }
+    out.write("== '%s' ==\n".format(fi['name']))
+    var ofs = 0
+    while ofs < fi['bytecodes']
+    {
+        ofs = bcline(fi['proto'], ofs, out)
+    }
+}

@@ -22,15 +22,8 @@ const playLink = document.querySelector('.homepage-snippet__play');
 
 playLink.addEventListener('click', async event => {
     event.preventDefault();
-    const code = codeBlock.textContent;
-    try {
-        const value = window.encodePlayCodeParam ? await window.encodePlayCodeParam(code) : encodeURIComponent(code);
-        window.location.href = `/play/?code=${value}`;
-        return;
-    } catch (err) {
-        console.error('Could not compress example for Play:', err);
-    }
-    window.location.href = `/play/?code=${encodeURIComponent(code)}`;
+    const file = document.getElementById('snippet').value;
+    window.location.href = `/play/?snippet=${encodeURIComponent(file)}`;
 });
 
 

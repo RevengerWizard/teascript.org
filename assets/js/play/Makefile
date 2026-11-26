@@ -18,9 +18,9 @@ $(GLUE_OBJ): $(GLUE_SRC)
 	$(E) "WASM CC      $<"
 	$(Q) $(WASM_CC) $(WASM_CFLAGS) -c -o $@ $<
 
-$(TARGET): $(LIBTEA_WASM) $(GLUE_OBJ)
+$(TARGET): Makefile $(LIBTEA_WASM) $(GLUE_OBJ)
 	$(E) "WASM LD      $@"
-	$(Q) $(WASM_CC) $(WASM_LDFLAGS) -o $@ $(LIBTEA_WASM) $(GLUE_OBJ)
+	$(Q) $(WASM_CC) $(WASM_LDFLAGS) -o $@ $(GLUE_OBJ) $(LIBTEA_WASM)
 	$(E) "OK        Successfully built demo.wasm"
 #@echo "WASM OPT     $@"
 #@$(WASM_OPT) $(WASM_OPT_FLAGS) $@ -o $@

@@ -1,4 +1,5 @@
 import { WasiPreview1 } from "./wasi.js";
+import { loadDirectoryFS } from "./dir.js";
 
 let memory;
 let wasmUrl;
@@ -17,9 +18,9 @@ function sleep_ms(milliseconds)
 	Atomics.wait(sleeper, 0, 0, Math.min(milliseconds, 2147483647));
 }
 
-function make_imports()
+function make_imports(fs)
 {
-	wasi = new WasiPreview1({ sleepMs: sleep_ms });
+	wasi = new WasiPreview1({ sleepMs: sleep_ms, fs });
 	wasi.stdout = function (bytes) {
 		postMessage({ type: "out", text: decoders[1].decode(bytes, { stream: true }), error: false });
 	};
@@ -48,25 +49,25 @@ function make_imports()
 async function get_wasm()
 {
 	if(wasmExports) return wasmExports;
-	const imports = make_imports();
-	let result;
-	try
-	{
-		result = await WebAssembly.instantiateStreaming(fetch(wasmUrl), imports);
-	}
-	catch
-	{
-		const response = await fetch(wasmUrl);
-		result = await WebAssembly.instantiate(await response.arrayBuffer(), imports);
-	}
+	const fs = await loadDirectoryFS(
+		new URL("./fs/", self.location.href).href,
+		new URL("./fs/index.json", self.location.href).href
+	);
+	const imports = make_imports(fs);
+	const { wasmBytes } = currentRun;
+	const result = await WebAssembly.instantiate(wasmBytes, imports);
 	wasmExports = result.instance.exports;
 	memory = wasmExports.memory;
 	wasi.setup(wasmExports);
+	if(typeof wasmExports._initialize === "function") wasmExports._initialize();
 	return wasmExports;
 }
 
+let currentRun;
+
 onmessage = async event => {
-	const { code, sab, wasm } = event.data;
+	const { code, mode, args, sab, wasm, wasmBytes } = event.data;
+	currentRun = { wasmBytes };
 	wasmUrl = new URL(wasm, self.location.href);
 	ctrl = new Int32Array(sab, 0, 2);
 	inputData = new Uint8Array(sab, 8);
@@ -77,12 +78,27 @@ onmessage = async event => {
 	try
 	{
 		const exports = await get_wasm();
-		const bytes = new TextEncoder().encode(code);
-		const ptr = exports.malloc(bytes.length + 1);
-		new Uint8Array(memory.buffer, ptr, bytes.length).set(bytes);
-		new Uint8Array(memory.buffer, ptr + bytes.length, 1)[0] = 0;
-		const status = exports.tea_demo(ptr);
-		exports.free(ptr);
+		let status;
+		if(mode === "tea")
+		{
+			const main = exports.tea_cli || exports.tea_repl;
+			if(typeof main !== "function")
+				throw new Error("WASM does not export tea_cli (exports: " + Object.keys(exports).join(", ") + ")");
+			const bytes = new TextEncoder().encode(args + "\0");
+			const ptr = exports.malloc(bytes.length);
+			new Uint8Array(memory.buffer, ptr, bytes.length).set(bytes);
+			status = main(ptr);
+			exports.free(ptr);
+		}
+		else
+		{
+			const bytes = new TextEncoder().encode(code);
+			const ptr = exports.malloc(bytes.length + 1);
+			new Uint8Array(memory.buffer, ptr, bytes.length).set(bytes);
+			new Uint8Array(memory.buffer, ptr + bytes.length, 1)[0] = 0;
+			status = exports.tea_demo(ptr);
+			exports.free(ptr);
+		}
 		postMessage({ type: "done", status });
 	}
 	catch(error)

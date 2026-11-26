@@ -26,11 +26,29 @@
     font-size: 13px;
 }
 
+.play__snippet-select {
+    width: 240px;
+    max-width: 40vw;
+    padding: 5px 28px 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--primary);
+    background: var(--theme);
+    font-size: 13px;
+    cursor: pointer;
+}
+
 .play__toolbar button:hover,
 .play__toolbar button:focus-visible {
     border-color: var(--accent);
     color: var(--accent);
     outline: none;
+}
+
+.play__snippet-select:hover,
+.play__snippet-select:focus-visible {
+	border-color: var(--accent);
+	outline: none;
 }
 
 .play__panes {
